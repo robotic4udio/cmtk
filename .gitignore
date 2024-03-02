@@ -1,0 +1,18 @@
+# Standard c++ .gitignore file
+
+# Ignore build files
+build/
+
+# Ignore temp files
+*.o
+*.out
+*.exe
+*.log
+*.swp
+*.swo
+*.swn
+
+# Ignore Visual Studio Code settings
+.vscode/
+
+
