@@ -1,11 +1,15 @@
 #include "Chords.h"
 #include "InterfaceGPT.h"
+#include "../../SimpleJSON/json.hpp"
 
-#define API_KEY "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"
+#define API_KEY "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"
+
+using json::JSON;
+using namespace cmtk;
 
 int main() {
     // Create a Chords object
-    Chords chord;
+    Chord chord;
 
   /*   // Major Scale (Ionian Mode)
     std::cout << "Major Scale Chords: " << std::endl;
@@ -62,12 +66,27 @@ int main() {
     std::cout << "2-5-1 Chord Progression: " << std::endl; 
 */
 
-    chord.printProgression({"C7", "d7", "e7", "F7", "G7", "a7", "b°7", "C7"});
+
+    ChordProgression cp("Cm|FMaj7|Eb7|B+|G7");
+    cp.print();
+
+
 
     // Create a InterfaceGPT object
-    InterfaceGPT gpt;
+    // InterfaceGPT gpt;
     // Print the response from the OpenAI API
-    std::cout << gpt.sendPrompt("What is the meaning of life?", API_KEY) << std::endl;
+    // auto response = gpt.generateMusic("Sad piece in D minor", API_KEY, "gpt-4-1106-preview");
+
+    // std::cout << response << std::endl;
+
+
+    // Create a JSON object and print it
+    // JSON Obj = JSON::Load(response);
+
+    // Print the JSON object
+    // auto content = Obj["choices"][0]["message"]["content"];
+    
+    // std::cout << content << std::endl;
 
 
     return 0;
