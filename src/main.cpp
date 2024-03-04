@@ -64,13 +64,52 @@ int main() {
     chord.printProgression({"ii7", "V7", "I7", "I7"});
 
     std::cout << "2-5-1 Chord Progression: " << std::endl; 
-*/
+
 
 
     ChordProgression cp("Cm|FMaj7|Eb7|B+|G7");
     cp.print();
 
 
+    // Andalusian
+    cp.setChordProgression("i|-bVII|-bVI|-V7");
+    cp.print();
+
+    // Axis
+
+    cp.setChordProgression("I|-V|-vi|IV");
+    cp.print();
+
+    // Summertime
+    cp.setChordProgression("i6|-ii6|");
+    cp.print();
+
+    
+
+
+    ChordProgressions chordProgressions;
+    chordProgressions.print();
+
+
+    // Andalusian
+    cp.setChordProgression("i|-bVII|-bVI|-V7");
+    cp.print();
+    
+    ChordSequencer cs;
+    cs.setChordProgression(cp);
+    
+    for(int i = 0; i < 16; i++) {
+        auto tmp = cs.next();
+        for(auto x : tmp) std::cout << x << " ";
+        std::cout << std::endl;
+    }
+
+    */
+
+
+    chord.setChord("CmMaj7");
+    chord.printIntervals();
+    chord.print();
 
     // Create a InterfaceGPT object
     // InterfaceGPT gpt;
