@@ -1,6 +1,6 @@
 #include "Chords.h"
 #include "InterfaceGPT.h"
-#include "../../SimpleJSON/json.hpp"
+#include "../libraries/SimpleJSON/json.hpp"
 
 #define API_KEY "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"
 
@@ -50,14 +50,7 @@ int main() {
     // Dominant 7th Chords
   
     // Print chord progression
-    std::cout << "Chord Progression: " << std::endl;
-    chord.printProgression({"I", "IV", "V", "I"});
-    std::cout << "Andalusian Chord Progression: " << std::endl;
-    chord.printProgression({"i", "bVII", "bVI", "V7no5"});
-    std::cout << "Axis Chord Progression: " << std::endl;
-    chord.printProgression({"I", "V7no5", "vi", "iv"});
-    std::cout << "Summertime Chord Progression: " << std::endl;
-    chord.printProgression({"iv", "ii6no5", "iv7", "bVI7"});
+
 
     std::cout << "2-5-1 Chord Progression: " << std::endl;
 
@@ -85,20 +78,21 @@ int main() {
     cp.print();
 
     
+    
 
-
-    ChordProgressions chordProgressions;
-    chordProgressions.print();
+    ChordProgression cp;
+    cp.print();
 
 
     // Andalusian
-    cp.setChordProgression("i|-bVII|-bVI|-V7");
+
+    cp.setChordProgression("Cm|G|Cm7|Ab°7|G7b9");
     cp.print();
     
     ChordSequencer cs;
     cs.setChordProgression(cp);
     
-    for(int i = 0; i < 16; i++) {
+    for(int i = 0; i < 16; i++){
         auto tmp = cs.next();
         for(auto x : tmp) std::cout << x << " ";
         std::cout << std::endl;
@@ -106,10 +100,12 @@ int main() {
 
     */
 
+    // Create a Chord object
+    Chord c3("Fm7"); c3.print(); c3.getGroupRange(30,52,6,true); c3.printIntervals(); c3.print();
+    
+    // c1.printNoteNames();
+  
 
-    chord.setChord("CmMaj7");
-    chord.printIntervals();
-    chord.print();
 
     // Create a InterfaceGPT object
     // InterfaceGPT gpt;

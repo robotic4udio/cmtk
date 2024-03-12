@@ -23,6 +23,7 @@ set(SOURCES
 set(HEADERS
     include/Chords.h
     include/InterfaceGPT.h
+    libraries/SimpleJSON/json.hpp
 )
 
 find_package(CURL REQUIRED) 

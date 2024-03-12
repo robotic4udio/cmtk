@@ -22,6 +22,8 @@ public:
     // Function to send a prompt to the OpenAI API and return the response
     std::string sendPrompt(std::string prompt, std::string API_KEY, std::string model = "gpt-3.5-turbo");
 
+    std::string generateMusic(std::string prompt, std::string API_KEY, std::string model = "gpt-3.5-turbo");
+
     // Write function
     static size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data);
 

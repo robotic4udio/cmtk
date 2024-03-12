@@ -1,0 +1,3 @@
+[submodule "libraries/SimpleJSON"]
+	path = libraries/SimpleJSON
+	url = https://github.com/HjalteBested/SimpleJSON.git
