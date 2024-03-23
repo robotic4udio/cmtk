@@ -1,10 +1,8 @@
 # Minimum required CMake version
 cmake_minimum_required(VERSION 3.12)
 
-# Select CC Compiler
+# Select Compiler
 set(CMAKE_C_COMPILER "clang")
-
-# Select CXX Compiler
 set(CMAKE_CXX_COMPILER "clang++")
 
 # Set C++ standard
@@ -21,12 +19,13 @@ set(SOURCES
 
 # Add your header files here
 set(HEADERS
-    include/Chords.h
-    include/InterfaceGPT.h
+    src/Chords.h
+    src/InterfaceGPT.h
     libraries/SimpleJSON/json.hpp
 )
 
-find_package(CURL REQUIRED) 
+# Find required packages
+find_package(CURL REQUIRED) # libcurl
 
 # Add executable target
 add_executable(MyProject ${SOURCES} ${HEADERS})

@@ -7,8 +7,8 @@
 Various classes to perform music composition tasks. 
 
 ## Features
-
-- List the key features of your library here.
+- Chord: A class representing a chord
+- Scale: A class representing a scale
 
 ## Installation
 

@@ -1,4 +1,4 @@
-#include "../include/InterfaceGPT.h"
+#include "InterfaceGPT.h"
 
 #define SYSTEM_PROMPT "You are a music composer. \
     You will return a JSON object with the following keys: \

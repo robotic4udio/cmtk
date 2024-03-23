@@ -1,6 +1,8 @@
 #include "Chords.h"
 #include "InterfaceGPT.h"
 #include "../libraries/SimpleJSON/json.hpp"
+#include "Interval.h"
+#include "Scale.h"
 
 #define API_KEY "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"
 
@@ -101,10 +103,24 @@ int main() {
     */
 
     // Create a Chord object
-    Chord c3("Fm7"); c3.print(); c3.getGroupRange(30,52,6,true); c3.printIntervals(); c3.print();
+    // Chord c3("Dm7/F"); c3.print(); c3.openVoicing(); c3.getGroupRange(30,52,6,true); c3.printIntervals(); c3.print();
+    // std::cout << std::endl;
+
+
+    Chord c4("i/5"); c4.printIntervals(); c4.print();
     
-    // c1.printNoteNames();
-  
+
+    I("12").print();
+    I i2("9"); i2.print();
+
+    // Create a Scale object
+    Scale("Ionian").print();
+    Scale("Dorian").print();
+    Scale("Phrygian").print();
+    Scale("Lydian").print();
+    Scale("Mixolydian").print();
+    Scale("Aeolian").print();
+    Scale("Locrian").print();
 
 
     // Create a InterfaceGPT object
@@ -113,7 +129,6 @@ int main() {
     // auto response = gpt.generateMusic("Sad piece in D minor", API_KEY, "gpt-4-1106-preview");
 
     // std::cout << response << std::endl;
-
 
     // Create a JSON object and print it
     // JSON Obj = JSON::Load(response);

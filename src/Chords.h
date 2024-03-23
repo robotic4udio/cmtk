@@ -33,13 +33,32 @@ inline bool replacePrefix(std::string& s, const std::string& prefix, const std::
     return false;
 }
 
-// ----------------------------------------------------------------------- //
-// ----------------------------- Interval Functions ---------------------- //
-// ----------------------------------------------------------------------- //
+// Is the string a chord symbol in roman numerals
+inline bool isRomanChordSymbol(const std::string& chordSymbol)
+{
+    return chordSymbol.find_first_of("ivIV") != std::string::npos;
+}
+
+// Is the string a chord symbol in arabic numerals
+inline bool isArabicChordSymbol(const std::string& chordSymbol)
+{
+    if(chordSymbol.empty()) return false;
+
+    // If size is 2 then the first character must be an 'b' or '#'
+    if(chordSymbol.size() >= 2){
+        if(chordSymbol[0] != 'b' && chordSymbol[0] != '#') return false;
+        return chordSymbol.find_first_of("1234567") == 1;
+    }
+
+    // If size is 1 then the first character must be a number
+    return chordSymbol.find_first_of("1234567") == 0;
+
+}
 
 // Enum class to represent the intervals
 enum class Interval {
-     _R = 0, // Root 
+     _1 = 0, // Root
+    _s1,     // Sharp Root
     _b2,     // Flat 2nd
      _2,     // 2nd
     _s2,     // Sharp 2nd
@@ -67,8 +86,354 @@ enum class Interval {
    _b13,     // Flat 13th
     _13,     // 13th
    _s13,     // Sharp 13th
-   COUNT
+    NA
 };
+
+// Convert the interval to a integer semi tone
+inline
+int intervalToInt(Interval interval)
+{   
+    // Return the interval as an integer
+    switch(interval){
+        case Interval::_1:   return  0;
+        case Interval::_s1:  return  1;
+        case Interval::_b2:  return  1;
+        case Interval::_2:   return  2;
+        case Interval::_s2:  return  3;
+        case Interval::_b3:  return  3;
+        case Interval::_3:   return  4;
+        case Interval::_s3:  return  5;
+        case Interval::_b4:  return  4;
+        case Interval::_4:   return  5;
+        case Interval::_s4:  return  6;
+        case Interval::_b5:  return  6;
+        case Interval::_5:   return  7;
+        case Interval::_s5:  return  8;
+        case Interval::_b6:  return  8;
+        case Interval::_6:   return  9;
+        case Interval::_s6:  return 10;
+        case Interval::_b7:  return 10;
+        case Interval::_7:   return 11;
+        case Interval::_s7:  return 12;
+        case Interval::_b9:  return 13;
+        case Interval::_9:   return 14;
+        case Interval::_s9:  return 15;
+        case Interval::_b11: return 16;
+        case Interval::_11:  return 17;
+        case Interval::_s11: return 18;
+        case Interval::_b13: return 20;
+        case Interval::_13:  return 21;
+        case Interval::_s13: return 22;
+        case Interval::NA:   break;
+    }
+
+    // Print error message
+    std::cerr << "intervalToInt(): Error: Unrecognized interval" << std::endl;
+
+    return -1;
+}
+
+// Convert the interval to a integer semi tone
+inline
+int shapFlat(Interval interval)
+{   
+    // Return the interval as an integer
+    switch(interval){
+        case Interval::_1:   return   0;
+        case Interval::_s1:  return   1;
+        case Interval::_b2:  return  -1;
+        case Interval::_2:   return   0;
+        case Interval::_s2:  return   1;
+        case Interval::_b3:  return  -1;
+        case Interval::_3:   return   0;
+        case Interval::_s3:  return   1;
+        case Interval::_b4:  return  -1;
+        case Interval::_4:   return   0;
+        case Interval::_s4:  return   1;
+        case Interval::_b5:  return  -1;
+        case Interval::_5:   return   0;
+        case Interval::_s5:  return   1;
+        case Interval::_b6:  return  -1;
+        case Interval::_6:   return   0;
+        case Interval::_s6:  return   1;
+        case Interval::_b7:  return  -1;
+        case Interval::_7:   return   0;
+        case Interval::_s7:  return   1;
+        case Interval::_b9:  return  -1;
+        case Interval::_9:   return   0;
+        case Interval::_s9:  return   1;
+        case Interval::_b11: return  -1;
+        case Interval::_11:  return   0;
+        case Interval::_s11: return   1;
+        case Interval::_b13: return  -1;
+        case Interval::_13:  return   0;
+        case Interval::_s13: return   1;
+        case Interval::NA:   return   0;
+    }
+}
+
+// Covert the interval to a string
+inline
+std::string intervalToString(Interval interval)
+{
+    switch(interval){
+        case Interval::_1:   return "1";
+        case Interval::_s1:  return "s1";
+        case Interval::_b2:  return "b2";
+        case Interval::_2:   return "2";
+        case Interval::_s2:  return "s2";
+        case Interval::_b3:  return "b3";
+        case Interval::_3:   return "3";
+        case Interval::_s3:  return "s3";
+        case Interval::_b4:  return "b4";
+        case Interval::_4:   return "4";
+        case Interval::_s4:  return "s4";
+        case Interval::_b5:  return "b5";
+        case Interval::_5:   return "5";
+        case Interval::_s5:  return "s5";
+        case Interval::_b6:  return "b6";
+        case Interval::_6:   return "6";
+        case Interval::_s6:  return "s6";
+        case Interval::_b7:  return "b7";
+        case Interval::_7:   return "7";
+        case Interval::_s7:  return "s7";
+        case Interval::_b9:  return "b9";
+        case Interval::_9:   return "9";
+        case Interval::_s9:  return "s9";
+        case Interval::_b11: return "b11";
+        case Interval::_11:  return "11";
+        case Interval::_s11: return "s11";
+        case Interval::_b13: return "b13";
+        case Interval::_13:  return "13";
+        case Interval::_s13: return "s13";
+        case Interval::NA:   break;
+    }
+    // Print error message
+    std::cerr << "Error: Unrecognized interval" << std::endl;
+
+    return "NA";
+}
+
+// Map to convert the string to an interval
+inline
+Interval intervalFromString(const std::string& interval){
+    if(interval == "1")  return Interval::_1;
+    if(interval == "s1") return Interval::_s1;
+    if(interval == "b2") return Interval::_b2;
+    if(interval == "2")  return Interval::_2;
+    if(interval == "s2") return Interval::_s2;
+    if(interval == "b3") return Interval::_b3;
+    if(interval == "3")  return Interval::_3;
+    if(interval == "s3") return Interval::_s3;
+    if(interval == "b4") return Interval::_b4;
+    if(interval == "4")  return Interval::_4;
+    if(interval == "s4") return Interval::_s4;
+    if(interval == "b5") return Interval::_b5;
+    if(interval == "5")  return Interval::_5;
+    if(interval == "s5") return Interval::_s5;
+    if(interval == "b6") return Interval::_b6;
+    if(interval == "6")  return Interval::_6;
+    if(interval == "s6") return Interval::_s6;
+    if(interval == "b7") return Interval::_b7;
+    if(interval == "7")  return Interval::_7;
+    if(interval == "s7") return Interval::_s7;
+    if(interval == "b9") return Interval::_b9;
+    if(interval == "9")  return Interval::_9;
+    if(interval == "s9") return Interval::_s9;
+    if(interval == "b11")return Interval::_b11;
+    if(interval == "11") return Interval::_11;
+    if(interval == "s11")return Interval::_s11;
+    if(interval == "b13")return Interval::_b13;
+    if(interval == "13") return Interval::_13;
+    if(interval == "s13")return Interval::_s13;
+    
+    // Print error message
+    std::cerr << "Error: Unrecognized interval: " << interval << std::endl;
+    // Return the root note
+    return Interval::_1;
+}
+
+// Interval to Note Name
+inline
+std::string intervalToNoteName(Interval interval, int rootNote, bool isRoman = false)
+{
+    // Get the note number
+    int note = (rootNote + intervalToInt(interval)) % 12;
+
+    auto sharpFlat = shapFlat(interval);
+    bool isSharp = sharpFlat > 0;
+    bool isFlat  = sharpFlat < 0;
+
+    // print note and sharp/flat
+    // std::cout << "Note: " << note << " sharpFlat: " << sharpFlat << " isSharp: " << isSharp << " isFlat: " << isFlat << std::endl;
+
+    if(isRoman){
+        // Return the note name
+        switch(note){
+            case 0:  return "I";
+            case 1:  return isSharp ? "#I" : "bII";
+            case 2:  return "II";
+            case 3:  return isSharp ? "#II" : "bIII";
+            case 4:  return "III";
+            case 5:  return "IV";
+            case 6:  return isSharp ? "#IV" : "bV";
+            case 7:  return "V";
+            case 8:  return isSharp ? "#V" : "bVI";
+            case 9:  return "VI";
+            case 10: return isSharp ? "#VI" : "bVII";
+            case 11: return "VII";
+        }
+    }
+    else {
+        // Return the note name
+        switch(note){
+            case 0:  return "C";
+            case 1:  return isSharp ? "C#" : "Db";
+            case 2:  return "D";
+            case 3:  return isSharp ? "D#" : "Eb";
+            case 4:  return "E";
+            case 5:  return "F";
+            case 6:  return isSharp ? "F#" : "Gb";
+            case 7:  return "G";
+            case 8:  return isSharp ? "G#" : "Ab";
+            case 9:  return "A";
+            case 10: return isSharp ? "A#" : "Bb";
+            case 11: return "B";
+        }
+    }
+    // Print error message
+    std::cerr << "Error: intervalToNoteName(): Note not found note" << std::endl;
+    return "C";
+}
+
+
+
+// Interval between two notes
+inline
+Interval intervalFromNoteName(std::string n, int rootNote)
+{   
+    // Convert to lower case
+    std::transform(n.begin(), n.end(), n.begin(), ::tolower);
+
+    // Get the note number
+    switch(rootNote){
+        case 0:{ // The key of C
+            if(n == "c")  return Interval::_1;
+            if(n == "d")  return Interval::_2;
+            if(n == "e")  return Interval::_3;
+            if(n == "f")  return Interval::_4;
+            if(n == "g")  return Interval::_5;
+            if(n == "a")  return Interval::_6;
+            if(n == "b")  return Interval::_7;
+            if(n == "cb") return Interval::_7;
+            if(n == "c#") return Interval::_s1;
+            if(n == "db") return Interval::_b2;
+            if(n == "d#") return Interval::_s2;
+            if(n == "eb") return Interval::_b3;
+            if(n == "e#") return Interval::_4;
+            if(n == "fb") return Interval::_3;
+            if(n == "f#") return Interval::_s4;
+            if(n == "gb") return Interval::_b5;
+            if(n == "g#") return Interval::_s5;
+            if(n == "ab") return Interval::_b6;
+            if(n == "a#") return Interval::_s6;
+            if(n == "bb") return Interval::_b7;
+            if(n == "b#") return Interval::_s7;
+        }
+        break;
+        case 1:{ // The key of C# or Db
+            if(n == "c#") return Interval::_1;
+            if(n == "db") return Interval::_1;
+            if(n == "d")  return Interval::_b2;
+            if(n == "d#") return Interval::_2;
+            if(n == "eb") return Interval::_2;
+            if(n == "e")  return Interval::_b3;
+            if(n == "fb") return Interval::_b3;
+            if(n == "e#") return Interval::_3;
+            if(n == "f")  return Interval::_3;
+            if(n == "f#") return Interval::_4;
+            if(n == "gb") return Interval::_4;
+            if(n == "g")  return Interval::_b5;
+            if(n == "g#") return Interval::_5;
+            if(n == "ab") return Interval::_5;
+            if(n == "a")  return Interval::_b6;
+            if(n == "a#") return Interval::_6;
+            if(n == "bb") return Interval::_6;
+            if(n == "b")  return Interval::_b7;
+            if(n == "b#") return Interval::_7;
+            if(n == "c")  return Interval::_7;
+            if(n == "cb") return Interval::_b7;
+        }
+        break;
+        case 2:{ // The key of D or Eb
+            if(n == "d")  return Interval::_1;
+            if(n == "e")  return Interval::_2;
+            if(n == "f#") return Interval::_3;
+            if(n == "g")  return Interval::_4;
+            if(n == "a")  return Interval::_5;
+            if(n == "b")  return Interval::_6;
+            if(n == "c#") return Interval::_7;
+            if(n == "db") return Interval::_7;
+            if(n == "d#") return Interval::_s1;
+            if(n == "eb") return Interval::_b2;
+            if(n == "e#") return Interval::_s2;
+            if(n == "f")  return Interval::_b3;
+            if(n == "fb") return Interval::_2;
+            if(n == "gb") return Interval::_3;
+            if(n == "g#") return Interval::_s4;
+            if(n == "ab") return Interval::_b5;
+            if(n == "a#") return Interval::_s5;
+            if(n == "bb") return Interval::_b6;
+            if(n == "b#") return Interval::_s6;
+            if(n == "c")  return Interval::_b7;
+            if(n == "cb") return Interval::_6;
+        }
+        break;
+        case 3:{ // The key of D# or E
+            if(n == "d#") return Interval::_1;
+            if(n == "eb") return Interval::_1;
+            if(n == "e")  return Interval::_b2;
+            if(n == "f")  return Interval::_2;
+            if(n == "f#") return Interval::_b3;
+            if(n == "gb") return Interval::_b3;
+            if(n == "g")  return Interval::_3;
+            if(n == "g#") return Interval::_s4;
+            if(n == "ab") return Interval::_b5;
+            if(n == "a")  return Interval::_5;
+            if(n == "a#") return Interval::_s5;
+            if(n == "bb") return Interval::_b6;
+            if(n == "b")  return Interval::_6;
+            if(n == "b#") return Interval::_s6;
+            if(n == "c")  return Interval::_b7;
+            if(n == "c#") return Interval::_7;
+            if(n == "db") return Interval::_7;
+            if(n == "d")  return Interval::_s1;
+            if(n == "fb") return Interval::_b2;
+        }
+
+    }
+
+
+
+
+
+    // Print note and sharp/flat
+
+
+    // Print error message
+    std::cerr << "Error: intervalFromNoteName(): Unrecognized note: " << n << ", with root: " << rootNote << std::endl;
+
+    // Return the root note
+    return Interval::_1;
+
+}
+
+// Print the interval
+inline
+void printInterval(Interval interval)
+{
+    std::cout << intervalToString(interval) << std::endl;
+}
 
 enum class NoteName {
     C = 0,
@@ -116,53 +481,6 @@ enum class NoteName {
     NA
 };
 
-// Get NoteName from beginnign of string
-inline
-NoteName getNoteName(std::string& s)
-{
-    auto copy = s;
-    std::transform(copy.begin(), copy.end(), copy.begin(), ::tolower);
-
-    if(s.empty()){
-        // Print error message
-        std::cerr << "Error: Unrecognized note" << std::endl;
-
-        return NoteName::NA;
-    }
-
-    auto s0 = tolower(s[0]);
-
-    if(s.size() >= 2){
-        if(s[1] == '#'){
-            if(s0 == 'c') return NoteName::Cs;
-            if(s0 == 'd') return NoteName::Ds;
-            if(s0 == 'e') return NoteName::Es;
-            if(s0 == 'f') return NoteName::Fs;
-            if(s0 == 'g') return NoteName::Gs;
-            if(s0 == 'a') return NoteName::As;
-            if(s0 == 'b') return NoteName::Bs;
-        }
-        else if(s[1] == 'b'){
-            if(s0 == 'c') return NoteName::Cb;
-            if(s0 == 'd') return NoteName::Db;
-            if(s0 == 'e') return NoteName::Eb;
-            if(s0 == 'f') return NoteName::Fb;
-            if(s0 == 'g') return NoteName::Gb;
-            if(s0 == 'a') return NoteName::Ab;
-            if(s0 == 'b') return NoteName::Bb;
-        }
-    }
-    else if(s.size() >= 1){
-        if(s0 == 'c') return NoteName::C;
-        if(s0 == 'd') return NoteName::D;
-        if(s0 == 'e') return NoteName::E;
-        if(s0 == 'f') return NoteName::F;
-        if(s0 == 'g') return NoteName::G;
-        if(s0 == 'a') return NoteName::A;
-        if(s0 == 'b') return NoteName::B;
-    }
-    return NoteName::NA;
-}
 
 // Get NoteName from beginnign of string
 inline
@@ -171,367 +489,106 @@ std::string getNoteNameString(std::string& s)
     if(s.empty()){
         // Print error message
         std::cerr << "Error: Unrecognized note" << std::endl;
-
         return "";
     }
 
-    char s0 = tolower(s[0]);
-    char s1 = tolower(s[1]);
+    // Convert to string s to lower case
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 
-    if(s.size() >= 2){
-        if(s1 == '#'){
-            if(s0 == 'c'){ s.erase(0,2); return "C#"; };
-            if(s0 == 'd'){ s.erase(0,2); return "D#"; };
-            if(s0 == 'e'){ s.erase(0,2); return "E#"; };
-            if(s0 == 'f'){ s.erase(0,2); return "F#"; };
-            if(s0 == 'g'){ s.erase(0,2); return "G#"; };
-            if(s0 == 'a'){ s.erase(0,2); return "A#"; };
-            if(s0 == 'b'){ s.erase(0,2); return "B#"; };
+    // Is the note expressed in roman numerals
+    if(isRomanChordSymbol(s))
+    {
+        // Create empty string for result
+        std::string result = "";
+
+        // Check for sharp or flat
+        if     (s[0] == 'b'){ result += "b"; s.erase(0,1); }
+        else if(s[0] == '#'){ result += "#"; s.erase(0,1); }
+
+        // Return if empty
+        if(s.empty()){ return ""; }
+
+        // Loop until no more symbols are found
+        bool found = !s.empty();
+        while(!s.empty() && found){
+            found = false;
+            if(s[0] == 'i'){ result += "I"; s.erase(0,1); found = true; }
+            if(s[0] == 'v'){ result += "V"; s.erase(0,1); found = true; }
         }
-        else if(s1 == 'b'){
-            if(s0 == 'c'){ s.erase(0,2); return "Cb"; };
-            if(s0 == 'd'){ s.erase(0,2); return "Db"; };
-            if(s0 == 'e'){ s.erase(0,2); return "Eb"; };
-            if(s0 == 'f'){ s.erase(0,2); return "Fb"; };
-            if(s0 == 'g'){ s.erase(0,2); return "Gb"; };
-            if(s0 == 'a'){ s.erase(0,2); return "Ab"; };
-            if(s0 == 'b'){ s.erase(0,2); return "Bb"; };
+
+        return result;
+    } 
+    // Is the note expressed in arabic numerals
+    if(isArabicChordSymbol(s))
+    {
+        // Create empty string for result
+        std::string result = "";
+
+        // Check for sharp or flat
+        if     (s[0] == 'b'){ result += "b"; s.erase(0,1); }
+        else if(s[0] == '#'){ result += "#"; s.erase(0,1); }
+
+        // Return if empty
+        if(s.empty()){ return ""; }
+
+        // Loop until no more symbols are found
+        bool found = !s.empty();
+        while(!s.empty() && found){
+            found = false;
+            if(s[0] == '1'){ result += "I";   s.erase(0,1); found = true; }
+            if(s[0] == '3'){ result += "III"; s.erase(0,1); found = true; }
+            if(s[0] == '2'){ result += "II";  s.erase(0,1); found = true; }
+            if(s[0] == '4'){ result += "IV";  s.erase(0,1); found = true; }
+            if(s[0] == '5'){ result += "V";   s.erase(0,1); found = true; }
+            if(s[0] == '6'){ result += "VI";  s.erase(0,1); found = true; }
+            if(s[0] == '7'){ result += "VII"; s.erase(0,1); found = true; }
+        }
+
+        return result;
+    }
+    else 
+    {
+        // Convert to lower case
+        char s0 = s[0];
+        char s1 = s[1];
+
+        if(s.size() >= 2){
+            if(s1 == '#'){
+                if(s0 == 'c'){ s.erase(0,2); return "C#"; };
+                if(s0 == 'd'){ s.erase(0,2); return "D#"; };
+                if(s0 == 'e'){ s.erase(0,2); return "E#"; };
+                if(s0 == 'f'){ s.erase(0,2); return "F#"; };
+                if(s0 == 'g'){ s.erase(0,2); return "G#"; };
+                if(s0 == 'a'){ s.erase(0,2); return "A#"; };
+                if(s0 == 'b'){ s.erase(0,2); return "B#"; };
+            }
+            else if(s1 == 'b'){
+                if(s0 == 'c'){ s.erase(0,2); return "Cb"; };
+                if(s0 == 'd'){ s.erase(0,2); return "Db"; };
+                if(s0 == 'e'){ s.erase(0,2); return "Eb"; };
+                if(s0 == 'f'){ s.erase(0,2); return "Fb"; };
+                if(s0 == 'g'){ s.erase(0,2); return "Gb"; };
+                if(s0 == 'a'){ s.erase(0,2); return "Ab"; };
+                if(s0 == 'b'){ s.erase(0,2); return "Bb"; };
+            }
+        }
+        else if(s.size() >= 1){
+            if(s0 == 'c'){ s.erase(0,1); return "C"; };
+            if(s0 == 'd'){ s.erase(0,1); return "D"; };
+            if(s0 == 'e'){ s.erase(0,1); return "E"; };
+            if(s0 == 'f'){ s.erase(0,1); return "F"; };
+            if(s0 == 'g'){ s.erase(0,1); return "G"; };
+            if(s0 == 'a'){ s.erase(0,1); return "A"; };
+            if(s0 == 'b'){ s.erase(0,1); return "B"; };
         }
     }
-    else if(s.size() >= 1){
-        if(s0 == 'c'){ s.erase(0,1); return "C"; };
-        if(s0 == 'd'){ s.erase(0,1); return "D"; };
-        if(s0 == 'e'){ s.erase(0,1); return "E"; };
-        if(s0 == 'f'){ s.erase(0,1); return "F"; };
-        if(s0 == 'g'){ s.erase(0,1); return "G"; };
-        if(s0 == 'a'){ s.erase(0,1); return "A"; };
-        if(s0 == 'b'){ s.erase(0,1); return "B"; };
-    }
+
+
     // Print error message
     std::cerr << "Error: getNoteNameString(): Unrecognized note" << std::endl;
     return "";
 }
 
-// Convert the interval to a integer semi tone
-inline
-int toInt(Interval interval)
-{   
-    // Return the interval as an integer
-    switch(interval){
-        case Interval::_R:   return  0;
-        case Interval::_b2:  return  1;
-        case Interval::_2:   return  2;
-        case Interval::_s2:  return  3;
-        case Interval::_b3:  return  3;
-        case Interval::_3:   return  4;
-        case Interval::_s3:  return  5;
-        case Interval::_b4:  return  4;
-        case Interval::_4:   return  5;
-        case Interval::_s4:  return  6;
-        case Interval::_b5:  return  6;
-        case Interval::_5:   return  7;
-        case Interval::_s5:  return  8;
-        case Interval::_b6:  return  8;
-        case Interval::_6:   return  9;
-        case Interval::_s6:  return 10;
-        case Interval::_b7:  return 10;
-        case Interval::_7:   return 11;
-        case Interval::_s7:  return 12;
-        case Interval::_b9:  return 13;
-        case Interval::_9:   return 14;
-        case Interval::_s9:  return 15;
-        case Interval::_b11: return 16;
-        case Interval::_11:  return 17;
-        case Interval::_s11: return 18;
-        case Interval::_b13: return 20;
-        case Interval::_13:  return 21;
-        case Interval::_s13: return 22;
-        case Interval::COUNT: return -1;
-    }
-
-    return -1;
-}
-
-// Convert the interval to a integer semi tone
-inline
-int shapFlat(Interval interval)
-{   
-    // Return the interval as an integer
-    switch(interval){
-        case Interval::_R:   return   0;
-        case Interval::_b2:  return  -1;
-        case Interval::_2:   return   0;
-        case Interval::_s2:  return   1;
-        case Interval::_b3:  return  -1;
-        case Interval::_3:   return   0;
-        case Interval::_s3:  return   1;
-        case Interval::_b4:  return  -1;
-        case Interval::_4:   return   0;
-        case Interval::_s4:  return   1;
-        case Interval::_b5:  return  -1;
-        case Interval::_5:   return   0;
-        case Interval::_s5:  return   1;
-        case Interval::_b6:  return  -1;
-        case Interval::_6:   return   0;
-        case Interval::_s6:  return   1;
-        case Interval::_b7:  return  -1;
-        case Interval::_7:   return   0;
-        case Interval::_s7:  return   1;
-        case Interval::_b9:  return  -1;
-        case Interval::_9:   return   0;
-        case Interval::_s9:  return   1;
-        case Interval::_b11: return  -1;
-        case Interval::_11:  return   0;
-        case Interval::_s11: return   1;
-        case Interval::_b13: return  -1;
-        case Interval::_13:  return   0;
-        case Interval::_s13: return   1;
-        case Interval::COUNT: return  0;
-    }
-}
-
-// Covert the interval to a string
-inline
-std::string intervalToString(Interval interval)
-{
-    switch(interval){
-        case Interval::_R:   return "R";
-        case Interval::_b2:  return "b2";
-        case Interval::_2:   return "2";
-        case Interval::_s2:  return "s2";
-        case Interval::_b3:  return "b3";
-        case Interval::_3:   return "3";
-        case Interval::_s3:  return "s3";
-        case Interval::_b4:  return "b4";
-        case Interval::_4:   return "4";
-        case Interval::_s4:  return "s4";
-        case Interval::_b5:  return "b5";
-        case Interval::_5:   return "5";
-        case Interval::_s5:  return "s5";
-        case Interval::_b6:  return "b6";
-        case Interval::_6:   return "6";
-        case Interval::_s6:  return "s6";
-        case Interval::_b7:  return "b7";
-        case Interval::_7:   return "7";
-        case Interval::_s7:  return "s7";
-        case Interval::_b9:  return "b9";
-        case Interval::_9:   return "9";
-        case Interval::_s9:  return "s9";
-        case Interval::_b11: return "b11";
-        case Interval::_11:  return "11";
-        case Interval::_s11: return "s11";
-        case Interval::_b13: return "b13";
-        case Interval::_13:  return "13";
-        case Interval::_s13: return "s13";
-        case Interval::COUNT: return "NA";
-    }
-    // Print error message
-    std::cerr << "Error: Unrecognized interval" << std::endl;
-
-    return "NA";
-}
-
-// Map to convert the string to an interval
-inline
-Interval intervalFromString(const std::string& interval){
-    if(interval == "R")  return Interval::_R;
-    if(interval == "b2") return Interval::_b2;
-    if(interval == "2")  return Interval::_2;
-    if(interval == "s2") return Interval::_s2;
-    if(interval == "b3") return Interval::_b3;
-    if(interval == "3")  return Interval::_3;
-    if(interval == "s3") return Interval::_s3;
-    if(interval == "b4") return Interval::_b4;
-    if(interval == "4")  return Interval::_4;
-    if(interval == "s4") return Interval::_s4;
-    if(interval == "b5") return Interval::_b5;
-    if(interval == "5")  return Interval::_5;
-    if(interval == "s5") return Interval::_s5;
-    if(interval == "b6") return Interval::_b6;
-    if(interval == "6")  return Interval::_6;
-    if(interval == "s6") return Interval::_s6;
-    if(interval == "b7") return Interval::_b7;
-    if(interval == "7")  return Interval::_7;
-    if(interval == "s7") return Interval::_s7;
-    if(interval == "b9") return Interval::_b9;
-    if(interval == "9")  return Interval::_9;
-    if(interval == "s9") return Interval::_s9;
-    if(interval == "b11")return Interval::_b11;
-    if(interval == "11") return Interval::_11;
-    if(interval == "s11")return Interval::_s11;
-    if(interval == "b13")return Interval::_b13;
-    if(interval == "13") return Interval::_13;
-    if(interval == "s13")return Interval::_s13;
-    
-    // Print error message
-    std::cerr << "Error: Unrecognized interval: " << interval << std::endl;
-    // Return the root note
-    return Interval::_R;
-}
-
-// Interval to Note Name
-inline
-std::string intervalToNoteName(Interval interval, int rootNote)
-{
-    // Get the note number
-    int note = (rootNote + toInt(interval)) % 12;
-
-    auto sharpFlat = shapFlat(interval);
-    bool isSharp = sharpFlat > 0;
-    bool isFlat  = sharpFlat < 0;
-
-    // print note and sharp/flat
-    std::cout << "Note: " << note << " sharpFlat: " << sharpFlat << " isSharp: " << isSharp << " isFlat: " << isFlat << std::endl;
-
-
-    // Return the note name
-    switch(note){
-        case 0:  return "C";
-        case 1:  return isSharp ? "C#" : "Db";
-        case 2:  return "D";
-        case 3:  return isSharp ? "D#" : "Eb";
-        case 4:  return "E";
-        case 5:  return "F";
-        case 6:  return isSharp ? "F#" : "Gb";
-        case 7:  return "G";
-        case 8:  return isSharp ? "G#" : "Ab";
-        case 9:  return "A";
-        case 10: return isSharp ? "A#" : "Bb";
-        case 11: return "B";
-    }
-
-    // Print error message
-    std::cerr << "Error: intervalToNoteName(): Note not found note" << std::endl;
-    return "C";
-}
-
-// Interval between two notes
-inline
-Interval intervalFromNoteName(std::string n, int rootNote)
-{   
-    // Convert to lower case
-    std::transform(n.begin(), n.end(), n.begin(), ::tolower);
-
-    // Get the note number
-    switch(rootNote){
-        case 0:{
-            if(n == "c") return Interval::_R;
-            if(n == "d") return Interval::_2;
-            if(n == "e") return Interval::_3;
-            if(n == "f") return Interval::_4;
-            if(n == "g") return Interval::_5;
-            if(n == "a") return Interval::_6;
-            if(n == "b") return Interval::_7;
-            if(n == "cb") return Interval::_7;
-            if(n == "c#") return Interval::_b2;
-            if(n == "db") return Interval::_b2;
-            if(n == "d#") return Interval::_s2;
-            if(n == "eb") return Interval::_b3;
-            if(n == "e#") return Interval::_4;
-            if(n == "fb") return Interval::_3;
-            if(n == "f#") return Interval::_s4;
-            if(n == "gb") return Interval::_b5;
-            if(n == "g#") return Interval::_s5;
-            if(n == "ab") return Interval::_b6;
-            if(n == "a#") return Interval::_s6;
-            if(n == "bb") return Interval::_b7;
-            if(n == "b#") return Interval::_R;
-        }
-        break;
-        case 1:{ // The key of C# or Db
-            if(n == "c#") return Interval::_R;
-            if(n == "db") return Interval::_R;
-            if(n == "d")  return Interval::_b2;
-            if(n == "d#") return Interval::_2;
-            if(n == "eb") return Interval::_2;
-            if(n == "e")  return Interval::_b3;
-            if(n == "fb") return Interval::_b3;
-            if(n == "e#") return Interval::_3;
-            if(n == "f")  return Interval::_3;
-            if(n == "f#") return Interval::_4;
-            if(n == "gb") return Interval::_4;
-            if(n == "g")  return Interval::_b5;
-            if(n == "g#") return Interval::_5;
-            if(n == "ab") return Interval::_5;
-            if(n == "a")  return Interval::_b6;
-            if(n == "a#") return Interval::_6;
-            if(n == "bb") return Interval::_6;
-            if(n == "b")  return Interval::_b7;
-            if(n == "b#") return Interval::_7;
-            if(n == "c")  return Interval::_7;
-
-
-
-
-
-
-
-
-        }
-    }
-
-
-
-
-
-    // Print note and sharp/flat
-
-
-    // Print error message
-    std::cerr << "Error: intervalFromNoteName(): Unrecognized note" << std::endl;
-
-    // Return the root note
-    return Interval::_R;
-
-}
-
-
-// ----------------------------------------------------------------------- //
-// ----------------------------- Scale Class ----------------------------- //
-// ----------------------------------------------------------------------- //
-
-class Scale {
-public:
-    // Constructor
-    Scale() = default;
-    Scale(std::string scaleName)
-    {
-        setScale(scaleName);
-    }
-
-    // Function to set the scale
-    void setScale(std::string aScaleName)
-    {
-        scaleName = aScaleName;
-        if(scaleName == "Major"){ 
-            scaleIntervals = {Interval::_R, Interval::_2, Interval::_3, Interval::_4, Interval::_5, Interval::_6, Interval::_7};  
-            scaleTones  = {0, 2, 4, 5, 7, 9, 11}; 
-            scaleChords = {"I","ii","iii","IV","V","vi","vii°"};
-        }
-        else if(scaleName == "Minor"){
-            scaleIntervals = {Interval::_R, Interval::_2, Interval::_b3, Interval::_4, Interval::_5, Interval::_b6, Interval::_b7};
-            scaleTones  = {0, 2, 3, 5, 7, 8, 10};
-            scaleChords = {"i","ii°","bIII","iv","v","bVI","bVII"};
-        }
-        else if(scaleName == "Dorian"){
-            scaleIntervals = {Interval::_R, Interval::_2, Interval::_b3, Interval::_4, Interval::_5, Interval::_6, Interval::_b7};
-            scaleTones  = {0, 2, 3, 5, 7, 9, 10};
-            scaleChords = {"i","ii","bIII","IV","v","vi°","bVII"};
-        }
-    }
-
-
-private:
-    // The scale name
-    std::string scaleName;
-    // The scale intervals
-    std::vector<Interval> scaleIntervals;
-    // The scale tones
-    std::vector<int> scaleTones;
-    // The scale chords
-    std::vector<std::string> scaleChords;
-
-};
 
 
 // ----------------------------------------------------------------------- //
@@ -613,12 +670,6 @@ public:
         return chordTones[index];
     }
 
-    // Interval between root and another note
-    Interval intervalFromRoot(std::string note, int rootNote)
-    {
-        return intervalFromNoteName(note, rootNote);
-    }
-
     // Get the chord tones from a chord symbol
     std::vector<int> getChordTones(const std::string& aChordSymbol, int rootNote = 0){
         auto chordSymbol = aChordSymbol;
@@ -629,11 +680,13 @@ public:
         bool sharp = false;
         bool flat  = false;
 
-        
+        // Test if the chors symbol is in roman numerals
+        const bool isRoman = isRomanChordSymbol(chordSymbol);
+
         // If the first character is a 'b' the the chord is flat and the root is lowered by 1 semitone. 
         // If the first character is a '#' then it is a flat or sharp chord and the root is raised by 1 semitone.
         // Handle this in a while loop to account for multiple flats or sharps
-        if(isRoman(chordSymbol)){
+        if(isRoman){
             while(chordSymbol[0] == 'b' || chordSymbol[0] == '#') {
                 if      (chordSymbol[0] == 'b') { rootNote -= 1; rootName += "b"; flat =  true;}
                 else if (chordSymbol[0] == '#') { rootNote += 1; rootName += "#"; sharp = true;}
@@ -671,8 +724,6 @@ public:
 
         // Convert to_lower 
         std::transform(chordSymbol.begin(), chordSymbol.end(), chordSymbol.begin(), ::tolower);
-
-
 
         // Move the rootNote according according to the chord symbol --- Roman Numerals
              if (removePrefix(chordSymbol, "iii" )){ rootNote += 4;  rootName += "III"; noteNames_[0] = flat ? NoteName::bIII : sharp ? NoteName::sIII : NoteName::III; }
@@ -727,14 +778,14 @@ public:
         // Initialize the chord tones vector based on the chord type
         switch (chordQuality)
         {
-            case Quality::Major:          chordIntervals = {Interval::_R, Interval::_3,  Interval::_5};  break;
-            case Quality::Minor:          chordIntervals = {Interval::_R, Interval::_b3, Interval::_5};  break;
-            case Quality::Diminished:     chordIntervals = {Interval::_R, Interval::_b3, Interval::_b5}; break;
-            case Quality::HalfDiminished: chordIntervals = {Interval::_R, Interval::_b3, Interval::_b5, Interval::_b7}; break;
-            case Quality::Augmented:      chordIntervals = {Interval::_R, Interval::_3,  Interval::_s5}; break;
-            case Quality::Sus2:           chordIntervals = {Interval::_R, Interval::_2,  Interval::_5};  break;
-            case Quality::Sus4:           chordIntervals = {Interval::_R, Interval::_4,  Interval::_5};  break;
-            case Quality::PowerChord:     chordIntervals = {Interval::_R,                Interval::_5};  break;
+            case Quality::Major:          chordIntervals = {Interval::_1, Interval::_3,  Interval::_5};  break;
+            case Quality::Minor:          chordIntervals = {Interval::_1, Interval::_b3, Interval::_5};  break;
+            case Quality::Diminished:     chordIntervals = {Interval::_1, Interval::_b3, Interval::_b5}; break;
+            case Quality::HalfDiminished: chordIntervals = {Interval::_1, Interval::_b3, Interval::_b5, Interval::_b7}; break;
+            case Quality::Augmented:      chordIntervals = {Interval::_1, Interval::_3,  Interval::_s5}; break;
+            case Quality::Sus2:           chordIntervals = {Interval::_1, Interval::_2,  Interval::_5};  break;
+            case Quality::Sus4:           chordIntervals = {Interval::_1, Interval::_4,  Interval::_5};  break;
+            case Quality::PowerChord:     chordIntervals = {Interval::_1,                Interval::_5};  break;
         }
 
         // Add Extension
@@ -800,7 +851,7 @@ public:
             if(removePrefix(chordSymbol, "#13" )){ remove(Interval::_13); remove(Interval::_b13); add(Interval::_s13); found = true; }
             
             // Remove notes if required
-            if(removePrefix(chordSymbol, "no1" )){ remove(Interval::_R);  found = true; }
+            if(removePrefix(chordSymbol, "no1" )){ remove(Interval::_1);  found = true; }
             if(removePrefix(chordSymbol, "no3" )){ remove(Interval::_3);  remove(Interval::_b3);  remove(Interval::_s3); found = true;}
             if(removePrefix(chordSymbol, "no5" )){ remove(Interval::_5);  remove(Interval::_b5);  remove(Interval::_s5); found = true;}
             if(removePrefix(chordSymbol, "no7" )){ remove(Interval::_7);  remove(Interval::_b7);  remove(Interval::_s7); found = true;}
@@ -843,13 +894,15 @@ public:
             std::string slashNoteName = getNoteNameString(chordSymbol);
             std::transform(slashNoteName.begin(), slashNoteName.end(), slashNoteName.begin(), ::tolower);
 
+            // Print Slash Note
+            std::cout << "Slash Note: " << slashNoteName << std::endl;
 
             if(slashNoteName.size() > 0){
 
                 int slashNote = 0;
                 bool found = false;
                 for(auto interval : chordIntervals){
-                    std::string note = intervalToNoteName(interval, rootNote);
+                    std::string note = intervalToNoteName(interval, rootNote, isRoman);
                     // Note to_lower
                     std::transform(note.begin(), note.end(), note.begin(), ::tolower);
 
@@ -879,10 +932,11 @@ public:
                 
         }        
 
+
         // Add the rest of the note names
         for(auto interval : chordIntervals){
-            if(interval != Interval::_R)
-                noteNames.push_back(intervalToNoteName(interval, rootNote));
+            if(interval != Interval::_1)
+                noteNames.push_back(intervalToNoteName(interval, rootNote, isRoman));
             else 
                 noteNames.push_back(rootName);
         }
@@ -893,10 +947,10 @@ public:
         }
         std::cout << std::endl;
 
-        // Cast the chordIntervals to int and assign to chordTones
+        // Convert the chordIntervals to int and assign to chordTones
         std::vector<int> chordTones;
         for (auto interval : chordIntervals) {
-            chordTones.push_back(toInt(interval));
+            chordTones.push_back(intervalToInt(interval));
         }
 
         // Sort the chord tones by shifting down an octave if the next value is lower
@@ -905,7 +959,6 @@ public:
                 chordTones[i] -= 12;
             }
         }
-
 
         // Add the rootNote to each of the chord tones
         for (int i = 0; i < chordTones.size(); i++) {
@@ -916,7 +969,7 @@ public:
         if(slash) bassNote = chordTones[0];
 
         if(chordSymbol.size() > 0){
-            std::cerr << "Warning: Unrecognized chord symbol: " << aChordSymbol << " : " << chordSymbol << std::endl;
+            std::cerr << "getChordTones(): Warning: Error parsing chord symbol: " << aChordSymbol << " - Remaining: " << chordSymbol << std::endl;
         }
 
         // Return the chord tones
@@ -924,22 +977,12 @@ public:
 
     }
 
-    // Function to flatten an interval
-    void flatten(Interval n)
-    {
-        for(auto& interval : chordIntervals){
-            if(interval == n){
-                interval = static_cast<Interval>(static_cast<int>(interval) - 1);
-            }
-        }
-    }
-
     // Function to add an interval
     void add(Interval n)
     {   
         // Test if interval already present
         for(auto& interval : chordIntervals){
-            if(toInt(interval) == toInt(n)) return;
+            if(intervalToInt(interval) == intervalToInt(n)) return;
         }
         // If not, add the interval
         chordIntervals.push_back(n);
@@ -949,7 +992,7 @@ public:
     {
         // Test if interval already present
         for(auto& interval : chordIntervals){
-            if(toInt(interval) == toInt(n)){ 
+            if(intervalToInt(interval) == intervalToInt(n)){ 
                 // If it is the move it the the new index
                 chordIntervals.erase(std::remove(chordIntervals.begin(), chordIntervals.end(), interval), chordIntervals.end());
                 chordIntervals.insert(chordIntervals.begin() + index, n);
@@ -965,7 +1008,7 @@ public:
     void remove(Interval n)
     {
         chordIntervals.erase(std::remove(chordIntervals.begin(), chordIntervals.end(), n), chordIntervals.end());
-        chordTones.erase(std::remove(chordTones.begin(), chordTones.end(), toInt(n)), chordTones.end());
+        chordTones.erase(std::remove(chordTones.begin(), chordTones.end(), intervalToInt(n)), chordTones.end());
     }
 
     // Function to find the lowest chord tone
@@ -1016,7 +1059,7 @@ public:
                 smallest = dist;
             }
         }
-        std::cout << "Smallest: " << smallest << std::endl;
+        // std::cout << "Smallest: " << smallest << std::endl;
         return smallest;
     }
 
@@ -1039,7 +1082,7 @@ public:
         while(mindist && smallestNoteDistance(notes) < mindist){
             for (int i = 1; i < notes.size(); i++) {
                 int dist = notes[i] - notes[i-1];
-                std::cout << "Dist: " << dist << std::endl;
+                // std::cout << "Dist: " << dist << std::endl;
                 if (dist < mindist){
                     notes[i] += 12;
                     std::sort(notes.begin(), notes.end());
@@ -1117,12 +1160,6 @@ public:
         std::cout << "BassNote: " << bassNote << "\t";
         std::cout << std::endl;
 
-    }
-
-    // Is the chord expressed in roman numerals
-    bool isRoman(const std::string& chordSymbol)
-    {
-        return chordSymbol.find_first_of("ivIV") != std::string::npos;
     }
 
     // Is the chord expressed in arabic numerals
@@ -1400,6 +1437,7 @@ private:
 
 // ----------------------------------------------------------------------- //
 // ----------------------- ChordSequencer Class -------------------------- //
+// ----------------------------------------------------------------------- //
 class ChordSequencer {
 public:
     // Constructor
