@@ -85,6 +85,12 @@ public:
 
     void set(int aDegree, int aQuality)
     {
+        // Test if the degree is below 1
+        if(aDegree < 1)
+        {
+            throw std::invalid_argument("Invalid interval degree");
+        }
+        // Set the degree, quality and semitones
         degree = aDegree;
         quality = aQuality;
         semitones = semitonesFromDegree(degree, quality);
@@ -166,6 +172,12 @@ public:
     {
         int newQuality = aQuality == 'b' ? -1 : aQuality == '#' ? 1 : 0;
         setQuality(newQuality);
+    }
+
+    // Get Quality
+    int getQuality()
+    {
+        return quality;
     }
 
     // Get Degree
