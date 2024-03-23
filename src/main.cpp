@@ -111,8 +111,7 @@ int main() {
     
 
     I("12").print();
-    I i2("9"); i2.print();
-
+    
     // Create a Scale object
     Scale("Ionian").print();
     Scale("Dorian").print();
@@ -137,6 +136,9 @@ int main() {
     // auto content = Obj["choices"][0]["message"]["content"];
     
     // std::cout << content << std::endl;
+    Chord c5("I9b5"); c5.printIntervals();
+
+
 
 
     return 0;

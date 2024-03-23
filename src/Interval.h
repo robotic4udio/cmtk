@@ -22,11 +22,15 @@ public:
     I() = default;
     I(std::string interval)
     {
-        setIval(interval);
+        set(interval);
+    }
+    I(int degree, int quality=0)
+    {
+        set(degree, quality);
     }
 
     // Function to set the interval
-    void setIval(std::string aName)
+    void set(std::string aName)
     {
         // Test that the string only contains valid characters
         for(auto c : aName)
@@ -42,59 +46,51 @@ public:
             throw std::invalid_argument("Invalid interval name");
         }
 
-
-        mName = aName;
+        // Initialize the quality of the interval
         quality = 0;
 
         // While the interval is not empty and starts with a 'b' or '#' character 
-        while(!mName.empty() && (mName[0] == 'b' || mName[0] == '#'))
+        while(!aName.empty() && (aName[0] == 'b' || aName[0] == '#'))
         {
             // If the interval starts with a 'b' character
-            if(mName[0] == 'b')
+            if(aName[0] == 'b')
             {
                 quality--;
             }
             // If the interval starts with a '#' character
-            else if(mName[0] == '#')
+            else if(aName[0] == '#')
             {
                 quality++;
             }
             // Remove the first character from the interval
-            mName.erase(0, 1);
+            aName.erase(0, 1);
         }
 
         // If the interval is not empty and the first character is a digit
-        if(!mName.empty() && std::isdigit(mName[0]))
+        if(!aName.empty() && std::isdigit(aName[0]))
         {
-            // Get the number of semitones
-            natural = std::stoi(mName);
-            
-            // Get the octave number
-            semitones = quality;
-            int intervalNumber = natural;
-            while(intervalNumber > 7)
-            {
-                intervalNumber -= 7;
-                semitones += 12;
-            }
-            
-            // Get the semitones from the interval number with the major scale as reference
-            switch(intervalNumber)
-            {
-                case 1: semitones += 0; break;
-                case 2: semitones += 2; break;
-                case 3: semitones += 4; break;
-                case 4: semitones += 5; break;
-                case 5: semitones += 7; break;
-                case 6: semitones += 9; break;
-                case 7: semitones += 11; break;
-                default: break;
-            }
+            // Get the degree of the interval
+            degree = std::stoi(aName);
 
+            // Calculate the number of semitones
+            semitones = semitonesFromDegree(degree, quality);
+
+            // Return
+            return;
         }
 
+        // If the interval is empty
+        throw std::invalid_argument("Invalid interval name");
     }
 
+    void set(int aDegree, int aQuality)
+    {
+        degree = aDegree;
+        quality = aQuality;
+        semitones = semitonesFromDegree(degree, quality);
+    }
+
+    // Function to get the interval as a string
     std::string getString()
     {
         auto quality = this->quality;
@@ -109,8 +105,14 @@ public:
             res += "#";
             quality--;
         }
-        res += std::to_string(natural);
+        res += std::to_string(degree);
         return std::move(res);
+    }
+
+    // Function to get the interval as a string
+    std::string getName()
+    {
+        return std::move(getString());
     }
 
     // Function to get the number of semitones
@@ -125,14 +127,101 @@ public:
         std::cout << getString() << ": " << getSemitones() << std::endl;   
     }
 
-private:
-    std::string mName;
+    // Sharpen the interval
+    void sharpen()
+    {
+        quality++;
+        semitones++;
+    }
 
+    // Flatten the interval
+    void flatten()
+    {
+        quality--;
+        semitones--;
+    }
+
+    // Set quality
+    void setQuality(int aQuality)
+    {
+        int diff = aQuality - quality;
+        quality = aQuality;
+        semitones += diff;
+    }
+
+    // Set quality from string
+    void setQuality(std::string aQuality)
+    {
+        int newQuality = 0;
+        for(auto c : aQuality)
+        {
+            if     (c == 'b') newQuality--;
+            else if(c == '#') newQuality++;
+        }
+        setQuality(newQuality);
+    }
+
+    // Set Quality from char
+    void setQuality(char aQuality)
+    {
+        int newQuality = aQuality == 'b' ? -1 : aQuality == '#' ? 1 : 0;
+        setQuality(newQuality);
+    }
+
+    // Get Degree
+    int getDegree()
+    {
+        return degree;
+    }
+
+    // Set Degree
+    void setDegree(int aDegree)
+    {
+        degree = aDegree;
+        semitones = semitonesFromDegree(degree, quality);
+    }
+    
+    // Equality operator
+    bool operator==(const I& other) const
+    {
+        return semitones == other.semitones;
+    }
+
+    // Add a function to be used in std::sort
+    bool operator<(const I& other) const
+    {
+        return semitones < other.semitones;
+    }
+
+private:
     // Function to set the interval
     int semitones = 0;
-    int natural = 0;
-    int quality = 0;
+    int degree = 0;  
+    int quality = 0; // -1 for flat, 0 for natural, 1 for sharp
 
+    int semitonesFromDegree(int aDegree, int aQuality=0)
+    {
+        int tmp_semitones = aQuality;
+        while(aDegree > 7)
+        {
+            aDegree -= 7;
+            tmp_semitones += 12;
+        }
+        
+        switch(degree)
+        {
+            case 1: tmp_semitones += 0; break;
+            case 2: tmp_semitones += 2; break;
+            case 3: tmp_semitones += 4; break;
+            case 4: tmp_semitones += 5; break;
+            case 5: tmp_semitones += 7; break;
+            case 6: tmp_semitones += 9; break;
+            case 7: tmp_semitones += 11; break;
+            default: break;
+        }
+
+        return tmp_semitones;
+    }
 
 };
 

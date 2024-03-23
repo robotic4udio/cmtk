@@ -7,6 +7,7 @@
 #include <map>
 #include <algorithm>
 #include <cctype>
+#include "Interval.h"
 
 namespace cmtk {
 
@@ -674,6 +675,7 @@ public:
     std::vector<int> getChordTones(const std::string& aChordSymbol, int rootNote = 0){
         auto chordSymbol = aChordSymbol;
         std::string rootName = "";
+        chordIntervals_old.clear();
         chordIntervals.clear();
         noteNames_.clear();
         noteNames_.push_back(NoteName::I);
@@ -778,55 +780,92 @@ public:
         // Initialize the chord tones vector based on the chord type
         switch (chordQuality)
         {
-            case Quality::Major:          chordIntervals = {Interval::_1, Interval::_3,  Interval::_5};  break;
-            case Quality::Minor:          chordIntervals = {Interval::_1, Interval::_b3, Interval::_5};  break;
-            case Quality::Diminished:     chordIntervals = {Interval::_1, Interval::_b3, Interval::_b5}; break;
-            case Quality::HalfDiminished: chordIntervals = {Interval::_1, Interval::_b3, Interval::_b5, Interval::_b7}; break;
-            case Quality::Augmented:      chordIntervals = {Interval::_1, Interval::_3,  Interval::_s5}; break;
-            case Quality::Sus2:           chordIntervals = {Interval::_1, Interval::_2,  Interval::_5};  break;
-            case Quality::Sus4:           chordIntervals = {Interval::_1, Interval::_4,  Interval::_5};  break;
-            case Quality::PowerChord:     chordIntervals = {Interval::_1,                Interval::_5};  break;
+            case Quality::Major:          chordIntervals_old = {Interval::_1, Interval::_3 , Interval::_5 };  
+                                          chordIntervals     = {I("1")      , I("3")       , I("5")       };
+            break;
+            case Quality::Minor:          chordIntervals_old = {Interval::_1, Interval::_b3, Interval::_5};  
+                                          chordIntervals     = {I("1")      , I("b3")      , I("5")      };
+            break;
+            case Quality::Diminished:     chordIntervals_old = {Interval::_1, Interval::_b3, Interval::_b5}; 
+                                          chordIntervals     = {I("1")      , I("b3")      , I("b5")      };
+            break;
+            case Quality::HalfDiminished: chordIntervals_old = {Interval::_1, Interval::_b3, Interval::_b5, Interval::_b7}; 
+                                          chordIntervals     = {I("1")      , I("b3")      , I("b5")      , I("b7")      };
+            break;
+            case Quality::Augmented:      chordIntervals_old = {Interval::_1, Interval::_3,  Interval::_s5}; 
+                                          chordIntervals     = {I("1")      , I("3")      , I("#5")       };
+            break;
+            case Quality::Sus2:           chordIntervals_old = {Interval::_1, Interval::_2,  Interval::_5};  
+                                          chordIntervals     = {I("1")      , I("2")      , I("5")       };
+            break;
+            case Quality::Sus4:           chordIntervals_old = {Interval::_1, Interval::_4,  Interval::_5};  
+                                          chordIntervals     = {I("1")      , I("4")      , I("5")       };
+            break;
+            case Quality::PowerChord:     chordIntervals_old = {Interval::_1,                Interval::_5};  
+                                          chordIntervals     = {I("1")      ,                I("5")       };
+            break;
         }
 
         // Add Extension
         if(removePrefix(chordSymbol, "6")){
             add(Interval::_6);
+            add(I(6));
         }
         else if(removePrefix(chordSymbol, "7")){
             add(chordQuality == Quality::Diminished ? Interval::_6 : Interval::_b7);
+            add(chordQuality == Quality::Diminished ? I(6) : I(7,-1));
         }
         else if(removePrefix(chordSymbol, "9")){ 
             add(chordQuality == Quality::Diminished ? Interval::_6 : Interval::_b7);
             add(Interval::_9);
+            add(chordQuality == Quality::Diminished ? I(6) : I(7,-1));
+            add(I(9));
         }
         else if(removePrefix(chordSymbol, "11")){ 
             add(chordQuality == Quality::Diminished ? Interval::_6 : Interval::_b7);
             add(Interval::_9);
             add(Interval::_11);
+            add(chordQuality == Quality::Diminished ? I(6) : I(7,-1));
+            add(I(9));
+            add(I(11));
         }
         else if(removePrefix(chordSymbol, "13")){ 
             add(chordQuality == Quality::Diminished ? Interval::_6 : Interval::_b7);
             add(Interval::_9);
             add(Interval::_11);
             add(Interval::_13);
+            add(chordQuality == Quality::Diminished ? I(6) : I(7,-1));
+            add(I(9));
+            add(I(11));
+            add(I(13));
         }
         else if(removePrefix(chordSymbol, "maj7")){ 
             add(Interval::_7);
+            add(I(7));
         }
         else if(removePrefix(chordSymbol, "maj9")){ 
             add(Interval::_7);
             add(Interval::_9);
+            add(I(7));
+            add(I(9));
         }
         else if(removePrefix(chordSymbol, "maj11")){ 
             add(Interval::_7);
             add(Interval::_9);
             add(Interval::_11);
+            add(I(7));
+            add(I(9));
+            add(I(11));
         }
         else if(removePrefix(chordSymbol, "maj13")){ 
             add(Interval::_7);
             add(Interval::_9);
             add(Interval::_11);
             add(Interval::_13);
+            add(I(7));
+            add(I(9));
+            add(I(11));
+            add(I(13));
         }
 
         // Handle more complex chords
@@ -835,52 +874,53 @@ public:
         {   
             found = false;
             // Flatten
-            if(removePrefix(chordSymbol, "b3"  )){ remove(Interval::_3);  remove(Interval::_s3);  add(Interval::_b3);  found = true; }
-            if(removePrefix(chordSymbol, "b5"  )){ remove(Interval::_5);  remove(Interval::_s5);  add(Interval::_b5);  found = true; }
-            if(removePrefix(chordSymbol, "b7"  )){ remove(Interval::_7);  remove(Interval::_s7);  add(Interval::_b7);  found = true; }
-            if(removePrefix(chordSymbol, "b9"  )){ remove(Interval::_9);  remove(Interval::_s9);  add(Interval::_b9);  found = true; }
-            if(removePrefix(chordSymbol, "b11" )){ remove(Interval::_11); remove(Interval::_s11); add(Interval::_b11); found = true; }
-            if(removePrefix(chordSymbol, "b13" )){ remove(Interval::_13); remove(Interval::_s13); add(Interval::_b13); found = true; }
+            if(removePrefix(chordSymbol, "b3"  )){ remove(Interval::_3);  remove(Interval::_s3);  add(Interval::_b3);  setQuality( 3,-1); found = true; }
+            if(removePrefix(chordSymbol, "b5"  )){ remove(Interval::_5);  remove(Interval::_s5 ); add(Interval::_b5);  setQuality( 5,-1); found = true; }
+            if(removePrefix(chordSymbol, "b7"  )){ remove(Interval::_7);  remove(Interval::_s7 ); add(Interval::_b7);  setQuality( 7,-1); found = true; }
+            if(removePrefix(chordSymbol, "b9"  )){ remove(Interval::_9);  remove(Interval::_s9 ); add(Interval::_b9);  setQuality( 9,-1); found = true; }
+            if(removePrefix(chordSymbol, "b11" )){ remove(Interval::_11); remove(Interval::_s11); add(Interval::_b11); setQuality(11,-1); found = true; }
+            if(removePrefix(chordSymbol, "b13" )){ remove(Interval::_13); remove(Interval::_s13); add(Interval::_b13); setQuality(13,-1); found = true; }
             
             // Sharpen
-            if(removePrefix(chordSymbol, "#3"  )){ remove(Interval::_3);  remove(Interval::_b3);  add(Interval::_s3);  found = true; }
-            if(removePrefix(chordSymbol, "#5"  )){ remove(Interval::_5);  remove(Interval::_b5);  add(Interval::_s5);  found = true; }
-            if(removePrefix(chordSymbol, "#7"  )){ remove(Interval::_7);  remove(Interval::_b7);  add(Interval::_s7);  found = true; }
-            if(removePrefix(chordSymbol, "#9"  )){ remove(Interval::_9);  remove(Interval::_b9);  add(Interval::_s9);  found = true; }
-            if(removePrefix(chordSymbol, "#11" )){ remove(Interval::_11); remove(Interval::_b11); add(Interval::_s11); found = true; }
-            if(removePrefix(chordSymbol, "#13" )){ remove(Interval::_13); remove(Interval::_b13); add(Interval::_s13); found = true; }
+            if(removePrefix(chordSymbol, "#3"  )){ remove(Interval::_3);  remove(Interval::_b3);  add(Interval::_s3);  setQuality(3 ,-1); found = true; }
+            if(removePrefix(chordSymbol, "#5"  )){ remove(Interval::_5);  remove(Interval::_b5);  add(Interval::_s5);  setQuality(5 ,-1); found = true; }
+            if(removePrefix(chordSymbol, "#7"  )){ remove(Interval::_7);  remove(Interval::_b7);  add(Interval::_s7);  setQuality(7 ,-1); found = true; }
+            if(removePrefix(chordSymbol, "#9"  )){ remove(Interval::_9);  remove(Interval::_b9);  add(Interval::_s9);  setQuality(9 ,-1); found = true; }
+            if(removePrefix(chordSymbol, "#11" )){ remove(Interval::_11); remove(Interval::_b11); add(Interval::_s11); setQuality(11,-1); found = true; }
+            if(removePrefix(chordSymbol, "#13" )){ remove(Interval::_13); remove(Interval::_b13); add(Interval::_s13); setQuality(13,-1); found = true; }
             
             // Remove notes if required
-            if(removePrefix(chordSymbol, "no1" )){ remove(Interval::_1);  found = true; }
-            if(removePrefix(chordSymbol, "no3" )){ remove(Interval::_3);  remove(Interval::_b3);  remove(Interval::_s3); found = true;}
-            if(removePrefix(chordSymbol, "no5" )){ remove(Interval::_5);  remove(Interval::_b5);  remove(Interval::_s5); found = true;}
-            if(removePrefix(chordSymbol, "no7" )){ remove(Interval::_7);  remove(Interval::_b7);  remove(Interval::_s7); found = true;}
-            if(removePrefix(chordSymbol, "no9" )){ remove(Interval::_9);  remove(Interval::_b9);  remove(Interval::_s9); found = true;}
-            if(removePrefix(chordSymbol, "no11")){ remove(Interval::_11); remove(Interval::_b11); remove(Interval::_s11);found = true;}
-            if(removePrefix(chordSymbol, "no13")){ remove(Interval::_13); remove(Interval::_b13); remove(Interval::_s13);found = true;}
+            if(removePrefix(chordSymbol, "no1" )){ remove(Interval::_1);  removeDegree(1); found = true; }
+            if(removePrefix(chordSymbol, "no3" )){ remove(Interval::_3);  remove(Interval::_b3);  remove(Interval::_s3);  removeDegree( 3); found = true;}
+            if(removePrefix(chordSymbol, "no5" )){ remove(Interval::_5);  remove(Interval::_b5);  remove(Interval::_s5);  removeDegree( 5); found = true;}
+            if(removePrefix(chordSymbol, "no7" )){ remove(Interval::_7);  remove(Interval::_b7);  remove(Interval::_s7);  removeDegree( 7); found = true;}
+            if(removePrefix(chordSymbol, "no9" )){ remove(Interval::_9);  remove(Interval::_b9);  remove(Interval::_s9);  removeDegree( 9); found = true;}
+            if(removePrefix(chordSymbol, "no11")){ remove(Interval::_11); remove(Interval::_b11); remove(Interval::_s11); removeDegree(11); found = true;}
+            if(removePrefix(chordSymbol, "no13")){ remove(Interval::_13); remove(Interval::_b13); remove(Interval::_s13); removeDegree(13); found = true;}
 
-            // Add notes if required
-            if(removePrefix(chordSymbol, "add2"  )){ add(Interval::_2);   found = true; }
-            if(removePrefix(chordSymbol, "add4"  )){ add(Interval::_4);   found = true; }
-            if(removePrefix(chordSymbol, "add6"  )){ add(Interval::_6);   found = true; }
-            if(removePrefix(chordSymbol, "add9"  )){ add(Interval::_9);   found = true; }
-            if(removePrefix(chordSymbol, "add11" )){ add(Interval::_11);  found = true; }
-            if(removePrefix(chordSymbol, "add13" )){ add(Interval::_13);  found = true; }
-            if(removePrefix(chordSymbol, "addb2" )){ add(Interval::_b2);  found = true; }
-            if(removePrefix(chordSymbol, "addb4" )){ add(Interval::_b4);  found = true; }
-            if(removePrefix(chordSymbol, "addb6" )){ add(Interval::_b6);  found = true; }
-            if(removePrefix(chordSymbol, "addb9" )){ add(Interval::_b9);  found = true; }
-            if(removePrefix(chordSymbol, "addb11")){ add(Interval::_b11); found = true; }
-            if(removePrefix(chordSymbol, "addb13")){ add(Interval::_b13); found = true; }
-            if(removePrefix(chordSymbol, "add#2" )){ add(Interval::_s2);  found = true; }
-            if(removePrefix(chordSymbol, "add#4" )){ add(Interval::_s4);  found = true; }
-            if(removePrefix(chordSymbol, "add#6" )){ add(Interval::_s6);  found = true; }
-            if(removePrefix(chordSymbol, "add#9" )){ add(Interval::_s9);  found = true; }
-            if(removePrefix(chordSymbol, "add#11")){ add(Interval::_s11); found = true; }
-            if(removePrefix(chordSymbol, "add#13")){ add(Interval::_s13); found = true; }
+            // Add notes if required -TODO: With the I class this should be easier
+            if(removePrefix(chordSymbol, "add2"  )){ add(Interval::_2);   add(I("2"));   found = true; }
+            if(removePrefix(chordSymbol, "add4"  )){ add(Interval::_4);   add(I("4"));   found = true; }
+            if(removePrefix(chordSymbol, "add6"  )){ add(Interval::_6);   add(I("6"));   found = true; }
+            if(removePrefix(chordSymbol, "add9"  )){ add(Interval::_9);   add(I("9"));   found = true; }
+            if(removePrefix(chordSymbol, "add11" )){ add(Interval::_11);  add(I("11"));  found = true; }
+            if(removePrefix(chordSymbol, "add13" )){ add(Interval::_13);  add(I("13"));  found = true; }
+            if(removePrefix(chordSymbol, "addb2" )){ add(Interval::_b2);  add(I("b2"));  found = true; }
+            if(removePrefix(chordSymbol, "addb4" )){ add(Interval::_b4);  add(I("b4"));  found = true; }
+            if(removePrefix(chordSymbol, "addb6" )){ add(Interval::_b6);  add(I("b6"));  found = true; }
+            if(removePrefix(chordSymbol, "addb9" )){ add(Interval::_b9);  add(I("b9"));  found = true; }
+            if(removePrefix(chordSymbol, "addb11")){ add(Interval::_b11); add(I("b11")); found = true; }
+            if(removePrefix(chordSymbol, "addb13")){ add(Interval::_b13); add(I("b13")); found = true; }
+            if(removePrefix(chordSymbol, "add#2" )){ add(Interval::_s2);  add(I("s2"));  found = true; }
+            if(removePrefix(chordSymbol, "add#4" )){ add(Interval::_s4);  add(I("s4"));  found = true; }
+            if(removePrefix(chordSymbol, "add#6" )){ add(Interval::_s6);  add(I("s6"));  found = true; }
+            if(removePrefix(chordSymbol, "add#9" )){ add(Interval::_s9);  add(I("s9"));  found = true; }
+            if(removePrefix(chordSymbol, "add#11")){ add(Interval::_s11); add(I("s11")); found = true; }
+            if(removePrefix(chordSymbol, "add#13")){ add(Interval::_s13); add(I("s13")); found = true; }
         }
 
-        // Sort the chordIntervals
+        // Sort the chordIntervals_old
+        std::sort(chordIntervals_old.begin(), chordIntervals_old.end());
         std::sort(chordIntervals.begin(), chordIntervals.end());
 
         // Print the noteNames
@@ -901,7 +941,7 @@ public:
 
                 int slashNote = 0;
                 bool found = false;
-                for(auto interval : chordIntervals){
+                for(auto interval : chordIntervals_old){
                     std::string note = intervalToNoteName(interval, rootNote, isRoman);
                     // Note to_lower
                     std::transform(note.begin(), note.end(), note.begin(), ::tolower);
@@ -915,9 +955,9 @@ public:
 
                 // Move the slash note to the front. Not by rotating the noteNames vector, just by inserting the slash note at the front and removing it from where it was
                 if(found){
-                    // Same for chordIntervals
-                    chordIntervals.insert(chordIntervals.begin(), chordIntervals[slashNote]);
-                    chordIntervals.erase(chordIntervals.begin() + slashNote + 1);
+                    // Same for chordIntervals_old
+                    chordIntervals_old.insert(chordIntervals_old.begin(), chordIntervals_old[slashNote]);
+                    chordIntervals_old.erase(chordIntervals_old.begin() + slashNote + 1);
                     // Set the bass note
                     bassNote = rootNote + slashNote;
                 
@@ -934,7 +974,7 @@ public:
 
 
         // Add the rest of the note names
-        for(auto interval : chordIntervals){
+        for(auto interval : chordIntervals_old){
             if(interval != Interval::_1)
                 noteNames.push_back(intervalToNoteName(interval, rootNote, isRoman));
             else 
@@ -947,9 +987,9 @@ public:
         }
         std::cout << std::endl;
 
-        // Convert the chordIntervals to int and assign to chordTones
+        // Convert the chordIntervals_old to int and assign to chordTones
         std::vector<int> chordTones;
-        for (auto interval : chordIntervals) {
+        for (auto interval : chordIntervals_old) {
             chordTones.push_back(intervalToInt(interval));
         }
 
@@ -977,24 +1017,65 @@ public:
 
     }
 
+    void setQuality(int aDegree, int aQuality)
+    {
+        // Find the Degree and set the quality
+        for(auto& interval : chordIntervals)
+        {
+            if(interval.getDegree() == aDegree)
+            {
+                interval.setQuality(aQuality);
+                return;
+            }
+        }
+        // If the degree is not found, add it
+        chordIntervals.push_back(I(aDegree, aQuality));
+    }
+
+    void add(I interval)
+    {
+        // If an equal interval is already present, then do not add it
+        for(auto& i : chordIntervals){
+            if(i == interval) return;
+        }
+
+        // Add the interval
+        chordIntervals.push_back(interval);
+    }
+
     // Function to add an interval
     void add(Interval n)
     {   
         // Test if interval already present
-        for(auto& interval : chordIntervals){
+        for(auto& interval : chordIntervals_old){
             if(intervalToInt(interval) == intervalToInt(n)) return;
         }
         // If not, add the interval
-        chordIntervals.push_back(n);
+        chordIntervals_old.push_back(n);
     }
 
     void insert(int index, Interval n)
     {
         // Test if interval already present
-        for(auto& interval : chordIntervals){
+        for(auto& interval : chordIntervals_old){
             if(intervalToInt(interval) == intervalToInt(n)){ 
                 // If it is the move it the the new index
-                chordIntervals.erase(std::remove(chordIntervals.begin(), chordIntervals.end(), interval), chordIntervals.end());
+                chordIntervals_old.erase(std::remove(chordIntervals_old.begin(), chordIntervals_old.end(), interval), chordIntervals_old.end());
+                chordIntervals_old.insert(chordIntervals_old.begin() + index, n);
+                return;
+            }
+        }
+
+        // If not, add the interval
+        chordIntervals_old.insert(chordIntervals_old.begin() + index, n);
+    }
+
+    void insert(int index, I n){
+        // Test if interval already present
+        for(auto& interval : chordIntervals){
+            if(interval == n){ 
+                // If it is the move it the the new index
+                chordIntervals.erase(std::remove(chordIntervals.begin(), chordIntervals.end(), n), chordIntervals.end());
                 chordIntervals.insert(chordIntervals.begin() + index, n);
                 return;
             }
@@ -1007,8 +1088,18 @@ public:
     // Remove Interval
     void remove(Interval n)
     {
-        chordIntervals.erase(std::remove(chordIntervals.begin(), chordIntervals.end(), n), chordIntervals.end());
+        chordIntervals_old.erase(std::remove(chordIntervals_old.begin(), chordIntervals_old.end(), n), chordIntervals_old.end());
         chordTones.erase(std::remove(chordTones.begin(), chordTones.end(), intervalToInt(n)), chordTones.end());
+    }
+
+    void remove(I n)
+    {
+        chordIntervals.erase(std::remove(chordIntervals.begin(), chordIntervals.end(), n), chordIntervals.end());
+    }
+
+    void removeDegree(int aDegree)
+    {
+        chordIntervals.erase(std::remove_if(chordIntervals.begin(), chordIntervals.end(), [aDegree](I i){ return i.getDegree() == aDegree; }), chordIntervals.end());
     }
 
     // Function to find the lowest chord tone
@@ -1133,17 +1224,25 @@ public:
 
     void printIntervals(){
         // Print the chord intervals
-        for(const auto& interval : chordIntervals){
+        for(const auto& interval : chordIntervals_old){
             std::cout << intervalToString(interval) << " ";
         }
         std::cout << std::endl;
+
+
+        for(auto& interval : chordIntervals){
+            std::cout << interval.getString() << " ";
+        }
+        std::cout << std::endl;
+
+
     }
 
     void printNoteNames()
     {
         // Convert the intervals to chord tones
         std::vector<std::string> noteNames;
-        for(auto interval : chordIntervals){
+        for(auto interval : chordIntervals_old){
             std::cout << intervalToNoteName(interval, rootNote) << " ";
         }
         std::cout << std::endl;
@@ -1179,7 +1278,7 @@ public:
 
     bool hasInterval(Interval interval)
     {
-        for(auto& i : chordIntervals){
+        for(auto& i : chordIntervals_old){
             if(i == interval) return true;
         }
         return false;
@@ -1189,7 +1288,7 @@ public:
     bool moveInterval(Interval interval, int octaves)
     {
         int n = 0;
-        for(auto& i : chordIntervals){
+        for(auto& i : chordIntervals_old){
             if(i == interval){
                 moveNthBy(n, octaves*12);
                 return true;
@@ -1312,7 +1411,11 @@ private:
     // Chord Tones
     std::vector<int> chordTones;
     // Chord Intervals
-    std::vector<Interval> chordIntervals;
+    std::vector<Interval> chordIntervals_old;
+
+    // Chord Intervals
+    std::vector<I> chordIntervals;
+
     // Note Names
     std::vector<std::string> noteNames;
     std::vector<NoteName> noteNames_;
