@@ -10,18 +10,19 @@
 #include "Chords.h"
 #include "Interval.h"
 
-
 namespace cmtk {
-
 
 // ----------------------------------------------------------------------- //
 // ----------------------------- Scale Class ----------------------------- //
 // ----------------------------------------------------------------------- //
-
 class Scale {
 public:
     // Constructor
-    Scale() = default;
+    Scale()
+    {
+        setScale("Major");
+    }
+
     Scale(std::string aName)
     {
         setScale(aName);

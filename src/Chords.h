@@ -62,8 +62,9 @@ inline
 std::string intervalToNoteName(I interval, int rootNote, bool isRoman = false)
 {
     // Get the note number
-    int note = rootNote + interval.getSemitones() % 12;
+    int note = (rootNote + interval.getSemitones()) % 12;
 
+    // Get the quality of the interval
     auto sharpFlat = interval.getQuality();
     bool isSharp = sharpFlat > 0;
     bool isFlat  = sharpFlat < 0;
@@ -169,7 +170,7 @@ I intervalFromNoteName(std::string n, int rootNote)
             if(n == "cb") return I(7,-1);
         }
         break;
-        case 2:{ // The key of D or Eb
+        case 2:{ // The key of D
             if(n == "d")  return I(1);
             if(n == "e")  return I(2);
             if(n == "f#") return I(3);
@@ -193,7 +194,7 @@ I intervalFromNoteName(std::string n, int rootNote)
             if(n == "cb") return I(6);
         }
         break;
-        case 3:{ // The key of D# or E
+        case 3:{ // The key of D# or Eb
             if(n == "d#") return I(1);
             if(n == "eb") return I(1);
             if(n == "e")  return I(2,-1);
@@ -224,54 +225,6 @@ I intervalFromNoteName(std::string n, int rootNote)
     return I(1);
 
 }
-
-
-enum class NoteName {
-    C = 0,
-    Cs,
-    Db,
-    D,
-    Ds,
-    Eb,
-    E,
-    Es,
-    Fb,
-    F,
-    Fs,
-    Gb,
-    G,
-    Gs,
-    Ab,
-    A,
-    As,
-    Bb,
-    B,
-    Bs,
-    Cb,
-    I,
-    II,
-    III,
-    IV,
-    V,
-    VI,
-    VII,
-    bI,
-    bII,
-    bIII,
-    bIV,
-    bV,
-    bVI,
-    bVII,
-    sI,
-    sII,
-    sIII,
-    sIV,
-    sV,
-    sVI,
-    sVII,
-    NA
-};
-
 
 // Get NoteName from beginnign of string
 inline
@@ -466,8 +419,6 @@ public:
         auto chordSymbol = aChordSymbol;
         std::string rootName = "";
         chordIntervals.clear();
-        noteNames_.clear();
-        noteNames_.push_back(NoteName::I);
         bool sharp = false;
         bool flat  = false;
 
@@ -517,35 +468,35 @@ public:
         std::transform(chordSymbol.begin(), chordSymbol.end(), chordSymbol.begin(), ::tolower);
 
         // Move the rootNote according according to the chord symbol --- Roman Numerals
-             if (removePrefix(chordSymbol, "iii" )){ rootNote += 4;  rootName += "III"; noteNames_[0] = flat ? NoteName::bIII : sharp ? NoteName::sIII : NoteName::III; }
-        else if (removePrefix(chordSymbol, "vii" )){ rootNote += 11; rootName += "VII"; noteNames_[0] = flat ? NoteName::bVII : sharp ? NoteName::sVII : NoteName::VII; }
-        else if (removePrefix(chordSymbol, "ii"  )){ rootNote += 2;  rootName += "II" ; noteNames_[0] = flat ? NoteName::bII  : sharp ? NoteName::sII  : NoteName::II;  }
-        else if (removePrefix(chordSymbol, "iv"  )){ rootNote += 5;  rootName += "IV" ; noteNames_[0] = flat ? NoteName::bIV  : sharp ? NoteName::sIV  : NoteName::IV;  }
-        else if (removePrefix(chordSymbol, "vi"  )){ rootNote += 9;  rootName += "VI" ; noteNames_[0] = flat ? NoteName::bVI  : sharp ? NoteName::sVI  : NoteName::VI;  }
-        else if (removePrefix(chordSymbol, "i"   )){ rootNote += 0;  rootName += "I"  ; noteNames_[0] = flat ? NoteName::bI   : sharp ? NoteName::sI   : NoteName::I;   }
-        else if (removePrefix(chordSymbol, "v"   )){ rootNote += 7;  rootName += "V"  ; noteNames_[0] = flat ? NoteName::bV   : sharp ? NoteName::sV   : NoteName::V;   }
+             if (removePrefix(chordSymbol, "iii" )){ rootNote += 4;  rootName += "III"; }
+        else if (removePrefix(chordSymbol, "vii" )){ rootNote += 11; rootName += "VII"; }
+        else if (removePrefix(chordSymbol, "ii"  )){ rootNote += 2;  rootName += "II" ; }
+        else if (removePrefix(chordSymbol, "iv"  )){ rootNote += 5;  rootName += "IV" ; }
+        else if (removePrefix(chordSymbol, "vi"  )){ rootNote += 9;  rootName += "VI" ; }
+        else if (removePrefix(chordSymbol, "i"   )){ rootNote += 0;  rootName += "I"  ; }
+        else if (removePrefix(chordSymbol, "v"   )){ rootNote += 7;  rootName += "V"  ; }
         // Move the rootNote according according to the chord symbol --- Specific Chords
-        else if (removePrefix(chordSymbol, "c#"  )){ rootNote += 1;  rootName = "C#"; noteNames_[0] = NoteName::Cs; }
-        else if (removePrefix(chordSymbol, "db"  )){ rootNote += 1;  rootName = "Db"; noteNames_[0] = NoteName::Db; }
-        else if (removePrefix(chordSymbol, "d#"  )){ rootNote += 3;  rootName = "D#"; noteNames_[0] = NoteName::Ds; }
-        else if (removePrefix(chordSymbol, "eb"  )){ rootNote += 3;  rootName = "Eb"; noteNames_[0] = NoteName::Eb; }
-        else if (removePrefix(chordSymbol, "e#"  )){ rootNote += 5;  rootName = "E#"; noteNames_[0] = NoteName::Es; }
-        else if (removePrefix(chordSymbol, "fb"  )){ rootNote += 5;  rootName = "Fb"; noteNames_[0] = NoteName::Fb; }
-        else if (removePrefix(chordSymbol, "f#"  )){ rootNote += 6;  rootName = "F#"; noteNames_[0] = NoteName::Fs; }
-        else if (removePrefix(chordSymbol, "gb"  )){ rootNote += 6;  rootName = "Gb"; noteNames_[0] = NoteName::Gb; }
-        else if (removePrefix(chordSymbol, "g#"  )){ rootNote += 8;  rootName = "G#"; noteNames_[0] = NoteName::Gs; }
-        else if (removePrefix(chordSymbol, "ab"  )){ rootNote += 8;  rootName = "Ab"; noteNames_[0] = NoteName::Ab; }
-        else if (removePrefix(chordSymbol, "a#"  )){ rootNote += 10; rootName = "A#"; noteNames_[0] = NoteName::As; }
-        else if (removePrefix(chordSymbol, "bb"  )){ rootNote += 10; rootName = "Bb"; noteNames_[0] = NoteName::Bb; }
-        else if (removePrefix(chordSymbol, "cb"  )){ rootNote += 11; rootName = "Cb"; noteNames_[0] = NoteName::Cb; } 
-        else if (removePrefix(chordSymbol, "b#"  )){ rootNote += 0;  rootName = "B#"; noteNames_[0] = NoteName::Bs; }
-        else if (removePrefix(chordSymbol, "c"   )){ rootNote += 0;  rootName = "C" ; noteNames_[0] = NoteName::C;  }
-        else if (removePrefix(chordSymbol, "d"   )){ rootNote += 2;  rootName = "D" ; noteNames_[0] = NoteName::D;  }
-        else if (removePrefix(chordSymbol, "e"   )){ rootNote += 4;  rootName = "E" ; noteNames_[0] = NoteName::E;  }
-        else if (removePrefix(chordSymbol, "f"   )){ rootNote += 5;  rootName = "F" ; noteNames_[0] = NoteName::F;  }
-        else if (removePrefix(chordSymbol, "g"   )){ rootNote += 7;  rootName = "G" ; noteNames_[0] = NoteName::G;  }
-        else if (removePrefix(chordSymbol, "a"   )){ rootNote += 9;  rootName = "A" ; noteNames_[0] = NoteName::A;  }
-        else if (removePrefix(chordSymbol, "b"   )){ rootNote += 11; rootName = "B" ; noteNames_[0] = NoteName::B;  }
+        else if (removePrefix(chordSymbol, "c#"  )){ rootNote += 1;  rootName = "C#"; }
+        else if (removePrefix(chordSymbol, "db"  )){ rootNote += 1;  rootName = "Db"; }
+        else if (removePrefix(chordSymbol, "d#"  )){ rootNote += 3;  rootName = "D#"; }
+        else if (removePrefix(chordSymbol, "eb"  )){ rootNote += 3;  rootName = "Eb"; }
+        else if (removePrefix(chordSymbol, "e#"  )){ rootNote += 5;  rootName = "E#"; }
+        else if (removePrefix(chordSymbol, "fb"  )){ rootNote += 5;  rootName = "Fb"; }
+        else if (removePrefix(chordSymbol, "f#"  )){ rootNote += 6;  rootName = "F#"; }
+        else if (removePrefix(chordSymbol, "gb"  )){ rootNote += 6;  rootName = "Gb"; }
+        else if (removePrefix(chordSymbol, "g#"  )){ rootNote += 8;  rootName = "G#"; }
+        else if (removePrefix(chordSymbol, "ab"  )){ rootNote += 8;  rootName = "Ab"; }
+        else if (removePrefix(chordSymbol, "a#"  )){ rootNote += 10; rootName = "A#"; }
+        else if (removePrefix(chordSymbol, "bb"  )){ rootNote += 10; rootName = "Bb"; }
+        else if (removePrefix(chordSymbol, "cb"  )){ rootNote += 11; rootName = "Cb"; } 
+        else if (removePrefix(chordSymbol, "b#"  )){ rootNote += 0;  rootName = "B#"; }
+        else if (removePrefix(chordSymbol, "c"   )){ rootNote += 0;  rootName = "C" ; }
+        else if (removePrefix(chordSymbol, "d"   )){ rootNote += 2;  rootName = "D" ; }
+        else if (removePrefix(chordSymbol, "e"   )){ rootNote += 4;  rootName = "E" ; }
+        else if (removePrefix(chordSymbol, "f"   )){ rootNote += 5;  rootName = "F" ; }
+        else if (removePrefix(chordSymbol, "g"   )){ rootNote += 7;  rootName = "G" ; }
+        else if (removePrefix(chordSymbol, "a"   )){ rootNote += 9;  rootName = "A" ; }
+        else if (removePrefix(chordSymbol, "b"   )){ rootNote += 11; rootName = "B" ; }
 
     
         // Change notes if the chord is diminished or augmented
@@ -1135,7 +1086,6 @@ private:
 
     // Note Names
     std::vector<std::string> noteNames;
-    std::vector<NoteName> noteNames_;
 
     // Root Note
     int rootNote = 0;

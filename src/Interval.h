@@ -15,7 +15,6 @@ namespace cmtk {
 // ----------------------------------------------------------------------- //
 // ----------------------------- Interval Class -------------------------- //
 // ----------------------------------------------------------------------- //
-
 class I {
 public:
     // Constructor
@@ -73,7 +72,7 @@ public:
             degree = std::stoi(aName);
 
             // Calculate the number of semitones
-            semitones = semitonesFromDegree(degree, quality);
+            semitones = getSemitones(degree, quality);
 
             // Return
             return;
@@ -93,7 +92,7 @@ public:
         // Set the degree, quality and semitones
         degree = aDegree;
         quality = aQuality;
-        semitones = semitonesFromDegree(degree, quality);
+        semitones = getSemitones(degree, quality);
     }
 
     // Function to get the interval as a string
@@ -190,7 +189,7 @@ public:
     void setDegree(int aDegree)
     {
         degree = aDegree;
-        semitones = semitonesFromDegree(degree, quality);
+        semitones = getSemitones(degree, quality);
     }
     
     // Equality operator
@@ -207,11 +206,12 @@ public:
 
 private:
     // Function to set the interval
-    int semitones = 0;
-    int degree = 0;  
-    int quality = 0; // -1 for flat, 0 for natural, 1 for sharp
+    int semitones = 0; // The number of semitones required to reach the interval
+    int degree = 0;    // The degree is relative to the major scale
+    int quality = 0;   // -1 for flat, 0 for natural, 1 for sharp
 
-    int semitonesFromDegree(int aDegree, int aQuality=0)
+    // Function to get the number of semitones from the degree and quality
+    int getSemitones(int aDegree, int aQuality=0)
     {
         int tmp_semitones = aQuality;
         while(aDegree > 7)
@@ -219,15 +219,21 @@ private:
             aDegree -= 7;
             tmp_semitones += 12;
         }
-        
-        switch(degree)
+        while(aDegree < 1)
         {
-            case 1: tmp_semitones += 0; break;
-            case 2: tmp_semitones += 2; break;
-            case 3: tmp_semitones += 4; break;
-            case 4: tmp_semitones += 5; break;
-            case 5: tmp_semitones += 7; break;
-            case 6: tmp_semitones += 9; break;
+            aDegree += 7;
+            tmp_semitones -= 12;
+        }
+    
+        // Add the number of semitones for the degree
+        switch(aDegree)
+        {
+            case 1: tmp_semitones +=  0; break;
+            case 2: tmp_semitones +=  2; break;
+            case 3: tmp_semitones +=  4; break;
+            case 4: tmp_semitones +=  5; break;
+            case 5: tmp_semitones +=  7; break;
+            case 6: tmp_semitones +=  9; break;
             case 7: tmp_semitones += 11; break;
             default: break;
         }
