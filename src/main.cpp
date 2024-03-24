@@ -10,9 +10,6 @@ using json::JSON;
 using namespace cmtk;
 
 int main() {
-    // Create a Chords object
-    Chord chord;
-
   /*   // Major Scale (Ionian Mode)
     std::cout << "Major Scale Chords: " << std::endl;
     chord.printChordTones("I");
@@ -105,9 +102,6 @@ int main() {
     // Create a Chord object
     // Chord c3("Dm7/F"); c3.print(); c3.openVoicing(); c3.getGroupRange(30,52,6,true); c3.printIntervals(); c3.print();
     // std::cout << std::endl;
-
-
-    Chord c4("i/5"); c4.printIntervals(); c4.print();
     
 
     
@@ -135,13 +129,25 @@ int main() {
     // auto content = Obj["choices"][0]["message"]["content"];
     
     // std::cout << content << std::endl;
-    Chord c5("Dm13"); c5.printIntervals();
+    Chord c5("FmMaj7"); c5.printIntervals(); c5.printSemitones(); c5.print();
 
+    // List scales in order of brightness
+    // std::cout << "Diatonic Scales: " << std::endl;
+    // auto scalesByBrightness = Scale::getDiatonicScales(c5);
+    // for(auto scale : scalesByBrightness)
+    // {
+    //     scale.print();
+    // }
+    auto scale = Scale("Dorian");
+    scale.print();
+    scale.setRoot(36);
 
-    I t1("10");
-    t1.print();
-
-
+    // Print the semitones of the scale using the [] operator
+    for(int i = 0; i < 8; i++)
+    {
+        std::cout << scale[i] << " ";
+    } 
+    std::cout << std::endl;
 
 
     return 0;

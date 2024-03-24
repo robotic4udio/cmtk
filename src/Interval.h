@@ -72,7 +72,7 @@ public:
             degree = std::stoi(aName);
 
             // Calculate the number of semitones
-            semitones = getSemitones(degree, quality);
+            updateSemitones(degree, quality);
 
             // Return
             return;
@@ -92,7 +92,7 @@ public:
         // Set the degree, quality and semitones
         degree = aDegree;
         quality = aQuality;
-        semitones = getSemitones(degree, quality);
+        updateSemitones(degree, quality);
     }
 
     // Function to get the interval as a string
@@ -189,7 +189,7 @@ public:
     void setDegree(int aDegree)
     {
         degree = aDegree;
-        semitones = getSemitones(degree, quality);
+        updateSemitones(degree, quality);
     }
     
     // Equality operator
@@ -204,6 +204,8 @@ public:
         return semitones < other.semitones;
     }
 
+
+
 private:
     // Function to set the interval
     int semitones = 0; // The number of semitones required to reach the interval
@@ -211,34 +213,33 @@ private:
     int quality = 0;   // -1 for flat, 0 for natural, 1 for sharp
 
     // Function to get the number of semitones from the degree and quality
-    int getSemitones(int aDegree, int aQuality=0)
+    void updateSemitones(int aDegree, int aQuality)
     {
-        int tmp_semitones = aQuality;
+        semitones = aQuality;
         while(aDegree > 7)
         {
             aDegree -= 7;
-            tmp_semitones += 12;
+            semitones += 12;
         }
         while(aDegree < 1)
         {
             aDegree += 7;
-            tmp_semitones -= 12;
+            semitones -= 12;
         }
     
         // Add the number of semitones for the degree
         switch(aDegree)
         {
-            case 1: tmp_semitones +=  0; break;
-            case 2: tmp_semitones +=  2; break;
-            case 3: tmp_semitones +=  4; break;
-            case 4: tmp_semitones +=  5; break;
-            case 5: tmp_semitones +=  7; break;
-            case 6: tmp_semitones +=  9; break;
-            case 7: tmp_semitones += 11; break;
+            case 1: semitones +=  0; break;
+            case 2: semitones +=  2; break;
+            case 3: semitones +=  4; break;
+            case 4: semitones +=  5; break;
+            case 5: semitones +=  7; break;
+            case 6: semitones +=  9; break;
+            case 7: semitones += 11; break;
             default: break;
         }
 
-        return tmp_semitones;
     }
 
 };

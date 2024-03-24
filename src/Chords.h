@@ -56,10 +56,8 @@ inline bool isArabicChordSymbol(const std::string& chordSymbol)
 
 }
 
-
 // Interval to Note Name
-inline
-std::string intervalToNoteName(I interval, int rootNote, bool isRoman = false)
+inline std::string intervalToNoteName(I interval, int rootNote, bool isRoman = false)
 {
     // Get the note number
     int note = (rootNote + interval.getSemitones()) % 12;
@@ -68,9 +66,6 @@ std::string intervalToNoteName(I interval, int rootNote, bool isRoman = false)
     auto sharpFlat = interval.getQuality();
     bool isSharp = sharpFlat > 0;
     bool isFlat  = sharpFlat < 0;
-
-    // print note and sharp/flat
-    // std::cout << "Note: " << note << " sharpFlat: " << sharpFlat << " isSharp: " << isSharp << " isFlat: " << isFlat << std::endl;
 
     if(isRoman){
         // Return the note name
@@ -111,10 +106,8 @@ std::string intervalToNoteName(I interval, int rootNote, bool isRoman = false)
     return "C";
 }
 
-
-
 // Interval between two notes
-inline
+inline 
 I intervalFromNoteName(std::string n, int rootNote)
 {   
     // Convert to lower case
@@ -334,7 +327,6 @@ std::string getNoteNameString(std::string& s)
 }
 
 
-
 // ----------------------------------------------------------------------- //
 // ----------------------------- Chord Class ----------------------------- //
 // ----------------------------------------------------------------------- //
@@ -378,6 +370,11 @@ public:
         return chordTones;
     }
 
+    const std::vector<I>& getIntervals() const
+    {
+        return chordIntervals;
+    }
+
     // Get the chord tones with an inversion
     std::vector<int> getChordTones(int inversion)
     {
@@ -419,8 +416,6 @@ public:
         auto chordSymbol = aChordSymbol;
         std::string rootName = "";
         chordIntervals.clear();
-        bool sharp = false;
-        bool flat  = false;
 
         // Test if the chors symbol is in roman numerals
         const bool isRoman = isRomanChordSymbol(chordSymbol);
@@ -430,8 +425,8 @@ public:
         // Handle this in a while loop to account for multiple flats or sharps
         if(isRoman){
             while(chordSymbol[0] == 'b' || chordSymbol[0] == '#') {
-                if      (chordSymbol[0] == 'b') { rootNote -= 1; rootName += "b"; flat =  true;}
-                else if (chordSymbol[0] == '#') { rootNote += 1; rootName += "#"; sharp = true;}
+                if      (chordSymbol[0] == 'b') { rootNote -= 1; rootName += "b"; }
+                else if (chordSymbol[0] == '#') { rootNote += 1; rootName += "#"; }
                 chordSymbol.erase(0,1);
             }
         }
@@ -497,7 +492,6 @@ public:
         else if (removePrefix(chordSymbol, "g"   )){ rootNote += 7;  rootName = "G" ; }
         else if (removePrefix(chordSymbol, "a"   )){ rootNote += 9;  rootName = "A" ; }
         else if (removePrefix(chordSymbol, "b"   )){ rootNote += 11; rootName = "B" ; }
-
     
         // Change notes if the chord is diminished or augmented
         if      (removePrefix(chordSymbol, "°"       )){ chordQuality = Quality::Diminished;     }
@@ -520,14 +514,14 @@ public:
         // Initialize the chord tones vector based on the chord type
         switch (chordQuality)
         {
-            case Quality::Major:          chordIntervals     = {I(1) , I(3)   , I(5)             }; break;
-            case Quality::Minor:          chordIntervals     = {I(1) , I(3,-1), I(5)             }; break;
-            case Quality::Diminished:     chordIntervals     = {I(1) , I(3,-1), I(5,-1)          }; break;
-            case Quality::HalfDiminished: chordIntervals     = {I(1) , I(3,-1), I(5,-1), I(7,-1) }; break;
-            case Quality::Augmented:      chordIntervals     = {I(1) , I(3)   , I(5, 1)          }; break;
-            case Quality::Sus2:           chordIntervals     = {I(1) , I(2)   , I(5)             }; break;
-            case Quality::Sus4:           chordIntervals     = {I(1) , I(4)   , I(5)             }; break;
-            case Quality::PowerChord:     chordIntervals     = {I(1) ,          I(5)             }; break;
+            case Quality::Major:          chordIntervals     = {I(1), I(3)   , I(5)             }; break;
+            case Quality::Minor:          chordIntervals     = {I(1), I(3,-1), I(5)             }; break;
+            case Quality::Diminished:     chordIntervals     = {I(1), I(3,-1), I(5,-1)          }; break;
+            case Quality::HalfDiminished: chordIntervals     = {I(1), I(3,-1), I(5,-1), I(7,-1) }; break;
+            case Quality::Augmented:      chordIntervals     = {I(1), I(3)   , I(5, 1)          }; break;
+            case Quality::Sus2:           chordIntervals     = {I(1), I(2)   , I(5)             }; break;
+            case Quality::Sus4:           chordIntervals     = {I(1), I(4)   , I(5)             }; break;
+            case Quality::PowerChord:     chordIntervals     = {I(1),          I(5)             }; break;
         }
 
         // Add Extension
@@ -899,6 +893,14 @@ public:
         std::cout << std::endl;
     }
 
+    void printSemitones(){
+        // Print the chord intervals
+        for(auto& interval : chordIntervals){
+            std::cout << interval.getSemitones() << " ";
+        }
+        std::cout << std::endl;        
+    }
+
     void printNoteNames()
     {
         // Convert the intervals to chord tones
@@ -1096,7 +1098,7 @@ private:
 };
 
 // ----------------------------------------------------------------------- //
-// ----------------------- ChordProgression Class ----------------------- //
+// ----------------------- ChordProgression Class ------------------------ //
 // ----------------------------------------------------------------------- //
 class ChordProgression 
 {
