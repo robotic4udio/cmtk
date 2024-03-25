@@ -105,14 +105,7 @@ int main() {
     
 
     
-    // Create a Scale object
-    Scale("Ionian").print();
-    Scale("Dorian").print();
-    Scale("Phrygian").print();
-    Scale("Lydian").print();
-    Scale("Mixolydian").print();
-    Scale("Aeolian").print();
-    Scale("Locrian").print();
+ 
 
 
     // Create a InterfaceGPT object
@@ -138,16 +131,40 @@ int main() {
     // {
     //     scale.print();
     // }
-    auto scale = Scale("Dorian");
-    scale.print();
-    scale.setRoot(36);
+
+
+
 
     // Print the semitones of the scale using the [] operator
-    for(int i = 0; i < 8; i++)
-    {
-        std::cout << scale[i] << " ";
-    } 
-    std::cout << std::endl;
+    Intervals intervals("1 b3 4 b5 b7 9 11"); // min9
+
+    Chord myChord(intervals);
+
+    I interval("#4");
+    interval.print();
+    interval.shiftOctave(1);
+    interval.print();
+
+
+   // Create a Scale object
+    Scale::printAllScales(3);
+
+    Intervals("7 9 11 13").print(); // min9
+
+
+    intervals.setFromSemitones(Intervals("1 b3 5 b6 9 #11 13").getSemitones());
+    intervals.print();
+
+
+    auto scale = Scale("Dorian");
+    scale.setRoot(36);
+    scale.print(7);
+
+
+    auto c = scale.getChord(6,7);
+    std::cout << c.getChordSymbol() << std::endl;
+    c.print();
+
 
 
     return 0;

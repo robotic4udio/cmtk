@@ -78,7 +78,8 @@
 			"regex": "cpp",
 			"set": "cpp",
 			"stack": "cpp",
-			"thread": "cpp"
+			"thread": "cpp",
+			"functional": "cpp"
 		}
 	}
 }
