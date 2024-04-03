@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cctype>
 #include "Interval.h"
+#include "Roman.h" 
 
 namespace cmtk {
 
@@ -34,12 +35,6 @@ inline bool replacePrefix(std::string& s, const std::string& prefix, const std::
     return false;
 }
 
-// Is the string a chord symbol in roman numerals
-inline bool isRomanChordSymbol(const std::string& chordSymbol)
-{
-    return chordSymbol.find_first_of("ivIV") != std::string::npos;
-}
-
 // Is the string a chord symbol in arabic numerals
 inline bool isArabicChordSymbol(const std::string& chordSymbol)
 {
@@ -56,55 +51,6 @@ inline bool isArabicChordSymbol(const std::string& chordSymbol)
 
 }
 
-// Interval to Note Name
-inline std::string intervalToNoteName(I interval, int rootNote, bool isRoman = false)
-{
-    // Get the note number
-    int note = (rootNote + interval.getSemitones()) % 12;
-
-    // Get the quality of the interval
-    auto sharpFlat = interval.getQuality();
-    bool isSharp = sharpFlat > 0;
-    bool isFlat  = sharpFlat < 0;
-
-    if(isRoman){
-        // Return the note name
-        switch(note){
-            case 0:  return "I";
-            case 1:  return isSharp ? "#I" : "bII";
-            case 2:  return "II";
-            case 3:  return isSharp ? "#II" : "bIII";
-            case 4:  return "III";
-            case 5:  return "IV";
-            case 6:  return isSharp ? "#IV" : "bV";
-            case 7:  return "V";
-            case 8:  return isSharp ? "#V" : "bVI";
-            case 9:  return "VI";
-            case 10: return isSharp ? "#VI" : "bVII";
-            case 11: return "VII";
-        }
-    }
-    else {
-        // Return the note name
-        switch(note){
-            case 0:  return "C";
-            case 1:  return isSharp ? "C#" : "Db";
-            case 2:  return "D";
-            case 3:  return isSharp ? "D#" : "Eb";
-            case 4:  return "E";
-            case 5:  return "F";
-            case 6:  return isSharp ? "F#" : "Gb";
-            case 7:  return "G";
-            case 8:  return isSharp ? "G#" : "Ab";
-            case 9:  return "A";
-            case 10: return isSharp ? "A#" : "Bb";
-            case 11: return "B";
-        }
-    }
-    // Print error message
-    std::cerr << "Error: intervalToNoteName(): Note not found note" << std::endl;
-    return "C";
-}
 
 // Interval between two notes
 inline 
@@ -327,8 +273,6 @@ std::string getNoteNameString(std::string& s)
 }
 
 
-
-
 // ----------------------------------------------------------------------- //
 // ----------------------------- Chord Class ----------------------------- //
 // ----------------------------------------------------------------------- //
@@ -365,8 +309,9 @@ public:
         chordTones = getChordTones(aChordSymbol, aRootNote);
     }
 
+    // Create a chord from a set of intervals
     void setChord(const Intervals& aIntervals, int aRootNote)
-    {   
+    {
         auto intervals = aIntervals;
         intervals.print();
         std::string chordSymbol = "";
@@ -721,7 +666,7 @@ public:
                 int slashNote = 0;
                 bool found = false;
                 for(auto interval : chordIntervals){
-                    std::string note = intervalToNoteName(interval, rootNote, isRoman);
+                    std::string note = interval.getNoteName(rootNote, isRoman);
                     // Note to_lower
                     std::transform(note.begin(), note.end(), note.begin(), ::tolower);
 
@@ -753,7 +698,7 @@ public:
         // Add the rest of the note names
         for(auto interval : chordIntervals){
             if(interval.getDegree() != 1)
-                noteNames.push_back(intervalToNoteName(interval, rootNote, isRoman));
+                noteNames.push_back(interval.getNoteName(rootNote, isRoman));
             else 
                 noteNames.push_back(rootName);
         }
@@ -934,7 +879,7 @@ public:
         // Convert the intervals to chord tones
         std::vector<std::string> noteNames;
         for(auto interval : chordIntervals){
-            std::cout << intervalToNoteName(interval, rootNote) << " ";
+            std::cout << interval.getNoteName(rootNote) << " ";
         }
         std::cout << std::endl;
     }
@@ -1086,20 +1031,19 @@ public:
         }
     }
 
-
-private:
     // Size function
-    size_t size()
+    const size_t size() const
     {
         return chordTones.size();
     }
 
     // Empty function
-    bool empty()
+    const bool empty() const
     {
         return chordTones.empty();
     }
 
+private:
     // Chord Symbol
     std::string      chordSymbol;
     // Chord Tones
@@ -1117,249 +1061,6 @@ private:
 
 
 };
-
-// ----------------------------------------------------------------------- //
-// ----------------------- ChordProgression Class ------------------------ //
-// ----------------------------------------------------------------------- //
-class ChordProgression 
-{
-public:
-    ChordProgression() = default;
-    // Constructor to create a chord progression from a vector of chords
-    ChordProgression(const std::vector<Chord>& chords)
-    {
-        this->setChordProgression(chords);
-    }
-    // Constructor to create a chord progression from a vector of chord symbols
-    ChordProgression(const std::vector<std::string>& chordSymbols, const int rootNote = 0)
-    {
-        this->setChordProgression(chordSymbols, rootNote);
-    }
-    // Constructor to create a chord progression from a string of chord symbols
-    ChordProgression(const std::string& chordSymbols, const int rootNote = 0)
-    {
-        this->setChordProgression(chordSymbols, rootNote);
-    }
-
-    // Function to set the chord progression from a vector of chords
-    void setChordProgression(const std::vector<Chord>& chords)
-    {
-        this->chords = chords;
-    }
-
-    // Function to set the chord progression from a vector of chord symbols
-    void setChordProgression(const std::vector<std::string>& chordSymbols, const int rootNote = 0)
-    {
-        chords.clear();
-        for (int i = 0; i < chordSymbols.size(); i++) {
-            chords.push_back(Chord(chordSymbols[i], rootNote));
-        }
-    }
-
-    // Function to set the chord progression from string of chord symbols
-    void setChordProgression(std::string chordSymbols, const int rootNote = 0)
-    {
-
-        // Remove all spaces from the chord symbols
-        chordSymbols.erase(std::remove(chordSymbols.begin(), chordSymbols.end(), ' '), chordSymbols.end());
-
-        std::vector<std::string> chordSymbolsVector;
-        std::string chordSymbol;
-        for (int i = 0; i < chordSymbols.size(); i++) {
-            auto c = chordSymbols[i];
-            if (c == '|' || c == ','){
-                if(chordSymbol.size() > 0){
-                    chordSymbolsVector.push_back(chordSymbol);
-                    chordSymbol = "";
-                }
-            } 
-            else {
-                chordSymbol += chordSymbols[i];
-            }
-        }
-        if(chordSymbol.size() > 0)
-            chordSymbolsVector.push_back(chordSymbol);
-        setChordProgression(chordSymbolsVector, rootNote);
-    }
-
-    // Function to add a chord to the progression
-    void addChord(const Chord& chord)
-    {
-        chords.push_back(chord);
-    }
-
-    // Function to add a chord to the progression
-    void addChord(const std::string& chordSymbol, int rootNote = 0)
-    {
-        chords.push_back(Chord(chordSymbol, rootNote));
-    }
-
-    // Function clear the progression
-    void clear()
-    {
-        chords.clear();
-    }
-
-    // Print the chord progression
-    void print()
-    {
-        for(auto& chord : chords) chord.print();
-    }
-
-    // Index Operator Overload
-    Chord& operator[](int index)
-    {
-        return chords[index];
-    }
-
-    // Size function
-    size_t size()
-    {
-        return chords.size();
-    }
-
-    // Empty function
-    bool empty()
-    {
-        return chords.empty();
-    }
-
-private:
-    std::vector<Chord> chords;
-};
-
-// ----------------------------------------------------------------------- //
-// ----------------------- ChordSequencer Class -------------------------- //
-// ----------------------------------------------------------------------- //
-class ChordSequencer {
-public:
-    // Constructor
-    ChordSequencer() = default;
-
-    // Function to set the chord progression
-    void setChordProgression(const ChordProgression& aChordProgression)
-    {
-        chordProgression = aChordProgression;
-        rewind();
-    }
-
-    std::vector<int> next(int min=0, int max=127, int mindist=0)
-    {
-        // If the chord progression is empty then return an empty vector
-        if(chordProgression.empty()) return {};
-        // Loop through the chord progression
-        if(++index >= chordProgression.size()) index = 0;
-        // Return the chord tones
-        current = chordProgression[index].getGroupRange(min,max,mindist);
-        return current;
-    }
-
-    int getBassNote(int min=0, int max=127)
-    {
-        return chordProgression[index].getBassNote(min,max);
-    }
-
-    // Function to reset the sequencer
-    void rewind()
-    {
-        index = -1;
-    }
-
-private:
-    ChordProgression chordProgression;
-    int index = -1;
-    std::vector<int> current = {};
-};
-
-
-// ----------------------------------------------------------------------- //
-// ----------------------- ChordProgressions Class ----------------------- //
-// ----------------------------------------------------------------------- //
-class ChordProgressions {
-public:
-    // Constructor
-    ChordProgressions()
-    {
-        // Create the chord progressions
-        createChordProgressions();
-    };
-
-    // Function to create the chord progressions
-    void createChordProgressions()
-    {
-        // Major Chord Progressions
-        chordProgressions["2-5-1"]               = ChordProgression("ii7|V7|I7");
-        chordProgressions["Axis"]                = ChordProgression("I|V|vi|iv");
-        chordProgressions["Axis2"]               = ChordProgression("vi|IV|I|V");
-        chordProgressions["Andalusian"]          = ChordProgression("i|bVII|bVI|V");
-        chordProgressions["AeolianVamp"]         = ChordProgression("i|bVII|bVI|bVII");
-        chordProgressions["DooWop"]              = ChordProgression("I|vi|IV|V");
-        chordProgressions["MixolydianVamp"]      = ChordProgression("I|bVII|IV|I");
-        chordProgressions["PlagelCascade"]       = ChordProgression("i|bIII|bVII|IV");
-        chordProgressions["RedHot1"]             = ChordProgression("i|bVII|v|bVI");
-        chordProgressions["RedHot2"]             = ChordProgression("I|V|ii|IV");
-        chordProgressions["RedHot3"]             = ChordProgression("IV|I|V|vi");
-        chordProgressions["RedHot4"]             = ChordProgression("I|V|vi|IV");
-        chordProgressions["RoyalRoad"]           = ChordProgression("I|IV|iii|vi");
-        chordProgressions["KissFromARose"]       = ChordProgression("bVI|bVII|I");
-        chordProgressions["SuperMarioCadence"]   = ChordProgression("I|bVI|bVII|I");
-        chordProgressions["AugmentedClimb"]      = ChordProgression("I|I+|I6no5|I7no5|IV");
-        chordProgressions["LastNightOnEarth"]    = ChordProgression("I|I+|I6no5|I7no5|IV|iv|I|I");
-        chordProgressions["Ghibli"]              = ChordProgression("IV|V7|iii|vi");
-        // Sad Chord Progressions from https://www.pianote.com/blog/sad-chord-progressions/
-        chordProgressions["PopProgression"]      = ChordProgression("vi|IV|I|V");
-        chordProgressions["HarmonicMinorAxis"]   = ChordProgression("vi|IV|I|bIII");
-        chordProgressions["Creep"]               = ChordProgression("I|III|IV|iv");
-        chordProgressions["HarmonicVamp"]        = ChordProgression("i|i|VI|V");
-        chordProgressions["HouseOfTheRisingSun"] = ChordProgression("i|III|IV|VI");
-        chordProgressions["Harmonic Shift"]      = ChordProgression("i|iv|III|V");
-        chordProgressions["AeolianClosedLoop"]   = ChordProgression("i|bVII|iv|i");
-        chordProgressions["LanaProgression"]     = ChordProgression("i|III|v|VI");
-        chordProgressions["Emotional"]           = ChordProgression("vi|IV|V|iii");
-        chordProgressions["MoonlightSonata"]     = ChordProgression("i|VI|ii|V");
-        chordProgressions["Sting"]               = ChordProgression("i|VII|iv|V");
-        chordProgressions["MinorMysteryClimb"]   = ChordProgression("IV|V|vi");
-        // The 5 Sad Piano Chord Progressions https://pianowithjonny.com/piano-lessons/5-sad-piano-chord-progressions/
-        chordProgressions["Evanescence"]         = ChordProgression("I|iii|I|iii");
-        chordProgressions["PrincessLeia"]        = ChordProgression("I|iv6");
-        chordProgressions["Sentimental"]         = ChordProgression("i|V|i|vi7b5"); // Normally arranged with decending bass line i | V/7 | i/b7 | vi7b5
-        chordProgressions["LoveProgression"]     = ChordProgression("I|V|vi|iii|IV|I|ii7|V"); // I | V/7 | vi | iii/5 | IV | I/3 | ii7 | V
-        // The 12 bar blues progression
-        chordProgressions["Blues"]               = ChordProgression("I7|IV7|I7|I7|IV7|IV7|I7|I7|V7|IV7|I7|V7");
-        // Jazz Progressions
-        chordProgressions["RhythmChanges"]       = ChordProgression("I|vi|ii|V");
-        // Cadence
-        chordProgressions["PlagalCadence"]       = ChordProgression("IV|I");
-        chordProgressions["PerfectCadence"]      = ChordProgression("V7|I");
-    }
-
-    // Function to add a chord progression to the map
-    void addChordProgression(const std::string& chordProgression, const ChordProgression& progression)
-    {
-        chordProgressions[chordProgression] = progression;
-    }
-
-    // Overload index operator to get the chord progression
-    ChordProgression& operator[](const std::string& chordProgression)
-    {
-        return chordProgressions[chordProgression];
-    }
-
-    // Print all the chord progressions
-    void print()
-    {
-        for (auto& chordProgression : chordProgressions) {
-            std::cout << chordProgression.first << ":\n";
-            chordProgression.second.print();
-        }
-    }
-
-private:
-    std::map<std::string, ChordProgression> chordProgressions; // TODO: Make this into a static private member
-};
-
-
-
 
 
 

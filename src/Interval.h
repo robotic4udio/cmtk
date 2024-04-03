@@ -256,6 +256,55 @@ public:
     }
 
 
+    // Interval to Note Name
+    std::string getNoteName(int rootNote, bool isRoman = false)
+    {
+        // Get the note number
+        int note = (rootNote + getSemitones()) % 12;
+
+        // Get the quality of the interval
+        auto sharpFlat = getQuality();
+        bool isSharp = sharpFlat > 0;
+        bool isFlat  = sharpFlat < 0;
+
+        if(isRoman){
+            // Return the note name
+            switch(note){
+                case 0:  return "I";
+                case 1:  return isSharp ? "#I" : "bII";
+                case 2:  return "II";
+                case 3:  return isSharp ? "#II" : "bIII";
+                case 4:  return "III";
+                case 5:  return "IV";
+                case 6:  return isSharp ? "#IV" : "bV";
+                case 7:  return "V";
+                case 8:  return isSharp ? "#V" : "bVI";
+                case 9:  return "VI";
+                case 10: return isSharp ? "#VI" : "bVII";
+                case 11: return "VII";
+            }
+        }
+        else {
+            // Return the note name
+            switch(note){
+                case 0:  return "C";
+                case 1:  return isSharp ? "C#" : "Db";
+                case 2:  return "D";
+                case 3:  return isSharp ? "D#" : "Eb";
+                case 4:  return "E";
+                case 5:  return "F";
+                case 6:  return isSharp ? "F#" : "Gb";
+                case 7:  return "G";
+                case 8:  return isSharp ? "G#" : "Ab";
+                case 9:  return "A";
+                case 10: return isSharp ? "A#" : "Bb";
+                case 11: return "B";
+            }
+        }
+        // Print error message
+        std::cerr << "Error: intervalToNoteName(): Note not found note" << std::endl;
+        return "C";
+    }
 
 
 
@@ -540,7 +589,7 @@ public:
         return std::find_if(IntervalVector::begin(), IntervalVector::end(), [n](I i){ return i.getDegree() == n.getDegree() && i.getQuality() == n.getQuality(); }) != IntervalVector::end();
     }
 
-    const bool contains(std::string yes) const
+    const bool contains(const std::string& yes) const
     {
         for(const auto& interval : fromString(yes))
         {
@@ -549,7 +598,7 @@ public:
         return true;        
     }
 
-    const bool containsNot(std::string no) const
+    const bool containsNot(const std::string& no) const
     {
         for(const auto& interval : fromString(no))
         {
@@ -559,7 +608,7 @@ public:
         return true;
     }
 
-    const bool contains(std::string yes, std::string no) const
+    const bool contains(const std::string& yes, const std::string& no) const
     {
         return contains(yes) && containsNot(no);
     }
@@ -616,7 +665,7 @@ public:
         return std::move(semitones);
     }
 
-    // Set from a vector of semitones
+    // Set from a vector of semitones - The lowest semitone will be treated as the root
     void setFromSemitones(std::vector<int> semitones)
     {
         // Sort the semitones
@@ -661,14 +710,14 @@ public:
         }
     }
 
-
-
     void getChordSymbol()
     {   
         auto intervals = *this;
         intervals.print();
         std::string chordSymbol = "";
         bool maj = false;
+        std::string toAppend = "";
+
         if     (intervals.contains("3 b7", "#5 b6")){ chordSymbol = "dom"  ; intervals.remove("3")           ; }
         else if(intervals.contains("3 #5", "b3 5" )){ chordSymbol = "aug"  ; intervals.remove("3")           ; }
         else if(intervals.contains("b3 b5","3 5"  )){ chordSymbol = "dim"  ; intervals.remove("b3")          ; }

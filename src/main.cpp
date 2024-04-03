@@ -3,6 +3,9 @@
 #include "../libraries/SimpleJSON/json.hpp"
 #include "Interval.h"
 #include "Scale.h"
+#include "Roman.h"
+#include "ChordProgression.h"
+
 
 #define API_KEY "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"
 
@@ -145,25 +148,24 @@ int main() {
     interval.shiftOctave(1);
     interval.print();
 
-
-   // Create a Scale object
+    // Create a Scale object
     Scale::printAllScales(3);
 
     Intervals("7 9 11 13").print(); // min9
 
-
-    intervals.setFromSemitones(Intervals("1 b3 5 b6 9 #11 13").getSemitones());
-    intervals.print();
-
-
-    auto scale = Scale("Dorian");
+    auto scale = Scale("Lydian");
     scale.setRoot(36);
-    scale.print(7);
+    scale.print();
+
+    // Test romanPitchToSemitone
+    std::cout << "Roman Pitch to Semitone: " << romanPitchToSemitone("bbvii") << std::endl;
 
 
-    auto c = scale.getChord(6,7);
-    std::cout << c.getChordSymbol() << std::endl;
-    c.print();
+    ChordProgression cp("Cm|FMaj7|Eb7|B+|G7");
+    
+    cp.setChordProgression("Cm|Bb|Ab|G");
+
+    cp.print();
 
 
 
