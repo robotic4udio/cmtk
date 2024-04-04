@@ -16,43 +16,43 @@ namespace cmtk {
 // ----------------------------------------------------------------------- //
 // ----------------------- ChordProgression Class ------------------------ //
 // ----------------------------------------------------------------------- //
-class ChordProgression 
-{
+using ChordVector = std::vector<Chord>;
+class ChordProgression : public ChordVector {
 public:
     ChordProgression() = default;
     // Constructor to create a chord progression from a vector of chords
-    ChordProgression(const std::vector<Chord>& chords)
+    ChordProgression(const ChordVector& chords)
     {
-        this->setChordProgression(chords);
+        this->set(chords);
     }
     // Constructor to create a chord progression from a vector of chord symbols
     ChordProgression(const std::vector<std::string>& chordSymbols, const int rootNote = 0)
     {
-        this->setChordProgression(chordSymbols, rootNote);
+        this->set(chordSymbols, rootNote);
     }
     // Constructor to create a chord progression from a string of chord symbols
     ChordProgression(const std::string& chordSymbols, const int rootNote = 0)
     {
-        this->setChordProgression(chordSymbols, rootNote);
+        this->set(chordSymbols, rootNote);
     }
 
     // Function to set the chord progression from a vector of chords
-    void setChordProgression(const std::vector<Chord>& chords)
+    void set(const ChordVector& chords)
     {
-        this->chords = chords;
+        *this = chords; // TODO: Access in a different way
     }
 
     // Function to set the chord progression from a vector of chord symbols
-    void setChordProgression(const std::vector<std::string>& chordSymbols, const int rootNote = 0)
+    void set(const std::vector<std::string>& chordSymbols, const int rootNote = 0)
     {
-        chords.clear();
+        this->clear();
         for (int i = 0; i < chordSymbols.size(); i++) {
-            chords.push_back(Chord(chordSymbols[i], rootNote));
+            this->push_back(Chord(chordSymbols[i], rootNote));
         }
     }
 
     // Function to set the chord progression from string of chord symbols
-    void setChordProgression(std::string chordSymbols, const int rootNote = 0)
+    void set(std::string chordSymbols, const int rootNote = 0)
     {
 
         // Remove all spaces from the chord symbols
@@ -72,57 +72,39 @@ public:
                 chordSymbol += chordSymbols[i];
             }
         }
-        if(chordSymbol.size() > 0)
-            chordSymbolsVector.push_back(chordSymbol);
-        setChordProgression(chordSymbolsVector, rootNote);
+        // If a chordSymbol is still present push it to the vector
+        if(chordSymbol.size() > 0) chordSymbolsVector.push_back(chordSymbol);
+
+        // Use the vector-based set function
+        set(chordSymbolsVector, rootNote);
     }
 
     // Function to add a chord to the progression
     void addChord(const Chord& chord)
     {
-        chords.push_back(chord);
+        ChordVector::push_back(chord);
     }
 
     // Function to add a chord to the progression
     void addChord(const std::string& chordSymbol, int rootNote = 0)
     {
-        chords.push_back(Chord(chordSymbol, rootNote));
+        ChordVector::push_back(Chord(chordSymbol, rootNote));
     }
 
     // Function to clear the progression
     void clear()
     {
-        chords.clear();
+        ChordVector::clear();
     }
 
     // Print the chord progression
     void print()
     {
-        for(auto& chord : chords) chord.print();
+        for(auto& chord : *this) chord.print(); // TODO: Use iterator
     }
-
-    // Index Operator Overload
-    Chord& operator[](int index)
-    {
-        return chords[index];
-    }
-
-    // Size function
-    size_t size()
-    {
-        return chords.size();
-    }
-
-    // Empty function
-    bool empty()
-    {
-        return chords.empty();
-    }
-
-    
 
 private:
-    std::vector<Chord> chords;
+
 };
 
 // ----------------------------------------------------------------------- //
@@ -134,7 +116,7 @@ public:
     ChordSequencer() = default;
 
     // Function to set the chord progression
-    void setChordProgression(const ChordProgression& aChordProgression)
+    void set(const ChordProgression& aChordProgression)
     {
         chordProgression = aChordProgression;
         rewind();
@@ -178,7 +160,7 @@ public:
     ChordProgressions()
     {
         // Create the chord progressions
-        createChordProgressions();
+        // createChordProgressions();
     };
 
     // Function to create the chord progressions

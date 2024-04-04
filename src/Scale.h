@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cctype>
 #include "Chords.h"
+#include "ChordProgression.h"
 #include "Interval.h"
 
 namespace cmtk
@@ -928,7 +929,7 @@ namespace cmtk
         // The styles of music the mode is usually used for
         std::string mStyle = "";
         // Some useful progressions for the scale
-        std::vector<std::string> mProgressions;
+        ChordProgressions mProgressions;
 
         // Function to test is a vector contains the values given in the arguments
         bool inVec(const std::vector<int> &vec, const std::vector<int> &values)

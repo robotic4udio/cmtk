@@ -163,7 +163,7 @@ int main() {
 
     ChordProgression cp("Cm|FMaj7|Eb7|B+|G7");
     
-    cp.setChordProgression("Cm|Bb|Ab|G");
+    cp.set("Cm|Bb|Ab|G");
 
     cp.print();
 
