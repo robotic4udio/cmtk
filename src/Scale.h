@@ -48,43 +48,43 @@ namespace cmtk
             // Ionian Mode - Major Scale 1st Mode {1 2 3 4 5 6 7}
             if (mName == "Ionian" || mName == "Major")
             {
-                mIntervals = {I(1), I(2), I(3), I(4), I(5), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Happy,Light,Bright,Positive,Pop,Rock,Jazz,Classical,Happy";
             }
             // Dorian Mode - Major Scale 2nd Mode {1 2 ♭3 4 5 6 ♭7} 
             else if (mName == "Dorian")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4), I(5), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Jazzy,Bluesy,Rocky,Sophisticated,Adventurous";
             }
             // Phrygian Mode - Major Scale 3rd Mode {1 ♭2 ♭3 4 5 ♭6 ♭7}
             else if (mName == "Phrygian")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4), I(5), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Exotic,Spanish,Eastern,Flamenco,Latin,Lively";
             }
             // Lydian Mode - Major Scale 4th Mode {1 2 3 ♯4 5 6 7}
             else if (mName == "Lydian")
             {
-                mIntervals = {I(1), I(2), I(3), I(4, 1), I(5), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Dreamy,Spacey,Modern,Jazz,Hopeful,Positive,Magical";
             }
             // Mixolydian Mode - Major Scale 5th Mode {1 2 3 4 5 6 ♭7}
             else if (mName == "Mixolydian")
             {
-                mIntervals = {I(1), I(2), I(3), I(4), I(5), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Blues,Rock,Jazz,Folk,Country,Pop";
             }
             // Aeolian Mode (Natural Minor) - Major Scale 6th Mode {1 2 ♭3 4 5 ♭6 ♭7}
             else if (mName == "Aeolian" || mName == "Minor")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4), I(5), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Sad,Dark,Blues,Jazz,Rock,Metal,Emotional,Sentimental,Serious";
             }
             // Locrian Mode - Major Scale 7th Mode {1 ♭2 ♭3 4 ♭5 ♭6 ♭7}
             else if (mName == "Locrian")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4), I(5, -1), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4), Interval(5, -1), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Dissonant,Unstable,Dark,Blues,Jazz,Complex,Exotic";
             }
 
@@ -92,43 +92,43 @@ namespace cmtk
             // Harmonic Major - Harmonic Major 1st Mode {1 2 3 4 5 ♭6 7}
             else if (mName == "Harmonic Major")
             {
-                mIntervals = {I(1), I(2), I(3), I(4), I(5), I(6, -1), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
                 mStyle = "Majestic,Heroic,Powerful,Exotic,Eastern,Classical";
             }
             // Dorian b5 - Harmonic Major 2nd Mode {1 2 ♭3 4 ♭5 6 7}
             else if (mName == "Dorian b5")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4), I(5, -1), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5, -1), Interval(6), Interval(7, -1)};
                 mStyle = "Mysterious,Dark,Unstable"; 
             }
             // Phrygian b4 - Harmonic Major 3rd Mode {1 2 ♭3 ♭4 5 ♭6 ♭7}
             else if (mName == "Phrygian b4")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4, -1), I(5), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4, -1), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Sentimental,Ambiguous,Exotic,Eastern,Spanish,Flamenco,Latin";
             }
             // Lydian b3 - Harmonic Major 4th Mode {1 2 ♭3 ♯4 5 6 7}
             else if (mName == "Lydian b3")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4, 1), I(5), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4, 1), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Mysterious,Exotic,Eastern,Spanish,Flamenco,Latin";
             }
             // Mixolydian b2 - Harmonic Major 5th Mode {1 ♭2 3 4 5 6 ♭7}
             else if (mName == "Mixolydian b2")
             {
-                mIntervals = {I(1), I(2, -1), I(3), I(4), I(5), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Heroic,Majestic,Powerful,Exotic,Eastern,Classical";
             }
             // Lydian Augmented - Harmonic Major 6th Mode {1 ♯2 3 ♯4 ♯5 6 7}
             else if (mName == "Lydian Augmented #2")
             {
-                mIntervals = {I(1), I(2, 1), I(3), I(4, 1), I(5, 1), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2, 1), Interval(3), Interval(4, 1), Interval(5, 1), Interval(6), Interval(7)};
                 mStyle = "Majestic,Heroic,Powerful,Exotic,Eastern,Classical";
             }
             // Locrian Diminished - Harmonic Major 7th Mode
             else if (mName == "Locrian Diminished")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4), I(5, -1), I(6, -1), I(7, -2)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4), Interval(5, -1), Interval(6, -1), Interval(7, -2)};
                 mStyle = "Classical,Emotional,Sentimental";
             }
 
@@ -136,43 +136,43 @@ namespace cmtk
             // Harmonic Minor - Harmonic Minor 1st Mode {1 2 b3 4 5 b6 7}
             else if (mName == "Harmonic Minor")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4), I(5), I(6, -1), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
                 mStyle = "Sad,Epic,Tragic,Classical,Emotional,Dark,Exotic,Eastern,Spanish,Flamenco,Latin";
             }
             // Locrian n6 - Harmonic Minor 2nd Mode
             else if (mName == "Locrian n6")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4), I(5, -1), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4), Interval(5, -1), Interval(6), Interval(7, -1)};
                 mStyle = "Ancient";
             }
             // Ionian Augmented - Harmonic Minor 3rd Mode
             else if (mName == "Ionian Augmented" || mName == "Ionian #5")
             {
-                mIntervals = {I(1), I(2), I(3), I(4), I(5, 1), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5, 1), Interval(6), Interval(7)};
                 mStyle = "Hopeful,Open,Majestic,Heroic";
             }
             // Dorian #4 - Harmonic Minor 4th Mode {1 2 ♭3 ♯4 5 6 ♭7}
             else if (mName == "Dorian #4" || mName == "Ukrainian Dorian")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4, 1), I(5), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4, 1), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "World,Gypsy,Eastern European,Mysterious";
             }
             // Phrygian Dominant - Harmonic Minor 5th Mode
             else if (mName == "Phrygian Dominant")
             {
-                mIntervals = {I(1), I(2, -1), I(3), I(4), I(5), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "World,Gypsy,Flamenco,Middle Eastern,Jewish";
             }
             // Lydian #2 - Harmonic Minor 6th Mode
             else if (mName == "Lydian #2")
             {
-                mIntervals = {I(1), I(2, 1), I(3), I(4, 1), I(5), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2, 1), Interval(3), Interval(4, 1), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Yearning,Emotional,Serious,Classical,Exotic";
             }
             // Super Locrian - Harmonic Minor 7th Mode
             else if (mName == "Super Locrian")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4, -1), I(5, -1), I(6, -1), I(7, -2)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4, -1), Interval(5, -1), Interval(6, -1), Interval(7, -2)};
                 mStyle = "Latin,Complex,Dissonant,Dark";
             }
 
@@ -180,43 +180,43 @@ namespace cmtk
             // Melodic Minor - Melodic Minor 1st Mode
             else if (mName == "Melodic Minor")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4), I(5), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Emosional,Classical,Sad,Hopeful,Spy";
             }
             // Dorian b2 - Melodic Minor 2nd Mode
             else if (mName == "Dorian b2")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4), I(5), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Suspeseful,Uneasy,Film Noir";
             }
             // Lydian Augmented - Melodic Minor 3rd Mode
             else if (mName == "Lydian Augmented")
             {
-                mIntervals = {I(1), I(2), I(3), I(4, 1), I(5, 1), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5, 1), Interval(6), Interval(7)};
                 mStyle = "Positive,Magical,Mysterious,Jazzy,Ethnic";
             }
             // Lydian Dominant - Melodic Minor 4th Mode
             else if (mName == "Lydian Dominant" || mName == "Acoustic")
             {
-                mIntervals = {I(1), I(2), I(3), I(4, 1), I(5), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Positive,Folk,World,Jazzy";
             }
             // Mixolydian b6 - Melodic Minor 5th Mode
             else if (mName == "Mixolydian b6")
             {
-                mIntervals = {I(1), I(2), I(3), I(4), I(5), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Sad,Sentimental";
             }
             // Locrian #2 - Melodic Minor 6th Mode
             else if (mName == "Half Diminished" || mName == "Locrian #2")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4), I(5, -1), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5, -1), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Jazz,Rock,Sad,Complex";
             }
             // Altered - Melodic Minor 7th Mode
             else if (mName == "Altered" || mName == "Super Locrian")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4, -1), I(5, -1), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4, -1), Interval(5, -1), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Jazz,Sophisticated";
             }
 
@@ -224,43 +224,43 @@ namespace cmtk
             // Neopolitan Major - Neopolitan Major 1st Mode
             else if (mName == "Neopolitan Major")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4), I(5), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Complex,Latin,Melancholic,Sentimental";
             }
             // Lydian Augmented #6 - Neopolitan Major 2nd Mode
             else if (mName == "Lydian Augmented #6")
             {
-                mIntervals = {I(1), I(2), I(3), I(4, 1), I(5, 1), I(6, 1), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5, 1), Interval(6, 1), Interval(7)};
                 mStyle = "Mysterious,Unstable";
             }
             // Lydian Augmented Dominant - Neopolitan Major 3rd Mode
             else if (mName == "Lydian Augmented Dominant")
             {
-                mIntervals = {I(1), I(2), I(3), I(4, 1), I(5, 1), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5, 1), Interval(6), Interval(7, -1)};
                 mStyle = "Unstable,Complex";
             }
             // Lydian b6 Dominant - Neopolitan Major 4th Mode
             else if (mName == "Lydian b6 Dominant")
             {
-                mIntervals = {I(1), I(2), I(3), I(4, 1), I(5), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Mysterious,Unstable";
             }
             // Major Locrian - Neopolitan Major 5th Mode
             else if (mName == "Major Locrian")
             {
-                mIntervals = {I(1), I(2), I(3), I(4), I(5, -1), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5, -1), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Positive,World,Mysterious,Middle Eastern";
             }
             // Super Locrian n2 - Neopolitan Major 6th Mode
             else if (mName == "Super Locrian n2")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4, -1), I(5, -1), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4, -1), Interval(5, -1), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Complex,Unstable";
             }
             // Super Locrian bb3 - Neopolitan Major 7th Mode
             else if (mName == "Super Locrian bb3")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -2), I(4, -1), I(5, -1), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -2), Interval(4, -1), Interval(5, -1), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Heroic,Mysterious";
             }
 
@@ -268,43 +268,43 @@ namespace cmtk
             // Neopolitan Minor - Neopolitan Minor 1st Mode
             else if (mName == "Neopolitan Minor")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4), I(5), I(6, -1), I(7)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
                 mStyle = "Complex,Latin,Melancholic,Sentimental";
             }
             // Lydian #6 - Neopolitan Minor 2nd Mode
             else if (mName == "Lydian #6")
             {
-                mIntervals = {I(1), I(2), I(3), I(4, 1), I(5), I(6, 1), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5), Interval(6, 1), Interval(7)};
                 mStyle = "Ethereal,Dreamy";
             }
             // Mixolydian Augmented - Neopolitan Minor 3rd Mode
             else if (mName == "Mixolydian Augmented")
             {
-                mIntervals = {I(1), I(2), I(3), I(4), I(5, 1), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5, 1), Interval(6), Interval(7, -1)};
                 mStyle = "Serious,Ambiguous";
             }
             // Hungarian Gypsy - Neopolitan Minor 4th Mode
             else if (mName == "Hungarian Gypsy")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4, 1), I(5), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4, 1), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "World,Flamenco,Gypsy,Eastern European,Middle Eastern";
             }
             // Locrian n3 - Neopolitan Minor 5th Mode
             else if (mName == "Locrian n3")
             {
-                mIntervals = {I(1), I(2, -1), I(3), I(4), I(5, -1), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(4), Interval(5, -1), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Complex,Jazz";
             }
             // Ionian #2 - Neopolitan Minor 6th Mode
             else if (mName == "Ionian #2")
             {
-                mIntervals = {I(1), I(2, 1), I(3), I(4), I(5), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2, 1), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Unstable,Complex";
             }
             // Super-Locrian Diminished - Neopolitan Minor 7th Mode
             else if (mName == "Super-Locrian Diminished")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -2), I(4, -1), I(5, -1), I(6, -1), I(7, -2)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -2), Interval(4, -1), Interval(5, -1), Interval(6, -1), Interval(7, -2)};
                 mStyle = "Latin,Dark";
             }
 
@@ -312,96 +312,96 @@ namespace cmtk
             // Double Harmonic Major - Double Harmonic Major 1st Mode
             else if (mName == "Double Harmonic Major")
             {
-                mIntervals = {I(1), I(2, -1), I(3), I(4), I(5), I(6, -1), I(7)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
             }
             // Lydian #2 #6 - Double Harmonic Major 2nd Mode
             else if (mName == "Lydian #2 #6")
             {
-                mIntervals = {I(1), I(2, 1), I(3), I(4, 1), I(5), I(6, 1), I(7)};
+                mIntervals = {Interval(1), Interval(2, 1), Interval(3), Interval(4, 1), Interval(5), Interval(6, 1), Interval(7)};
             }
             // Ultra Phrygian - Double Harmonic Major 3rd Mode
             else if (mName == "Ultra Phrygian")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4, -1), I(5), I(6, -1), I(7, -2)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4, -1), Interval(5), Interval(6, -1), Interval(7, -2)};
             }
             // Hungarian Minor - Double Harmonic Major 4rd Mode
             else if (mName == "Hungarian Minor")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4, 1), I(5), I(6, -1), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4, 1), Interval(5), Interval(6, -1), Interval(7)};
             }
             // Oriental - Double Harmonic Major 5th Mode
             else if (mName == "Oriental")
             {
-                mIntervals = {I(1), I(2, -1), I(3), I(4), I(5, -1), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(4), Interval(5, -1), Interval(6), Interval(7, -1)};
             }
             // Ionian Augmented #2 - Double Harmonic Major 6th Mode
             else if (mName == "Ionian Augmented #2")
             {
-                mIntervals = {I(1), I(2, 1), I(3), I(4), I(5, 1), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2, 1), Interval(3), Interval(4), Interval(5, 1), Interval(6), Interval(7)};
             }
             // Locrian Diminished bb3 - Double Harmonic Major 7th Mode
             else if (mName == "Locrian Diminished bb3")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -2), I(4), I(5, -1), I(6, -1), I(7, -2)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -2), Interval(4), Interval(5, -1), Interval(6, -1), Interval(7, -2)};
             }
 
             // ----------------------- Pentatonic Modes -------------- //
             // Major Pentatonic - Pentatonic 1st Mode
             else if (mName == "Major Pentatonic")
             {
-                mIntervals = {I(1), I(2), I(3), I(5), I(6)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(5), Interval(6)};
             }
             // Egyptian Pentatonic - Pentatonic 2nd Mode
             else if (mName == "Egyptian Pentatonic")
             {
-                mIntervals = {I(1), I(2), I(4), I(5), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2), Interval(4), Interval(5), Interval(7, -1)};
             }
             // Man Gong Pentatonic - Pentatonic 3rd Mode
             else if (mName == "Man Gong Pentatonic")
             {
-                mIntervals = {I(1), I(3, -1), I(4), I(6, -1), I(7, -1)};
+                mIntervals = {Interval(1), Interval(3, -1), Interval(4), Interval(6, -1), Interval(7, -1)};
             }
             // Ritsusen Pentatonic - Pentatonic 4rd Mode
             else if (mName == "Ritsusen Pentatonic")
             {
-                mIntervals = {I(1), I(2), I(4), I(5), I(6)};
+                mIntervals = {Interval(1), Interval(2), Interval(4), Interval(5), Interval(6)};
             }
             // Minor Pentatonic - Pentatonic 5th Mode
             else if (mName == "Minor Pentatonic")
             {
-                mIntervals = {I(1), I(3, -1), I(4), I(5), I(7, -1)};
+                mIntervals = {Interval(1), Interval(3, -1), Interval(4), Interval(5), Interval(7, -1)};
             }
 
             // ----------------------- Blues Scale Modes ------------------ //
             // Major Blues - Blues 1st Mode
             else if (mName == "Major Blues" || mName == "Gospel" || mName == "Blues 1st Mode")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(3), I(5), I(6)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(3), Interval(5), Interval(6)};
             }
             // Blues 2nd Mode
             else if (mName == "Blues 2nd Mode")
             {
-                mIntervals = {I(1), I(2, -1), I(2), I(4), I(5), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(2), Interval(4), Interval(5), Interval(7, -1)};
             }
             // Blues 3rd Mode
             else if (mName == "Blues 3rd Mode")
             {
-                mIntervals = {I(1), I(2, -1), I(3), I(5, -1), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(5, -1), Interval(6), Interval(7)};
             }
             // Blues 4th Mode
             else if (mName == "Blues 4th Mode")
             {
-                mIntervals = {I(1), I(3, -1), I(4), I(5, 1), I(6, 1), I(7)};
+                mIntervals = {Interval(1), Interval(3, -1), Interval(4), Interval(5, 1), Interval(6, 1), Interval(7)};
             }
             // Blues 5th Mode
             else if (mName == "Blues 5th Mode")
             {
-                mIntervals = {I(1), I(2), I(4), I(5), I(6, -1), I(6)};
+                mIntervals = {Interval(1), Interval(2), Interval(4), Interval(5), Interval(6, -1), Interval(6)};
             }
             // Minor Blues - Blues 6th Mode
             else if (mName == "Minor Blues" || mName == "Blues 6th Mode")
             {
-                mIntervals = {I(1), I(3, -1), I(4), I(5, -1), I(5), I(7, -1)};
+                mIntervals = {Interval(1), Interval(3, -1), Interval(4), Interval(5, -1), Interval(5), Interval(7, -1)};
             }
 
             // ----------------------- Other Scales ----------------------- //
@@ -409,31 +409,31 @@ namespace cmtk
             // Octatonic
             else if (mName == "Octatonic")
             {
-                mIntervals = {I(1), I(2, -1), I(3, -1), I(4), I(5), I(6, -1), I(7, -1), I(7)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1), Interval(7)};
             }
             // Augmented Scale
             else if (mName == "Augmented")
             {
-                mIntervals = {I(1), I(3, -1), I(3), I(5), I(5, 1), I(7)};
+                mIntervals = {Interval(1), Interval(3, -1), Interval(3), Interval(5), Interval(5, 1), Interval(7)};
             }
             // Bebop Dominant
             else if (mName == "Bebop Dominant")
             {
-                mIntervals = {I(1), I(2), I(3), I(4), I(5), I(6), I(7, -1), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7, -1), Interval(7)};
             }
             // Octatonic Half-Whole
             else if (mName == "Octatonic Whole-Half")
             {
-                mIntervals = {I(1), I(2), I(3, -1), I(4), I(5, -1), I(6, -1), I(6), I(7)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5, -1), Interval(6, -1), Interval(6), Interval(7)};
             }
             else if (mName == "Octatonic Half-Whole")
             {
-                mIntervals = {I(1), I(2 - 1), I(3, -1), I(3), I(4, 1), I(5), I(6), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2 - 1), Interval(3, -1), Interval(3), Interval(4, 1), Interval(5), Interval(6), Interval(7, -1)};
             }
             // Tritone
             else if (mName == "Tritone")
             {
-                mIntervals = {I(1), I(2, -1), I(3), I(5, -1), I(5), I(7, -1)};
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(5, -1), Interval(5), Interval(7, -1)};
             }
 
             else
@@ -443,7 +443,7 @@ namespace cmtk
         }
 
         // Overload the [] operator to get the semi-tone of the scale
-        I operator[](int index)
+        Interval operator[](int index)
         {
             return intervalAt(index);
         }
@@ -467,7 +467,7 @@ namespace cmtk
             return res;
         }
 
-        I intervalAt(int index)
+        Interval intervalAt(int index)
         {
             int octave = 0;
             while (index < 0)
@@ -726,7 +726,7 @@ namespace cmtk
         // Get chord at index
         Chord getChord(int index, int size = 3)
         {
-            const auto &chordSymbol = getChordSymbol(index, size);
+            const auto& chordSymbol = getChordSymbol(index, size);
             auto chord = Chord(chordSymbol);
             return std::move(chord);
         }
@@ -832,7 +832,7 @@ namespace cmtk
             {
                 auto semitones = interval.getSemitones() % 12;
                 // Check if the interval is in the scale
-                if (std::find_if(mIntervals.begin(), mIntervals.end(), [semitones, this](I i)
+                if (std::find_if(mIntervals.begin(), mIntervals.end(), [semitones, this](Interval i)
                                  { return i.getSemitones() == semitones; }) == mIntervals.end())
                 {
                     return false;
@@ -850,7 +850,7 @@ namespace cmtk
             {
                 auto semitones = interval.getSemitones() % 12;
                 // Check if the interval is in the scale
-                if (std::find_if(mIntervals.begin(), mIntervals.end(), [semitones, this](I i)
+                if (std::find_if(mIntervals.begin(), mIntervals.end(), [semitones, this](Interval i)
                                  { return i.getSemitones() == semitones; }) != mIntervals.end())
                 {
                     diatonicNotes++;

@@ -54,7 +54,7 @@ inline bool isArabicChordSymbol(const std::string& chordSymbol)
 
 // Interval between two notes
 inline 
-I intervalFromNoteName(std::string n, int rootNote)
+Interval intervalFromNoteName(std::string n, int rootNote)
 {   
     // Convert to lower case
     std::transform(n.begin(), n.end(), n.begin(), ::tolower);
@@ -62,97 +62,97 @@ I intervalFromNoteName(std::string n, int rootNote)
     // Get the note number
     switch(rootNote){
         case 0:{ // The key of C
-            if(n == "c")  return I(1);
-            if(n == "d")  return I(2);
-            if(n == "e")  return I(3);
-            if(n == "f")  return I(4);
-            if(n == "g")  return I(5);
-            if(n == "a")  return I(6);
-            if(n == "b")  return I(7);
-            if(n == "cb") return I(7);
-            if(n == "c#") return I(1, 1);
-            if(n == "db") return I(2,-1);
-            if(n == "d#") return I(2, 1);
-            if(n == "eb") return I(3,-1);
-            if(n == "e#") return I(4);
-            if(n == "fb") return I(3);
-            if(n == "f#") return I(4, 1);
-            if(n == "gb") return I(5,-1);
-            if(n == "g#") return I(5, 1);
-            if(n == "ab") return I(6,-1);
-            if(n == "a#") return I(6, 1);
-            if(n == "bb") return I(7,-1);
-            if(n == "b#") return I(7, 1);
+            if(n == "c")  return Interval(1);
+            if(n == "d")  return Interval(2);
+            if(n == "e")  return Interval(3);
+            if(n == "f")  return Interval(4);
+            if(n == "g")  return Interval(5);
+            if(n == "a")  return Interval(6);
+            if(n == "b")  return Interval(7);
+            if(n == "cb") return Interval(7);
+            if(n == "c#") return Interval(1, 1);
+            if(n == "db") return Interval(2,-1);
+            if(n == "d#") return Interval(2, 1);
+            if(n == "eb") return Interval(3,-1);
+            if(n == "e#") return Interval(4);
+            if(n == "fb") return Interval(3);
+            if(n == "f#") return Interval(4, 1);
+            if(n == "gb") return Interval(5,-1);
+            if(n == "g#") return Interval(5, 1);
+            if(n == "ab") return Interval(6,-1);
+            if(n == "a#") return Interval(6, 1);
+            if(n == "bb") return Interval(7,-1);
+            if(n == "b#") return Interval(7, 1);
         }
         break;
         case 1:{ // The key of C# or Db
-            if(n == "c#") return I(1);
-            if(n == "db") return I(1);
-            if(n == "d")  return I(2,-1);
-            if(n == "d#") return I(2);
-            if(n == "eb") return I(2);
-            if(n == "e")  return I(3,-1);
-            if(n == "fb") return I(3,-1);
-            if(n == "e#") return I(3);
-            if(n == "f")  return I(3);
-            if(n == "f#") return I(4);
-            if(n == "gb") return I(4);
-            if(n == "g")  return I(5,-1);
-            if(n == "g#") return I(5);
-            if(n == "ab") return I(5);
-            if(n == "a")  return I(6,-1);
-            if(n == "a#") return I(6);
-            if(n == "bb") return I(6);
-            if(n == "b")  return I(7,-1);
-            if(n == "b#") return I(7);
-            if(n == "c")  return I(7);
-            if(n == "cb") return I(7,-1);
+            if(n == "c#") return Interval(1);
+            if(n == "db") return Interval(1);
+            if(n == "d")  return Interval(2,-1);
+            if(n == "d#") return Interval(2);
+            if(n == "eb") return Interval(2);
+            if(n == "e")  return Interval(3,-1);
+            if(n == "fb") return Interval(3,-1);
+            if(n == "e#") return Interval(3);
+            if(n == "f")  return Interval(3);
+            if(n == "f#") return Interval(4);
+            if(n == "gb") return Interval(4);
+            if(n == "g")  return Interval(5,-1);
+            if(n == "g#") return Interval(5);
+            if(n == "ab") return Interval(5);
+            if(n == "a")  return Interval(6,-1);
+            if(n == "a#") return Interval(6);
+            if(n == "bb") return Interval(6);
+            if(n == "b")  return Interval(7,-1);
+            if(n == "b#") return Interval(7);
+            if(n == "c")  return Interval(7);
+            if(n == "cb") return Interval(7,-1);
         }
         break;
         case 2:{ // The key of D
-            if(n == "d")  return I(1);
-            if(n == "e")  return I(2);
-            if(n == "f#") return I(3);
-            if(n == "g")  return I(4);
-            if(n == "a")  return I(5);
-            if(n == "b")  return I(6);
-            if(n == "c#") return I(7);
-            if(n == "db") return I(7);
-            if(n == "d#") return I(1, 1);
-            if(n == "eb") return I(2,-1);
-            if(n == "e#") return I(2, 1);
-            if(n == "f")  return I(3,-1);
-            if(n == "fb") return I(2);
-            if(n == "gb") return I(3);
-            if(n == "g#") return I(4, 1);
-            if(n == "ab") return I(5,-1);
-            if(n == "a#") return I(5, 1);
-            if(n == "bb") return I(6,-1);
-            if(n == "b#") return I(6, 1);
-            if(n == "c")  return I(7,-1);
-            if(n == "cb") return I(6);
+            if(n == "d")  return Interval(1);
+            if(n == "e")  return Interval(2);
+            if(n == "f#") return Interval(3);
+            if(n == "g")  return Interval(4);
+            if(n == "a")  return Interval(5);
+            if(n == "b")  return Interval(6);
+            if(n == "c#") return Interval(7);
+            if(n == "db") return Interval(7);
+            if(n == "d#") return Interval(1, 1);
+            if(n == "eb") return Interval(2,-1);
+            if(n == "e#") return Interval(2, 1);
+            if(n == "f")  return Interval(3,-1);
+            if(n == "fb") return Interval(2);
+            if(n == "gb") return Interval(3);
+            if(n == "g#") return Interval(4, 1);
+            if(n == "ab") return Interval(5,-1);
+            if(n == "a#") return Interval(5, 1);
+            if(n == "bb") return Interval(6,-1);
+            if(n == "b#") return Interval(6, 1);
+            if(n == "c")  return Interval(7,-1);
+            if(n == "cb") return Interval(6);
         }
         break;
         case 3:{ // The key of D# or Eb
-            if(n == "d#") return I(1);
-            if(n == "eb") return I(1);
-            if(n == "e")  return I(2,-1);
-            if(n == "f")  return I(2);
-            if(n == "f#") return I(3,-1);
-            if(n == "gb") return I(3,-1);
-            if(n == "g")  return I(3);
-            if(n == "g#") return I(4, 1);
-            if(n == "ab") return I(5,-1);
-            if(n == "a")  return I(5);
-            if(n == "a#") return I(5, 1);
-            if(n == "bb") return I(6,-1);
-            if(n == "b")  return I(6);
-            if(n == "b#") return I(6, 1);
-            if(n == "c")  return I(7,-1);
-            if(n == "c#") return I(7);
-            if(n == "db") return I(7);
-            if(n == "d")  return I(1, 1);
-            if(n == "fb") return I(2,-1);
+            if(n == "d#") return Interval(1);
+            if(n == "eb") return Interval(1);
+            if(n == "e")  return Interval(2,-1);
+            if(n == "f")  return Interval(2);
+            if(n == "f#") return Interval(3,-1);
+            if(n == "gb") return Interval(3,-1);
+            if(n == "g")  return Interval(3);
+            if(n == "g#") return Interval(4, 1);
+            if(n == "ab") return Interval(5,-1);
+            if(n == "a")  return Interval(5);
+            if(n == "a#") return Interval(5, 1);
+            if(n == "bb") return Interval(6,-1);
+            if(n == "b")  return Interval(6);
+            if(n == "b#") return Interval(6, 1);
+            if(n == "c")  return Interval(7,-1);
+            if(n == "c#") return Interval(7);
+            if(n == "db") return Interval(7);
+            if(n == "d")  return Interval(1, 1);
+            if(n == "fb") return Interval(2,-1);
         }
 
     }
@@ -161,7 +161,7 @@ I intervalFromNoteName(std::string n, int rootNote)
     std::cerr << "Error: intervalFromNoteName(): Unrecognized note: " << n << ", with root: " << rootNote << std::endl;
 
     // Return the root note
-    return I(1);
+    return Interval(1);
 
 }
 
@@ -551,46 +551,46 @@ public:
         // Initialize the chord tones vector based on the chord type
         switch (chordQuality)
         {
-            case Quality::Major:          chordIntervals     = {I(1), I(3)   , I(5)             }; break;
-            case Quality::Minor:          chordIntervals     = {I(1), I(3,-1), I(5)             }; break;
-            case Quality::Diminished:     chordIntervals     = {I(1), I(3,-1), I(5,-1)          }; break;
-            case Quality::HalfDiminished: chordIntervals     = {I(1), I(3,-1), I(5,-1), I(7,-1) }; break;
-            case Quality::Augmented:      chordIntervals     = {I(1), I(3)   , I(5, 1)          }; break;
-            case Quality::Sus2:           chordIntervals     = {I(1), I(2)   , I(5)             }; break;
-            case Quality::Sus4:           chordIntervals     = {I(1), I(4)   , I(5)             }; break;
-            case Quality::PowerChord:     chordIntervals     = {I(1),          I(5)             }; break;
+            case Quality::Major:          chordIntervals     = {Interval(1), Interval(3)   , Interval(5)             }; break;
+            case Quality::Minor:          chordIntervals     = {Interval(1), Interval(3,-1), Interval(5)             }; break;
+            case Quality::Diminished:     chordIntervals     = {Interval(1), Interval(3,-1), Interval(5,-1)          }; break;
+            case Quality::HalfDiminished: chordIntervals     = {Interval(1), Interval(3,-1), Interval(5,-1), Interval(7,-1) }; break;
+            case Quality::Augmented:      chordIntervals     = {Interval(1), Interval(3)   , Interval(5, 1)          }; break;
+            case Quality::Sus2:           chordIntervals     = {Interval(1), Interval(2)   , Interval(5)             }; break;
+            case Quality::Sus4:           chordIntervals     = {Interval(1), Interval(4)   , Interval(5)             }; break;
+            case Quality::PowerChord:     chordIntervals     = {Interval(1),          Interval(5)             }; break;
         }
 
         // Add Extension
         if(removePrefix(chordSymbol, "6")){
-            chordIntervals.add(I(6));
+            chordIntervals.add(Interval(6));
         }
         else if(removePrefix(chordSymbol, "7")){
-            chordIntervals.add(chordQuality == Quality::Diminished ? I(6) : I(7,-1));
+            chordIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
         }
         else if(removePrefix(chordSymbol, "9")){ 
-            chordIntervals.add(chordQuality == Quality::Diminished ? I(6) : I(7,-1));
-            chordIntervals.add(I(9));
+            chordIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
+            chordIntervals.add(Interval(9));
         }
         else if(removePrefix(chordSymbol, "11")){ 
-            chordIntervals.add(chordQuality == Quality::Diminished ? I(6) : I(7,-1));
-            chordIntervals.add(I(9),I(11));
+            chordIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
+            chordIntervals.add(Interval(9),Interval(11));
         }
         else if(removePrefix(chordSymbol, "13")){ 
-            chordIntervals.add(chordQuality == Quality::Diminished ? I(6) : I(7,-1));
-            chordIntervals.add(I(9),I(11),I(13));
+            chordIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
+            chordIntervals.add(Interval(9),Interval(11),Interval(13));
         }
         else if(removePrefix(chordSymbol, "maj7")){ 
-            chordIntervals.add(I(7));
+            chordIntervals.add(Interval(7));
         }
         else if(removePrefix(chordSymbol, "maj9")){ 
-            chordIntervals.add(I(7),I(9));
+            chordIntervals.add(Interval(7),Interval(9));
         }
         else if(removePrefix(chordSymbol, "maj11")){ 
-            chordIntervals.add(I(7),I(9),I(11));
+            chordIntervals.add(Interval(7),Interval(9),Interval(11));
         }
         else if(removePrefix(chordSymbol, "maj13")){ 
-            chordIntervals.add(I(7),I(9),I(11),I(13));
+            chordIntervals.add(Interval(7),Interval(9),Interval(11),Interval(13));
         }
 
         // Handle more complex chords
@@ -624,24 +624,24 @@ public:
             if(removePrefix(chordSymbol, "no13")){ chordIntervals.removeDegree(13); found = true; }
 
             // Add notes if required -TODO: With the I class this should be easier
-            if(removePrefix(chordSymbol, "add2"  )){ chordIntervals.add(I( 2));    found = true; }
-            if(removePrefix(chordSymbol, "add4"  )){ chordIntervals.add(I( 4));    found = true; }
-            if(removePrefix(chordSymbol, "add6"  )){ chordIntervals.add(I( 6));    found = true; }
-            if(removePrefix(chordSymbol, "add9"  )){ chordIntervals.add(I( 9));    found = true; }
-            if(removePrefix(chordSymbol, "add11" )){ chordIntervals.add(I(11));    found = true; }
-            if(removePrefix(chordSymbol, "add13" )){ chordIntervals.add(I(13));    found = true; }
-            if(removePrefix(chordSymbol, "addb2" )){ chordIntervals.add(I( 2,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb4" )){ chordIntervals.add(I( 4,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb6" )){ chordIntervals.add(I( 6,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb9" )){ chordIntervals.add(I( 9,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb11")){ chordIntervals.add(I(11,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb13")){ chordIntervals.add(I(13,-1)); found = true; }
-            if(removePrefix(chordSymbol, "add#2" )){ chordIntervals.add(I( 2, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#4" )){ chordIntervals.add(I( 4, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#6" )){ chordIntervals.add(I( 6, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#9" )){ chordIntervals.add(I( 9, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#11")){ chordIntervals.add(I(11, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#13")){ chordIntervals.add(I(13, 1)); found = true; }
+            if(removePrefix(chordSymbol, "add2"  )){ chordIntervals.add(Interval( 2));    found = true; }
+            if(removePrefix(chordSymbol, "add4"  )){ chordIntervals.add(Interval( 4));    found = true; }
+            if(removePrefix(chordSymbol, "add6"  )){ chordIntervals.add(Interval( 6));    found = true; }
+            if(removePrefix(chordSymbol, "add9"  )){ chordIntervals.add(Interval( 9));    found = true; }
+            if(removePrefix(chordSymbol, "add11" )){ chordIntervals.add(Interval(11));    found = true; }
+            if(removePrefix(chordSymbol, "add13" )){ chordIntervals.add(Interval(13));    found = true; }
+            if(removePrefix(chordSymbol, "addb2" )){ chordIntervals.add(Interval( 2,-1)); found = true; }
+            if(removePrefix(chordSymbol, "addb4" )){ chordIntervals.add(Interval( 4,-1)); found = true; }
+            if(removePrefix(chordSymbol, "addb6" )){ chordIntervals.add(Interval( 6,-1)); found = true; }
+            if(removePrefix(chordSymbol, "addb9" )){ chordIntervals.add(Interval( 9,-1)); found = true; }
+            if(removePrefix(chordSymbol, "addb11")){ chordIntervals.add(Interval(11,-1)); found = true; }
+            if(removePrefix(chordSymbol, "addb13")){ chordIntervals.add(Interval(13,-1)); found = true; }
+            if(removePrefix(chordSymbol, "add#2" )){ chordIntervals.add(Interval( 2, 1)); found = true; }
+            if(removePrefix(chordSymbol, "add#4" )){ chordIntervals.add(Interval( 4, 1)); found = true; }
+            if(removePrefix(chordSymbol, "add#6" )){ chordIntervals.add(Interval( 6, 1)); found = true; }
+            if(removePrefix(chordSymbol, "add#9" )){ chordIntervals.add(Interval( 9, 1)); found = true; }
+            if(removePrefix(chordSymbol, "add#11")){ chordIntervals.add(Interval(11, 1)); found = true; }
+            if(removePrefix(chordSymbol, "add#13")){ chordIntervals.add(Interval(13, 1)); found = true; }
         }
 
         // Sort the chordIntervals
@@ -914,7 +914,7 @@ public:
     }
 
     // Function to add or subtract an octave to a specific note defined by the interval
-    bool moveInterval(I interval, int octaves)
+    bool moveInterval(Interval interval, int octaves)
     {
         int n = 0;
         for(auto& i : chordIntervals){

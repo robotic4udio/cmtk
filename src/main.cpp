@@ -143,7 +143,7 @@ int main() {
 
     Chord myChord(intervals);
 
-    I interval("#4");
+    Interval interval("#4");
     interval.print();
     interval.shiftOctave(1);
     interval.print();

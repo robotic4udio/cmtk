@@ -15,15 +15,15 @@ namespace cmtk {
 // ----------------------------------------------------------------------- //
 // ----------------------------- Interval Class -------------------------- //
 // ----------------------------------------------------------------------- //
-class I {
+class Interval {
 public:
     // Constructor
-    I() = default;
-    I(std::string interval)
+    Interval() = default;
+    Interval(std::string interval)
     {
         set(interval);
     }
-    I(int degree, int quality=0)
+    Interval(int degree, int quality=0)
     {
         set(degree, quality);
     }
@@ -220,26 +220,26 @@ public:
     }
     
     // Equality operator
-    bool operator==(const I& other) const
+    bool operator==(const Interval& other) const
     {
         return degree == other.degree && quality == other.quality;
         return semitones == other.semitones;
     }
 
     // Inequality operator
-    bool operator!=(const I& other) const
+    bool operator!=(const Interval& other) const
     {
         return semitones != other.semitones;
     }
 
     // Add a function to be used in std::sort
-    bool operator<(const I& other) const
+    bool operator<(const Interval& other) const
     {
         return semitones < other.semitones;
     }
 
     // Stream operator
-    friend std::ostream& operator<<(std::ostream& os, const I& i)
+    friend std::ostream& operator<<(std::ostream& os, const Interval& i)
     {
         auto tmp = i;
         os << tmp.getString();
@@ -254,7 +254,6 @@ public:
         // Shift the quality up by 12
         semitones += 12*n;
     }
-
 
     // Interval to Note Name
     std::string getNoteName(int rootNote, bool isRoman = false)
@@ -374,7 +373,7 @@ private:
 // ----------------------------------------------------------------------- //
 // ----------------------------- Intervals Class ------------------------- //
 // ----------------------------------------------------------------------- //
-using IntervalVector = std::vector<I>;
+using IntervalVector = std::vector<Interval>;
 class Intervals : public IntervalVector {
 public:
     // Constructor
@@ -431,7 +430,7 @@ public:
 
     void add(int degree, int quality=0)
     {
-        add(I(degree, quality));
+        add(Interval(degree, quality));
     }
 
     void add(std::string str)
@@ -443,7 +442,7 @@ public:
     }
 
     // Function to add an interval to the chord
-    void add(const I& interval){
+    void add(const Interval& interval){
         // If an equal interval is already present, then do not add it, but replace it
         for(auto& i : *this){
             if(i == interval){
@@ -458,20 +457,20 @@ public:
 
     // Template function to add an interval to the chord
     template<typename... Args>
-    void add(const I& interval, Args... args){
+    void add(const Interval& interval, Args... args){
         add(interval);
         add(args...);
     }
 
     // Template function to set the intervals
     template<typename... Args>
-    void set(const I& interval, Args... args){
+    void set(const Interval& interval, Args... args){
         set(interval);
         add(args...);
     }
 
     // Function to insert an interval into a specific index
-    void insert(int index, const I& n){
+    void insert(int index, const Interval& n){
         // Test if interval already present
         for(auto& interval : *this){
             if(interval == n){ 
@@ -487,10 +486,10 @@ public:
     }
 
     // Remove Interval, return true if removed
-    bool remove(const I& n)
+    bool remove(const Interval& n)
     {
         // Remove the interval if Degree and Quality are the same
-        auto it = std::remove_if(IntervalVector::begin(), IntervalVector::end(), [n](I i){ return i.getDegree() == n.getDegree() && i.getQuality() == n.getQuality();});
+        auto it = std::remove_if(IntervalVector::begin(), IntervalVector::end(), [n](Interval i){ return i.getDegree() == n.getDegree() && i.getQuality() == n.getQuality();});
         if(it == IntervalVector::end()) return false;
         IntervalVector::erase(it, IntervalVector::end());
         return true;
@@ -510,10 +509,10 @@ public:
         size_t pos = 0;
         while((pos = str.find(" ")) != std::string::npos)
         {
-            res.add(I(str.substr(0, pos)));
+            res.add(Interval(str.substr(0, pos)));
             str.erase(0, pos + 1);
         }
-        res.add(I(str));
+        res.add(Interval(str));
 
         return std::move(res);
     }
@@ -534,13 +533,13 @@ public:
     // Remove Interval by Degree and Quality
     void remove(int degree, int quality)
     {
-        IntervalVector::erase(std::remove_if(IntervalVector::begin(), IntervalVector::end(), [degree, quality](I i){ return (i.getDegree() == degree) && (i.getQuality() == quality); }), IntervalVector::end());
+        IntervalVector::erase(std::remove_if(IntervalVector::begin(), IntervalVector::end(), [degree, quality](Interval i){ return (i.getDegree() == degree) && (i.getQuality() == quality); }), IntervalVector::end());
     }
 
     // Remove Interval by Degree related to the Major Scale
     void removeDegree(int aDegree)
     {
-        IntervalVector::erase(std::remove_if(IntervalVector::begin(), IntervalVector::end(), [aDegree](I i){ return i.getDegree() == aDegree; }), IntervalVector::end());
+        IntervalVector::erase(std::remove_if(IntervalVector::begin(), IntervalVector::end(), [aDegree](Interval i){ return i.getDegree() == aDegree; }), IntervalVector::end());
     }
 
     // Set Quality
@@ -558,7 +557,7 @@ public:
         // If the degree is not found, add it
         if(allowAdd)
         {
-            IntervalVector::push_back(I(aDegree, aQuality));
+            IntervalVector::push_back(Interval(aDegree, aQuality));
         }
     }
 
@@ -583,10 +582,10 @@ public:
     }
 
     // Test if an interval is present
-    const bool contains(const I& n) const
+    const bool contains(const Interval& n) const
     {
         // Test if interval is present - both Degree and Quality must match
-        return std::find_if(IntervalVector::begin(), IntervalVector::end(), [n](I i){ return i.getDegree() == n.getDegree() && i.getQuality() == n.getQuality(); }) != IntervalVector::end();
+        return std::find_if(IntervalVector::begin(), IntervalVector::end(), [n](Interval i){ return i.getDegree() == n.getDegree() && i.getQuality() == n.getQuality(); }) != IntervalVector::end();
     }
 
     const bool contains(const std::string& yes) const
@@ -616,7 +615,7 @@ public:
     // Contains Degree
     const bool containsDegree(int degree) const
     {
-        return std::find_if(IntervalVector::begin(), IntervalVector::end(), [degree](I i){ return i.getDegree() == degree; }) != IntervalVector::end();
+        return std::find_if(IntervalVector::begin(), IntervalVector::end(), [degree](Interval i){ return i.getDegree() == degree; }) != IntervalVector::end();
     }
 
     // Equality operator
