@@ -124,50 +124,31 @@ int main() {
     // Print the JSON object
     // auto content = Obj["choices"][0]["message"]["content"];
     
-    // std::cout << content << std::endl;
-    Chord c5("FmMaj7"); c5.printIntervals(); c5.printSemitones(); c5.print();
-
-    // List scales in order of brightness
-    // std::cout << "Diatonic Scales: " << std::endl;
-    // auto scalesByBrightness = Scale::getDiatonicScales(c5);
-    // for(auto scale : scalesByBrightness)
-    // {
-    //     scale.print();
-    // }
-
-
-
-
-    // Print the semitones of the scale using the [] operator
-    Intervals intervals("1 b3 4 b5 b7 9 11"); // min9
-
-    Chord myChord(intervals);
-
-    Interval interval("#4");
-    interval.print();
-    interval.shiftOctave(1);
-    interval.print();
-
-    // Create a Scale object
-    Scale::printAllScales(3);
-
-    Intervals("7 9 11 13").print(); // min9
-
-    auto scale = Scale("Lydian");
-    scale.setRoot(36);
-    scale.print();
 
     // Test romanPitchToSemitone
-    std::cout << "Roman Pitch to Semitone: " << romanPitchToSemitone("bbvii") << std::endl;
+    // std::cout << "Roman Pitch to Semitone: " << romanPitchToSemitone("vii") << std::endl;
 
 
-    ChordProgression cp("Cm|FMaj7|Eb7|B+|G7");
-    
-    cp.set("Cm|Bb|Ab|G");
+  
+    // ChordProgression cp = ChordProgression("i|iv|bVII7|bIII7|bVI7|V7|i");
+    // std::cout << "Chord Progression: " << std::endl;
+    // cp.print();
+    // cp[0].print();
+    // 
+    // std::cout << "Diatonic Scales: " << std::endl;
+    // Scale::printDiatonicScales(cp,4);
 
-    cp.print();
 
+    //  Number  -9  -8  -7  -6  -5  -4  -3  -2  -1  | 1   2   3   4   5   6   7   8   9
+    //  Interval 5   b6  6   b7  7   1   b2  2   b3 | 3   4   b5  5   b6  6   b7  7   8
+    //  Semi     7   8   9   10  11  0   1   2   3  | 4   5   6   7   8   9   10  11  0   
 
+    // auto i = Intervals("3 b6 7");
+    // i.print();
+    // i.getNegativeHarmonic().print();
+
+    auto scale = Scale("Major");
+    scale.print();
 
     return 0;
 }

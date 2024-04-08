@@ -28,6 +28,13 @@ public:
         set(degree, quality);
     }
 
+    static Interval newFromSemi(int semitones, bool sharp=false)
+    {
+        Interval res;
+        res.setFromSemi(semitones,sharp);
+        return std::move(res);
+    }
+
     // Function to set the interval
     void set(std::string aName)
     {
@@ -84,19 +91,49 @@ public:
 
     void set(int aDegree, int aQuality=0)
     {
-        // Test if the degree is below 1
-        if(aDegree < 1)
-        {
-            throw std::invalid_argument("Invalid interval degree");
-        }
+        // Make sure the degree is 1 or higher
+        while(aDegree < 1) aDegree += 7;
+
         // Set the degree, quality and semitones
         degree = aDegree;
         quality = aQuality;
         updateSemitones(degree, quality);
     }
 
+       // Set from a vector of semitones - The lowest semitone will be treated as the root
+    void setFromSemi(int s, bool sharp=false)
+    {
+        int octave = 0;
+        while(s >= 12)
+        {
+            s -= 12;
+            octave++;
+        }
+        while(s < 0)
+        {
+            s += 12;
+            octave--;
+        }
+
+        switch(s)
+        {
+            case  0: set(octave*7 + 1)   ; break;
+            case  1: sharp ? set(octave*7 + 1, 1) : set(octave*7 + 2,-1); break;
+            case  2: set(octave*7 + 2)   ; break;
+            case  3: sharp ? set(octave*7 + 2, 1) : set(octave*7 + 3,-1); break;
+            case  4: set(octave*7 + 3)   ; break;
+            case  5: set(octave*7 + 4)   ; break;
+            case  6: sharp ? set(octave*7 + 4, 1) : set(octave*7 + 5,-1); break;
+            case  7: set(octave*7 + 5)   ; break;
+            case  8: sharp ? set(octave*7 + 5, 1) : set(octave*7 + 6,-1); break;
+            case  9: set(octave*7 + 6)   ; break;
+            case 10: sharp ? set(octave*7 + 6, 1) : set(octave*7 + 7,-1); break;
+            case 11: set(octave*7 + 7)   ; break;
+        }        
+    }
+
     // Function to get the interval as a string
-    std::string getString()
+    const std::string getString() const
     {
         auto quality = this->quality;
         std::string res = "";
@@ -140,15 +177,14 @@ public:
 
     }
 
-
     // Function to get the interval as a string
-    std::string getName()
+    const std::string getName() const
     {
         return std::move(getString());
     }
 
     // Function to get the number of semitones
-    int getSemitones()
+    const int getSemitones() const
     {
         return semitones;
     }
@@ -157,6 +193,12 @@ public:
     void print()
     {
         std::cout << "(" << getString() << "~" << getSemitones() << ")" << std::endl;   
+    }
+
+    // Print name
+    void printName()
+    {
+        std::cout << getName() << std::endl;   
     }
 
     // Sharpen the interval
@@ -223,13 +265,18 @@ public:
     bool operator==(const Interval& other) const
     {
         return degree == other.degree && quality == other.quality;
-        return semitones == other.semitones;
+    }
+
+    // Equality operator for string
+    const bool operator==(const std::string& intervalString) const
+    {
+        return intervalString == getName();
     }
 
     // Inequality operator
     bool operator!=(const Interval& other) const
     {
-        return semitones != other.semitones;
+        return !((*this) == other);
     }
 
     // Add a function to be used in std::sort
@@ -305,6 +352,25 @@ public:
         return "C";
     }
 
+    // Function to return the negative harmonic to the interval
+    Interval getNegativeHarmonic()
+    {
+        // This will mirror on the Major <--> Minor axis
+        return std::move(Interval::newFromSemi(7-semitones));
+    }
+
+    // Function to convert the interval to the negative harmonic by mirroring on the Major <--> Minor axis
+    void negHarmonic()
+    {
+        // This will mirror on the Major <--> Minor axis
+        setFromSemi(7-semitones);
+    }
+
+    // Transpose
+    void transpose(int semitones)
+    {
+        setFromSemi(getSemitones() + semitones);
+    }
 
 
 private:
@@ -367,12 +433,14 @@ private:
             default: return "";
         }
     }
-
+ 
 };
 
-// ----------------------------------------------------------------------- //
-// ----------------------------- Intervals Class ------------------------- //
-// ----------------------------------------------------------------------- //
+
+
+// ------------------------------------------------------------------------------------------------ //
+// ---------------------------------------- Intervals Class --------------------------------------- //
+// ------------------------------------------------------------------------------------------------ //
 using IntervalVector = std::vector<Interval>;
 class Intervals : public IntervalVector {
 public:
@@ -588,6 +656,7 @@ public:
         return std::find_if(IntervalVector::begin(), IntervalVector::end(), [n](Interval i){ return i.getDegree() == n.getDegree() && i.getQuality() == n.getQuality(); }) != IntervalVector::end();
     }
 
+    // Test if an interval is present
     const bool contains(const std::string& yes) const
     {
         for(const auto& interval : fromString(yes))
@@ -597,6 +666,7 @@ public:
         return true;        
     }
 
+    // Test if an interval is not present
     const bool containsNot(const std::string& no) const
     {
         for(const auto& interval : fromString(no))
@@ -607,6 +677,7 @@ public:
         return true;
     }
 
+    // Test if an interval is present and another is not
     const bool contains(const std::string& yes, const std::string& no) const
     {
         return contains(yes) && containsNot(no);
@@ -629,6 +700,7 @@ public:
         return true;
     }
 
+
     // Stream operator
     friend std::ostream& operator<<(std::ostream& os, const Intervals& intervals)
     {
@@ -642,7 +714,7 @@ public:
         return os;
     }
 
-    std::vector<int> getSemitones()
+    const std::vector<int> getSemitones() const
     {
         std::vector<int> res;
         for(auto& interval : *this)
@@ -656,7 +728,7 @@ public:
     std::vector<int> getSemitonesNormalized()
     {
         auto semitones = getSemitones();
-        int min = *std::min_element(semitones.begin(), semitones.end());
+        const int min = *std::min_element(semitones.begin(), semitones.end());
         for(auto& s : semitones)
         {
             s -= min;
@@ -664,17 +736,79 @@ public:
         return std::move(semitones);
     }
 
+    // Get the minimum Interval
+    Interval getMin()
+    {
+        return *std::min_element(IntervalVector::begin(), IntervalVector::end());
+    }
+
+    // Get the minimum semitone
+    int getMinSemi()
+    {
+        return *std::min_element(getSemitones().begin(), getSemitones().end());
+    }
+
+    // Get the maximum Interval
+    Interval getMax()
+    {
+        return *std::max_element(IntervalVector::begin(), IntervalVector::end());
+    }
+
+    // Get the maximum semitone
+    int getMaxSemi()
+    {
+        return *std::max_element(getSemitones().begin(), getSemitones().end());
+    }
+
+    // Get the median Interval
+    Interval getMedian()
+    {
+        auto intervals = *this;
+        std::sort(intervals.begin(), intervals.end());
+        return intervals[intervals.size()/2];
+    }
+
+    // Get the median semitone
+    int getMedianSemi()
+    {
+        auto semitones = getSemitones();
+        std::sort(semitones.begin(), semitones.end());
+        return semitones[semitones.size()/2];
+    }
+
+    // Get the mean semitone
+    int getMeanSemi()
+    {
+        auto semitones = getSemitones();
+        int sum = 0;
+        for(auto s : semitones)
+        {
+            sum += s;
+        }
+        return sum / semitones.size();
+    }
+
+
+
+    // Create a new Intervals object from the semitones 
+    static Intervals newFromSemi(std::vector<int> semitones, bool normalize=false)
+    {
+        Intervals res;
+        res.setFromSemi(semitones, normalize);
+        return std::move(res);
+    }
+
     // Set from a vector of semitones - The lowest semitone will be treated as the root
-    void setFromSemitones(std::vector<int> semitones)
+    void setFromSemi(std::vector<int> semitones, bool normalize=false)
     {
         // Sort the semitones
         std::sort(semitones.begin(), semitones.end());
 
         // Normalize the semitones
-        int min = *std::min_element(semitones.begin(), semitones.end());
-        for(auto& s : semitones)
+        if(normalize)
         {
-            s -= min;
+            int min = *std::min_element(semitones.begin(), semitones.end());
+            for(auto& s : semitones){ s -= min; }
         }
 
         // Clear the intervals
@@ -709,10 +843,9 @@ public:
         }
     }
 
-    void getChordSymbol()
+    std::string getChordSymbol()
     {   
-        auto intervals = *this;
-        intervals.print();
+        auto intervals = this->getNormalized();
         std::string chordSymbol = "";
         bool maj = false;
         std::string toAppend = "";
@@ -792,11 +925,72 @@ public:
             }
         }
 
-        // Print the chord symbol
-        std::cout << "Chord Symbol: " << chordSymbol << std::endl;
+        return chordSymbol;
+    }
+
+    // Print the ChordSymbol
+    void printChordSymbol()
+    {
+        std::cout << "Chord Symbol: " << getChordSymbol() << std::endl;
+    }
+
+    // Function to get the Intervals normalized
+    Intervals getNormalized()
+    {
+        Intervals res;
+        for(auto s : getSemitonesNormalized())
+        {
+            res.add(Interval::newFromSemi(s));
+        }
+        return std::move(res);
+    }
+
+    // Normalize the Intervals
+    void normalize()
+    {
+        setFromSemi(getSemitonesNormalized());
+    }
+    
+    // Get negative harmonic 
+    Intervals getNegativeHarmonic()
+    {
+        Intervals res;
+        for(auto& interval : *this)
+        {
+            res.add(interval.getNegativeHarmonic());
+        }
+        // Sort the intervals
+        res.sort();
+
+        return std::move(res);
+    }
+
+    // Convert to Negative Harmonic by mirroring on the Major <--> Minor axis
+    void negHarmonic()
+    {
+        for(auto& interval : *this) interval.negHarmonic();
+    }
+
+    // Transpose this
+    void transpose(int semitones)
+    {
+        for(auto& interval : *this)
+        {
+            interval.transpose(semitones);
+        }
+    }
+
+    // Return a new transposed Intervals object
+    Intervals getTransposed(int semitones)
+    {
+        auto res = *this;
+        res.transpose(semitones);
+        return std::move(res);
     }
 
 private:
+
+
 };
 
 

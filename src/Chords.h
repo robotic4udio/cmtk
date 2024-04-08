@@ -448,6 +448,8 @@ public:
         return chordTones[index];
     }
 
+    
+
     // Get the chord tones from a chord symbol
     std::vector<int> getChordTones(const std::string& aChordSymbol, int rootNote = 0){
         auto chordSymbol = aChordSymbol;
@@ -704,10 +706,10 @@ public:
         }
         
         // Print the noteNames
-        for(auto note : noteNames){
-            std::cout << note << " ";
-        }
-        std::cout << std::endl;
+        // for(auto note : noteNames){
+        //     std::cout << note << " ";
+        // }
+        // std::cout << std::endl;
 
         // Convert the chordIntervals to int and assign to chordTones
         std::vector<int> chordTones;
@@ -842,6 +844,11 @@ public:
         while(note > max) note -= 12;
 
         return note;
+    }
+
+    const int getRoot() const 
+    {
+        return rootNote;
     }
 
     void zeroCollaps(std::vector<int>& chordTones)

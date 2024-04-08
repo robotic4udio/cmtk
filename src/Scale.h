@@ -45,18 +45,32 @@ namespace cmtk
         void setScale(std::string aScaleName)
         {
             mName = aScaleName;
+            mProgressions.clear();
             // ----------------------- Major Modes ----------------------- //
             // Ionian Mode - Major Scale 1st Mode {1 2 3 4 5 6 7}
             if (mName == "Ionian" || mName == "Major")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Happy,Light,Bright,Positive,Pop,Rock,Jazz,Classical,Happy";
+                mProgressions.add("Axis"        ,"I|V|vi|IV"  );
+                mProgressions.add("Axis2"       ,"vi|IV|I|V"  );
+                mProgressions.add("DooWop"      ,"I|vi|IV|V"  );
+                mProgressions.add("RedHot2"     ,"I|V|ii|IV"  );
+                mProgressions.add("RedHot3"     ,"IV|I|V|vi"  );
+                mProgressions.add("RedHot4"     ,"I|V|vi|IV"  );
+                mProgressions.add("RoyalRoad"   ,"I|IV|iii|vi");
+                mProgressions.add("Ghibli"      ,"IV|V|iii|vi");
+                mProgressions.add("Emotional"   ,"vi|IV|V|iii");
+                mProgressions.add("MysteryClimb","IV|V|vi"    );
+                mProgressions.add("Evanescence" ,"I|iii|I|iii");
             }
             // Dorian Mode - Major Scale 2nd Mode {1 2 ♭3 4 5 6 ♭7} 
             else if (mName == "Dorian")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Jazzy,Bluesy,Rocky,Sophisticated,Adventurous";
+                mProgressions.add("PlagelCascade","i|bIII|bVII|IV");
+                mProgressions.add("Adventure","i|IV|i|IV");
             }
             // Phrygian Mode - Major Scale 3rd Mode {1 ♭2 ♭3 4 5 ♭6 ♭7}
             else if (mName == "Phrygian")
@@ -69,18 +83,23 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Dreamy,Spacey,Modern,Jazz,Hopeful,Positive,Magical";
+                mProgressions.add("Evanescence" ,"I|iii|I|iii");
             }
             // Mixolydian Mode - Major Scale 5th Mode {1 2 3 4 5 6 ♭7}
             else if (mName == "Mixolydian")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Blues,Rock,Jazz,Folk,Country,Pop";
+                mProgressions.add("MixolydianVamp","I|bVII|IV|I");
             }
             // Aeolian Mode (Natural Minor) - Major Scale 6th Mode {1 2 ♭3 4 5 ♭6 ♭7}
             else if (mName == "Aeolian" || mName == "Minor")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Sad,Dark,Blues,Jazz,Rock,Metal,Emotional,Sentimental,Serious";
+                mProgressions.add("AeolianVamp"      ,"i|bVII|bVI|bVII");
+                mProgressions.add("RedHot1"          ,"i|bVII|v|bVI"   );
+                mProgressions.add("AeolianClosedLoop","i|bVII|iv|i"    );
             }
             // Locrian Mode - Major Scale 7th Mode {1 ♭2 ♭3 4 ♭5 ♭6 ♭7}
             else if (mName == "Locrian")
@@ -96,7 +115,7 @@ namespace cmtk
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
                 mStyle = "Majestic,Heroic,Powerful,Exotic,Eastern,Classical";
             }
-            // Dorian b5 - Harmonic Major 2nd Mode {1 2 ♭3 4 ♭5 6 7}
+            // Dorian b5 - Harmonic Major 2nd Mode {1 2 ♭3 4 ♭5 6 ♭7}
             else if (mName == "Dorian b5")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5, -1), Interval(6), Interval(7, -1)};
@@ -139,6 +158,8 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
                 mStyle = "Sad,Epic,Tragic,Classical,Emotional,Dark,Exotic,Eastern,Spanish,Flamenco,Latin";
+                mProgressions.add("HarmonicVamp"  ,"i|i|bVI|V");
+                mProgressions.add("ChocolateJesus","i|iv|i|V7");
             }
             // Locrian n6 - Harmonic Minor 2nd Mode
             else if (mName == "Locrian n6")
@@ -289,6 +310,7 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4, 1), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "World,Flamenco,Gypsy,Eastern European,Middle Eastern";
+                mProgressions.add("ClapHands","i|bVI7");
             }
             // Locrian n3 - Neopolitan Minor 5th Mode
             else if (mName == "Locrian n3")
@@ -301,6 +323,7 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2, 1), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Unstable,Complex";
+                mProgressions.add("RoyalRoad","I|IV|iii|vi");
             }
             // Super-Locrian Diminished - Neopolitan Minor 7th Mode
             else if (mName == "Super-Locrian Diminished")
@@ -329,6 +352,8 @@ namespace cmtk
             else if (mName == "Hungarian Minor")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4, 1), Interval(5), Interval(6, -1), Interval(7)};
+                mProgressions.add("HarmonicVamp","i|i|bVI|V");
+                mProgressions.add("ClapHands"   ,"i|bVI7");
             }
             // Oriental - Double Harmonic Major 5th Mode
             else if (mName == "Oriental")
@@ -468,7 +493,7 @@ namespace cmtk
             return res;
         }
 
-        Interval intervalAt(int index)
+        const Interval intervalAt(int index) const 
         {
             int octave = 0;
             while (index < 0)
@@ -488,7 +513,7 @@ namespace cmtk
             return std::move(interval);
         }
 
-        Intervals intervalAt(const std::vector<int> &indexes)
+        const Intervals intervalAt(const std::vector<int> &indexes) const 
         {
             Intervals intervals;
             for (auto index : indexes)
@@ -499,7 +524,7 @@ namespace cmtk
             return std::move(intervals);
         }
 
-        std::string getChordSymbol(int index, int size = 3)
+        const std::string getChordSymbol(int index, int size = 3) const
         {
             // Check that size is valid
             if (size < 3 || size > 7)
@@ -516,6 +541,7 @@ namespace cmtk
                 auto interval = intervalAt(index + 2 * i);
                 chordIntervals.add(interval);
             }
+
             // Get the normalized semitones
             auto semitones = chordIntervals.getSemitonesNormalized();
 
@@ -554,39 +580,14 @@ namespace cmtk
             bool uppercase = true;
 
             // Triads
-            if (inVec(semitones, {4, 7}))
-            {
-            }
-            else if (inVec(semitones, {4, 6}))
-            {
-                toAppend = "b5";
-            }
-            else if (inVec(semitones, {3, 7}))
-            {
-                uppercase = false;
-            }
-            else if (inVec(semitones, {3, 6}))
-            {
-                chordSymbol = "°";
-                uppercase = false;
-            }
-            else if (inVec(semitones, {4, 8}))
-            {
-                chordSymbol = "+";
-            }
-            else if (inVec(semitones, {2, 7}))
-            {
-                toAppend = "sus2";
-            }
-            else if (inVec(semitones, {2, 6}))
-            {
-                toAppend = "sus2b5";
-                uppercase = false;
-            }
-            else if (inVec(semitones, {5, 7}))
-            {
-                toAppend = "sus4";
-            }
+            if      (inVec(semitones, {4, 7})){                                           }
+            else if (inVec(semitones, {4, 6})){ toAppend = "b5"     ;                     }
+            else if (inVec(semitones, {3, 7})){                       uppercase = false;  }
+            else if (inVec(semitones, {3, 6})){ chordSymbol = "°"   ; uppercase = false;  }
+            else if (inVec(semitones, {4, 8})){ chordSymbol = "+"   ;                     }
+            else if (inVec(semitones, {2, 7})){ toAppend = "sus2"   ;                     }
+            else if (inVec(semitones, {2, 6})){ toAppend = "sus2b5" ; uppercase = false;  }
+            else if (inVec(semitones, {5, 7})){ toAppend = "sus4"   ;                     }
             else
             {
                 // String with the semitones:
@@ -599,23 +600,10 @@ namespace cmtk
             }
 
             // 7th
-            if (size > 3)
-            {
-                if (inVec(semitones, Intervals("b7").getSemitones()))
-                {
-                    if (chordSymbol == "°")
-                        chordSymbol = "ø7";
-                    else
-                        chordSymbol.append("7");
-                }
-                else if (inVec(semitones, Intervals("7").getSemitones()))
-                {
-                    chordSymbol.append("Maj7");
-                }
-                else if (inVec(semitones, Intervals("6").getSemitones()))
-                {
-                    chordSymbol.append(chordSymbol == "°" ? "7" : "6");
-                }
+            if (size > 3){
+                if      (inVec(semitones, Intervals("b7").getSemitones())){ if(chordSymbol == "°") chordSymbol = "ø7"; else chordSymbol.append("7"); }
+                else if (inVec(semitones, Intervals("7") .getSemitones())){ chordSymbol.append("Maj7"); }
+                else if (inVec(semitones, Intervals("6") .getSemitones())){ chordSymbol.append(chordSymbol == "°" ? "7" : "6"); }
                 else
                 {
                     // String with the semitones:
@@ -779,8 +767,14 @@ namespace cmtk
             return os;
         }
 
+        // Get Intervals
+        const Intervals &getIntervals() const
+        {
+            return mIntervals;
+        }
+
         // Print the scale
-        void print(int size = 3)
+        const void print(int size = 3) const
         {
             std::cout << "Scale: " << mName << " : " << getWholeHalfPattern();
             if (!mStyle.empty())
@@ -797,7 +791,7 @@ namespace cmtk
         }
 
         // Print the scale as whole and half steps
-        std::string getWholeHalfPattern()
+        const std::string getWholeHalfPattern() const
         {   
             auto intervals = mIntervals.getSemitones();
             intervals.push_back(intervals[0] + 12);
@@ -826,18 +820,29 @@ namespace cmtk
         }
 
         // Function to test if a chord is diatonic to the scale
-        bool isChordDiatonic(const Chord &chord)
+        bool isDiatonic(const Chord &chord, bool useRoot=true)
         {
             std::vector<int> chordNotes;
             for (auto interval : chord.getIntervals())
-            {
-                auto semitones = interval.getSemitones() % 12;
+            {   
+                auto semitones = interval.getSemitones();
+                if(useRoot) semitones += chord.getRoot();
+                semitones %= 12;
                 // Check if the interval is in the scale
                 if (std::find_if(mIntervals.begin(), mIntervals.end(), [semitones, this](Interval i)
                                  { return i.getSemitones() == semitones; }) == mIntervals.end())
                 {
                     return false;
                 }
+            }
+            return true;
+        }
+
+        bool isDiatonic(const ChordProgression& chordProgression, bool useRoot=true)
+        {
+            for(const auto& chord : chordProgression)
+            {
+                if(!isDiatonic(chord,useRoot)) return false;
             }
 
             return true;
@@ -859,6 +864,18 @@ namespace cmtk
             }
 
             return static_cast<float>(diatonicNotes) / chord.size();
+        }
+
+        // Function to calculate the diatonicity of a chordProgression to the scale
+        float diatonicity(const ChordProgression& chordProgression)
+        {
+            float diatonicitySum = 0.0f;
+            for(const auto& chord : chordProgression)
+            {
+                diatonicitySum += diatonicity(chord);
+            }
+
+            return diatonicitySum / chordProgression.size();
         }
 
         static std::vector<Scale> getAllScales()
@@ -905,12 +922,12 @@ namespace cmtk
             return std::move(scales);
         }
 
-        static std::vector<Scale> getDiatonicScales(const Chord &chord)
+        static std::vector<Scale> getDiatonicScales(const Chord& chord)
         {
             std::vector<Scale> diatonicScales;
             for (auto scale : getAllScales())
             {
-                if (scale.isChordDiatonic(chord))
+                if (scale.isDiatonic(chord))
                 {
                     diatonicScales.push_back(scale);
                 }
@@ -918,6 +935,38 @@ namespace cmtk
 
             return std::move(diatonicScales);
         }
+
+        static std::vector<Scale> getDiatonicScales(const ChordProgression& chordProgression)
+        {
+            std::vector<Scale> diatonicScales;
+            for (auto scale : getAllScales())
+            {
+                if (scale.isDiatonic(chordProgression))
+                {
+                    diatonicScales.push_back(scale);
+                }
+            }
+
+            return std::move(diatonicScales);
+        }
+
+        static void printDiatonicScales(const Chord& chord, int size = 3)
+        {
+            for(const auto& scale : getDiatonicScales(chord))
+            {
+                scale.print(size);
+            }
+        }
+
+        static void printDiatonicScales(const ChordProgression& chordProgression, int size = 3)
+        {
+            for(const auto& scale : getDiatonicScales(chordProgression))
+            {
+                scale.print(size);
+            }
+        }
+
+        
 
     private:
         // The scale name
@@ -932,19 +981,19 @@ namespace cmtk
         ChordProgressions mProgressions;
 
         // Function to test is a vector contains the values given in the arguments
-        bool inVec(const std::vector<int> &vec, const std::vector<int> &values)
+        const bool inVec(const std::vector<int> &vec, const std::vector<int> &values) const 
         {
             return std::all_of(values.begin(), values.end(), [&vec](int value)
                                { return std::find(vec.begin(), vec.end(), value) != vec.end(); });
         }
 
-        void replaceBack(std::string &str, const std::string &toReplace, int size = 1)
+        const void replaceBack(std::string &str, const std::string &toReplace, int size = 1) const 
         {
             str.replace(str.end() - size, str.end(), toReplace);
         }
 
         // Test is a string ens with another string
-        bool endsWith(const std::string &str, const std::string &ending)
+        const bool endsWith(const std::string &str, const std::string &ending) const
         {
             if (str.length() >= ending.length())
             {
