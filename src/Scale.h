@@ -31,6 +31,11 @@ namespace cmtk
             setScale(aName);
         }
 
+        Scale(std::string aName, std::string aRootKey)
+        {
+            setScale(aName,aRootKey);
+        }
+
         void setRoot(int aRootNote)
         {
             mRootNote = aRootNote;
@@ -42,7 +47,7 @@ namespace cmtk
         }
 
         // Function to set the scale
-        void setScale(std::string aScaleName)
+        void setScale(std::string aScaleName, std::string rootKey="")
         {
             mName = aScaleName;
             mProgressions.clear();
@@ -63,43 +68,50 @@ namespace cmtk
                 mProgressions.add("Emotional"   ,"vi|IV|V|iii");
                 mProgressions.add("MysteryClimb","IV|V|vi"    );
                 mProgressions.add("Evanescence" ,"I|iii|I|iii");
+                mProgressions.add("Christiania" ,"I|iii|vi|V|IV|I|ii|V");
+                mProgressions.add("Love"        ,"I|V|vi|iii|IV|I|ii|V"); // "I|V/7|vi|iii/5|IV|I/3|ii|V"
             }
-            // Dorian Mode - Major Scale 2nd Mode {1 2 ♭3 4 5 6 ♭7} 
-            else if (mName == "Dorian")
+            // Dorian Mode - Major Scale 2nd Mode {1 2 ♭3 4 5 6 ♭7} - Def:Nat6
+            // Riders On The Storm by The Doors, Mad World by Tears for Fears, Scarborough Fair, Woodstock by Joni Mitchell, Blue Jeans by Lana Del Rey, Drive by R.E.M., The "Dorian vamp", Pink Floyd and Dorian
+            else if (mName == "Dorian") 
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Jazzy,Bluesy,Rocky,Sophisticated,Adventurous";
                 mProgressions.add("PlagelCascade","i|bIII|bVII|IV");
-                mProgressions.add("Adventure","i|IV|i|IV");
+                mProgressions.add("DorianVamp"  ,"i|IV|i|IV");
+                mProgressions.add("DorianMinMin","i|ii|i|ii");
+                mProgressions.add("Dorian","i|bVII|bIII|IV"); // What name?
             }
-            // Phrygian Mode - Major Scale 3rd Mode {1 ♭2 ♭3 4 5 ♭6 ♭7}
+            // Phrygian Mode - Major Scale 3rd Mode {1 ♭2 ♭3 4 5 ♭6 ♭7} - Def:b2
             else if (mName == "Phrygian")
             {
                 mIntervals = {Interval(1), Interval(2, -1), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Exotic,Spanish,Eastern,Flamenco,Latin,Lively";
             }
-            // Lydian Mode - Major Scale 4th Mode {1 2 3 ♯4 5 6 7}
+            // Lydian Mode - Major Scale 4th Mode {1 2 3 ♯4 5 6 7} - Def:#4
             else if (mName == "Lydian")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Dreamy,Spacey,Modern,Jazz,Hopeful,Positive,Magical";
                 mProgressions.add("Evanescence" ,"I|iii|I|iii");
             }
-            // Mixolydian Mode - Major Scale 5th Mode {1 2 3 4 5 6 ♭7}
-            else if (mName == "Mixolydian")
+            // Mixolydian Mode - Major Scale 5th Mode {1 2 3 4 5 6 ♭7} - Def:b7
+            else if (mName == "Mixolydian") 
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Blues,Rock,Jazz,Folk,Country,Pop";
                 mProgressions.add("MixolydianVamp","I|bVII|IV|I");
             }
-            // Aeolian Mode (Natural Minor) - Major Scale 6th Mode {1 2 ♭3 4 5 ♭6 ♭7}
+            // Aeolian Mode (Natural Minor) - Major Scale 6th Mode {1 2 ♭3 4 5 ♭6 ♭7} 
             else if (mName == "Aeolian" || mName == "Minor")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Sad,Dark,Blues,Jazz,Rock,Metal,Emotional,Sentimental,Serious";
-                mProgressions.add("AeolianVamp"      ,"i|bVII|bVI|bVII");
-                mProgressions.add("RedHot1"          ,"i|bVII|v|bVI"   );
-                mProgressions.add("AeolianClosedLoop","i|bVII|iv|i"    );
+                mProgressions.add("Aeolian Vamp"       ,"i|bVII|bVI|bVII");
+                mProgressions.add("RedHot1"            ,"i|bVII|v|bVI"   );
+                mProgressions.add("Aeolian Closed Loop","i|bVII|iv|i"    );
+                mProgressions.add("Aeolian"            ,"i|bVII|bIII|iv" ); // TODO: Try this progression and give a name
+
             }
             // Locrian Mode - Major Scale 7th Mode {1 ♭2 ♭3 4 ♭5 ♭6 ♭7}
             else if (mName == "Locrian")
@@ -979,6 +991,8 @@ namespace cmtk
         std::string mStyle = "";
         // Some useful progressions for the scale
         ChordProgressions mProgressions;
+        // RootKey
+        std::string mRootKey = "";
 
         // Function to test is a vector contains the values given in the arguments
         const bool inVec(const std::vector<int> &vec, const std::vector<int> &values) const 

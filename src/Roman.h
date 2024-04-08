@@ -142,6 +142,4 @@ inline bool isRomanChordSymbol(const std::string& chordSymbol)
 
 
 
-
-
 } // namespace cmtk

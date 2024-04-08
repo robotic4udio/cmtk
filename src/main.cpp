@@ -150,5 +150,10 @@ int main() {
     auto scale = Scale("Major");
     scale.print();
 
+    auto chord = Chord("ii7",2);
+    chord.print();
+    chord.printIntervals();
+
+
     return 0;
 }

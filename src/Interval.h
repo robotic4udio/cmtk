@@ -151,31 +151,7 @@ public:
         return std::move(res);
     }
 
-    // Get Name as Roman Numeral
-    std::string getRomanName(bool upperCase)
-    {
-        std::string res = "";
-        
-        // Add the quality
-        auto quality = this->quality;
-        while(quality < 0)
-        {
-            res += "b";
-            quality++;
-        }
-        while(quality > 0)
-        {
-            res += "#";
-            quality--;
-        }
 
-        // Add the degree
-        res += getRomanDegree(upperCase);
-        
-        // Return the result
-        return std::move(res);
-
-    }
 
     // Function to get the interval as a string
     const std::string getName() const
@@ -300,6 +276,32 @@ public:
         degree += 7*n;
         // Shift the quality up by 12
         semitones += 12*n;
+    }
+
+    // Get Name as Roman Numeral
+    std::string getRomanName(bool upperCase)
+    {
+        std::string res = "";
+        
+        // Add the quality
+        auto quality = this->quality;
+        while(quality < 0)
+        {
+            res += "b";
+            quality++;
+        }
+        while(quality > 0)
+        {
+            res += "#";
+            quality--;
+        }
+
+        // Add the degree
+        res += getRomanDegree(upperCase);
+        
+        // Return the result
+        return std::move(res);
+
     }
 
     // Interval to Note Name
