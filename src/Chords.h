@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <algorithm>
+#include <set>
 #include <cctype>
 #include "Interval.h"
 #include "Roman.h" 
@@ -449,6 +450,17 @@ public:
         return chordIntervals;
     }
 
+    // Get Voicing from a list of degrees in the wanted order
+    const std::vector<int> getSemitones() const
+    {
+        auto root = getRoot();
+        std::vector<int> voicing;
+        for(auto i : chordIntervals){
+            voicing.push_back(i.getSemitones()+root);
+        }
+        return std::move(voicing);
+    }
+
     // Get the chord tones with an inversion
     /*
     std::vector<int> getChordTones(int inversion)
@@ -480,32 +492,37 @@ public:
     // Overload the index operator
     int operator[](int index)
     {   
-        if(index >= chordTones.size()){
-            std::cerr << "Error: Index out of range" << std::endl;
-            return 0;
-        }
-        return chordTones[index];
+        while(index < 0)                  index += chordIntervals.size();
+        while(index >= chordIntervals.size()) index -= chordIntervals.size();
+
+        return chordIntervals[index].getSemitones()+getRoot();
     }
 
 
     // Get Voicing from a list of degrees in the wanted order
-    std::vector<int> getVoicing(std::vector<int> degrees, bool addRest=true)
+    std::vector<int> getVoicing(std::vector<int> degrees, bool addBass=false, bool addRest=false)
     {
         auto intervals = this->chordIntervals;
-        std::vector<int> voicing = {};
-        voicing.push_back(getBass());
-        if(bassNote == rootNote) intervals.remove(1);
+        std::vector<int> voicing;
+        if(addBass) voicing.push_back(getBass());
         int last = -1;  
+        std::set<int> usedDegrees;
         for(auto d : degrees){ 
             if(intervals.containsDegree(d)){
+                usedDegrees.insert(d);
                 auto i = intervals.getIntervalFromDegree(d);
-                intervals.remove(i);
                 auto n = i.getSemitones()+getRoot();
                 while(n < last) n += 12;
                 voicing.push_back(n);
                 last = n;
             }
         }
+
+        // Remove the used degrees
+        for(auto d : usedDegrees){
+            intervals.removeDegree(d);
+        }
+
         // Add the rest of the intervals
         if(addRest){
             for(auto i : intervals){
@@ -516,12 +533,19 @@ public:
             }
         }
 
-        return voicing;
+        return std::move(voicing);
     }
-
-
-
-
+    // Get Voicing from a list of degrees in the wanted order
+    std::vector<int> getVoicing(bool addBass=false)
+    {
+        std::vector<int> voicing;
+        if(addBass) voicing.push_back(getBass());
+        auto root = getRoot();
+        for(auto i : chordIntervals){
+            voicing.push_back(i.getSemitones()+root);
+        }
+        return std::move(voicing);
+    }
 
     // Get the chord tones from a chord symbol - rootNote only used for roman numerals
     std::vector<int> getChordTones(const std::string& aChordSymbol, int aRoot = 0){

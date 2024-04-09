@@ -153,11 +153,12 @@ int main() {
 
 
 
-    auto chord = Chord("i7no5");
+    auto chord = Chord("C+13");
     chord.print();
-    auto v = chord.getVoicing({1,5,6,7,2,3,4,1});
+    std::vector<int> v = chord.getVoicing({5,3},true,true);
     for(auto x : v) std::cout << x << " ";
     std::cout << std::endl;
+
 
 
 

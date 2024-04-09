@@ -142,7 +142,6 @@ inline bool isRomanChordSymbol(const std::string& chordSymbol)
 // ---------------------------------- Arabic Numerals ----------------------------------------- //
 // -------------------------------------------------------------------------------------------- //
 
-
 // Is the string a chord symbol in arabic numerals
 inline bool isArabicChordSymbol(std::string chordSymbol)
 {

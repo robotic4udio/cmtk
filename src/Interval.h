@@ -268,7 +268,7 @@ public:
     }
 
     // Function to shift the interval up a number of octaves by manipulating the degree and the quality
-    void shiftOctave(int n=1)
+    void shiftOctave(int n)
     {   
         // Shift the degree up by 7
         degree += 7*n;
@@ -277,7 +277,7 @@ public:
     }
 
     // Get Name as Roman Numeral
-    std::string getRomanName(bool upperCase)
+    std::string getRomanName(bool upperCase) 
     {
         std::string res = "";
         
@@ -714,12 +714,12 @@ public:
         return os;
     }
 
-    const std::vector<int> getSemitones() const
+    const std::vector<int> getSemitones(int offset=0) const
     {
         std::vector<int> res;
         for(auto& interval : *this)
         {
-            res.push_back(interval.getSemitones());
+            res.push_back(interval.getSemitones()+offset);
         }
         return std::move(res);
     }
