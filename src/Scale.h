@@ -78,9 +78,9 @@ namespace cmtk
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Jazzy,Bluesy,Rocky,Sophisticated,Adventurous";
                 mProgressions.add("PlagelCascade","i|bIII|bVII|IV");
-                mProgressions.add("DorianVamp"  ,"i|IV|i|IV");
-                mProgressions.add("DorianMinMin","i|ii|i|ii");
-                mProgressions.add("Dorian","i|bVII|bIII|IV"); // What name?
+                mProgressions.add("DorianVamp"   ,"i|IV|i|IV");
+                mProgressions.add("Dorian12"     ,"i|ii|i|ii");
+                mProgressions.add("Dorian"       ,"i|bVII|bIII|IV"); // What name?
             }
             // Phrygian Mode - Major Scale 3rd Mode {1 ♭2 ♭3 4 5 ♭6 ♭7} - Def:b2
             else if (mName == "Phrygian")
@@ -486,8 +486,8 @@ namespace cmtk
             return intervalAt(index);
         }
 
-        // Function to get the scale name
-        int semiToneAt(int index)
+        // Function to get the semi-tone of the scale at a given index
+        int semiToneAt(int index) 
         {
             int res = mRootNote;
             while (index < 0)
@@ -505,6 +505,19 @@ namespace cmtk
             return res;
         }
 
+        // Function to get the semi-tones of the scale at given indexes
+        std::vector<int> semitoneAt(const std::vector<int> &indexes)
+        {
+            std::vector<int> semitones;
+            for (auto index : indexes)
+            {
+                semitones.push_back(semiToneAt(index));
+            }
+
+            return std::move(semitones);
+        }
+
+        // Function to get the interval of the scale at a given index
         const Interval intervalAt(int index) const 
         {
             int octave = 0;
@@ -525,6 +538,7 @@ namespace cmtk
             return std::move(interval);
         }
 
+        // Function to get the intervals of the scale at given indexes
         const Intervals intervalAt(const std::vector<int> &indexes) const 
         {
             Intervals intervals;
@@ -536,15 +550,12 @@ namespace cmtk
             return std::move(intervals);
         }
 
+        // Function to get the chord symbol of the scale at a given index
         const std::string getChordSymbol(int index, int size = 3) const
         {
             // Check that size is valid
             if (size < 3 || size > 7)
-            {
                 throw std::invalid_argument("Scale::getChordSymbol(): Invalid size: " + std::to_string(size) + std::string(" - Size must be between 3 and 7"));
-            }
-
-            // std::cout << "--- Chord @ Index: --- " << index << std::endl;
 
             // Create a vector of indexes for the chord
             Intervals chordIntervals;
@@ -556,33 +567,6 @@ namespace cmtk
 
             // Get the normalized semitones
             auto semitones = chordIntervals.getSemitonesNormalized();
-
-            /*
-            // Print chord intervals for debugging
-            std::cout << "Chord Intervals: ";
-            for(auto interval : chordIntervals)
-            {
-                std::cout << interval.getString() << " ";
-            }
-            std::cout << std::endl;
-
-            // Print chord semitones for debugging
-            std::cout << "Chord Semitones: ";
-            for(auto interval : chordIntervals)
-            {
-                std::cout << interval.getSemitones() << " ";
-            }
-            std::cout << std::endl;
-
-            // Print normalized semitones for debugging
-            std::cout << "Normalized Semitones: ";
-            for(auto semitone : semitones)
-            {
-                std::cout << semitone << " ";
-            }
-            std::cout << std::endl;
-
-            */
 
             // String for the chord symbol
             std::string chordSymbol = "";
@@ -602,13 +586,8 @@ namespace cmtk
             else if (inVec(semitones, {5, 7})){ toAppend = "sus4"   ;                     }
             else
             {
-                // String with the semitones:
-                std::string semitonesString = "";
-                for (auto semitone : semitones)
-                    semitonesString += std::to_string(semitone) + " ";
-
                 // Throw exception for unknown chord
-                throw std::runtime_error("Scale::getChordSymbol(" + std::to_string(index) + "," + std::to_string(size) + "): Unknown chord with Semitones: " + semitonesString);
+                throw std::runtime_error("Scale::getChordSymbol(" + std::to_string(index) + "," + std::to_string(size) + "): Unknown chord with Semitones: " + toString(semitones));
             }
 
             // 7th
@@ -628,55 +607,26 @@ namespace cmtk
             }
 
             // 9th Chords
-            if (size > 4)
-            {
-                if (inVec(semitones, Intervals("9").getSemitones()))
-                {
-                    chordSymbol.back() = '9';
-                }
-                else if (inVec(semitones, Intervals("b9").getSemitones()))
-                {
-                    toAppend += "b9";
-                }
-                else if (inVec(semitones, Intervals("#9").getSemitones()))
-                {
-                    toAppend += "#9";
-                }
+            if (size > 4){
+                if      (inVec(semitones, Intervals( "9").getSemitones())){ chordSymbol.back() = '9'; }
+                else if (inVec(semitones, Intervals("b9").getSemitones())){ toAppend += "b9";         }
+                else if (inVec(semitones, Intervals("#9").getSemitones())){ toAppend += "#9";         }
                 else
                 {
-                    // String with the semitones:
-                    std::string semitonesString = "";
-                    for (auto semitone : semitones)
-                        semitonesString += std::to_string(semitone) + " ";
                     // Throw exception for unknown chord
-                    throw std::runtime_error("Scale::getChordSymbol(): Unknown 9th chord with Semitones: " + semitonesString);
+                    throw std::runtime_error("Scale::getChordSymbol(): Unknown 9th chord with Semitones: " + toString(semitones));
                 }
             }
 
             // 11th Chords
-            if (size > 5)
-            {
-                if (inVec(semitones, Intervals("11").getSemitones()))
-                {
-                    chordSymbol.back() = '1';
-                    chordSymbol.push_back('1');
-                }
-                else if (inVec(semitones, Intervals("b11").getSemitones()))
-                {
-                    toAppend += "b11";
-                }
-                else if (inVec(semitones, Intervals("#11").getSemitones()))
-                {
-                    toAppend += "#11";
-                }
+            if(size > 5){
+                if      (inVec(semitones, Intervals("11") .getSemitones())){ chordSymbol.back() = '1'; chordSymbol.push_back('1'); }
+                else if (inVec(semitones, Intervals("b11").getSemitones())){ toAppend += "b11"; }
+                else if (inVec(semitones, Intervals("#11").getSemitones())){ toAppend += "#11"; }
                 else
                 {
-                    // String with the semitones:
-                    std::string semitonesString = "";
-                    for (auto semitone : semitones)
-                        semitonesString += std::to_string(semitone) + " ";
                     // Throw exception for unknown chord
-                    throw std::runtime_error("Scale::getChordSymbol(): Unknown 11th chord with Semitones: " + semitonesString);
+                    throw std::runtime_error("Scale::getChordSymbol(): Unknown 11th chord with Semitones: " + toString(semitones));
                 }
             }
 
@@ -697,12 +647,7 @@ namespace cmtk
                 }
                 else
                 {
-                    // String with the semitones:
-                    std::string semitonesString = "";
-                    for (auto semitone : semitones)
-                        semitonesString += std::to_string(semitone) + " ";
-                    // Throw exception for unknown chord
-                    throw std::runtime_error("Scale::getChordSymbol(): Unknown 13th chord with Semitones: " + semitonesString);
+                    throw std::runtime_error("Scale::getChordSymbol(): Unknown 13th chord with Semitones: " + toString(semitones));
                 }
             }
 
@@ -732,6 +677,7 @@ namespace cmtk
             return std::move(chord);
         }
 
+        // Get all the chord symbols
         std::vector<std::string> getChordSymbols(int size = 3)
         {
             std::vector<std::string> chordSymbols;
@@ -742,6 +688,37 @@ namespace cmtk
 
             return std::move(chordSymbols);
         }
+
+        // Get ChordProgression from a vector of indexes
+        ChordProgression getChordProgression(const std::vector<int> &indexes, int size = 3)
+        {
+            ChordProgression chordProgression;
+            for (auto index : indexes)
+            {
+                chordProgression.addChord(getChord(index-1, size));
+            }
+
+            return std::move(chordProgression);
+        }
+
+        // Get ChordProgression from a vector of indexes and sizes
+        ChordProgression getChordProgression(const std::vector<int>& indexes, const std::vector<int>& aSize)
+        {
+            ChordProgression chordProgression;
+            int i=0;
+            for (auto index : indexes)
+            {
+                if(i >= aSize.size()) i = 0;
+                chordProgression.addChord(getChord(index-1, aSize[i++]));
+            }
+
+            return std::move(chordProgression);
+        }
+
+
+
+
+
 
         // Print the chord symbols
         void printChordSymbols(int size = 3)
@@ -1014,6 +991,17 @@ namespace cmtk
                 return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
             }
             return false;
+        }
+
+        // Function to convert semitones to string
+        const std::string toString(const std::vector<int>& vec) const
+        {
+            std::string result = "";
+            for (auto x : vec)
+            {
+                result += std::to_string(x) + " ";
+            }
+            return std::move(result);
         }
     };
 

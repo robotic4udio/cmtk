@@ -151,8 +151,6 @@ public:
         return std::move(res);
     }
 
-
-
     // Function to get the interval as a string
     const std::string getName() const
     {
@@ -988,6 +986,16 @@ public:
         auto res = *this;
         res.transpose(semitones);
         return std::move(res);
+    }
+
+    // Get Interval from Degree
+    Interval getIntervalFromDegree(int degree)
+    {
+        for(auto& interval : *this)
+        {
+            if(interval.getDegree() == degree) return interval;
+        }
+        return Interval();
     }
 
 private:

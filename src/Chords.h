@@ -35,21 +35,6 @@ inline bool replacePrefix(std::string& s, const std::string& prefix, const std::
     return false;
 }
 
-// Is the string a chord symbol in arabic numerals
-inline bool isArabicChordSymbol(const std::string& chordSymbol)
-{
-    if(chordSymbol.empty()) return false;
-
-    // If size is 2 then the first character must be an 'b' or '#'
-    if(chordSymbol.size() >= 2){
-        if(chordSymbol[0] != 'b' && chordSymbol[0] != '#') return false;
-        return chordSymbol.find_first_of("1234567") == 1;
-    }
-
-    // If size is 1 then the first character must be a number
-    return chordSymbol.find_first_of("1234567") == 0;
-
-}
 
 
 // Interval between two notes
@@ -166,8 +151,7 @@ Interval intervalFromNoteName(std::string n, int rootNote)
 }
 
 // Get NoteName from beginnign of string
-inline
-std::string getNoteNameString(std::string& s)
+inline std::string getNoteNameString(std::string& s)
 {
     if(s.empty()){
         // Print error message
@@ -184,23 +168,23 @@ std::string getNoteNameString(std::string& s)
         // Create empty string for result
         std::string result = "";
 
-        // Check for sharp or flat
-        if     (s[0] == 'b'){ result += "b"; s.erase(0,1); }
-        else if(s[0] == '#'){ result += "#"; s.erase(0,1); }
-
-        // Return if empty
-        if(s.empty()){ return ""; }
+        // While the first character is a 'b' or '#' add it to the result
+        while(s[0] == 'b' || s[0] == '#'){
+            if(s[0] == 'b'){ result += "b"; s.erase(0,1); }
+            if(s[0] == '#'){ result += "#"; s.erase(0,1); }
+        }
 
         // Loop until no more symbols are found
         bool found = !s.empty();
-        while(!s.empty() && found){
-            found = false;
+        while(found){
+            found = !s.empty();
             if(s[0] == 'i'){ result += "I"; s.erase(0,1); found = true; }
             if(s[0] == 'v'){ result += "V"; s.erase(0,1); found = true; }
         }
 
         return result;
     } 
+
     // Is the note expressed in arabic numerals
     if(isArabicChordSymbol(s))
     {
@@ -208,16 +192,19 @@ std::string getNoteNameString(std::string& s)
         std::string result = "";
 
         // Check for sharp or flat
-        if     (s[0] == 'b'){ result += "b"; s.erase(0,1); }
-        else if(s[0] == '#'){ result += "#"; s.erase(0,1); }
+        // While the first character is a 'b' or '#' add it to the result
+        while(s[0] == 'b' || s[0] == '#'){
+            if(s[0] == 'b'){ result += "b"; s.erase(0,1); }
+            if(s[0] == '#'){ result += "#"; s.erase(0,1); }
+        }
 
         // Return if empty
         if(s.empty()){ return ""; }
 
         // Loop until no more symbols are found
         bool found = !s.empty();
-        while(!s.empty() && found){
-            found = false;
+        while(found){
+            found = !s.empty();
             if(s[0] == '1'){ result += "I";   s.erase(0,1); found = true; }
             if(s[0] == '3'){ result += "III"; s.erase(0,1); found = true; }
             if(s[0] == '2'){ result += "II";  s.erase(0,1); found = true; }
@@ -273,6 +260,56 @@ std::string getNoteNameString(std::string& s)
 }
 
 
+// Get Note Number from beginnign of string
+inline int getNoteNumber(const std::string& s, int root=0)
+{
+    if(s.empty()) throw std::runtime_error("Error: Unrecognized note");
+
+    // Is the note expressed in roman numerals
+    if(isRomanChordSymbol(s)) return romanPitchToSemitone(s,root);
+
+    // Is the note expressed in arabic numerals
+    if(isArabicChordSymbol(s)) return arabicPitchToSemitone(s,root);
+
+    // Convert to lower case
+    std::string n = s;
+    std::transform(n.begin(), n.end(), n.begin(), ::tolower);    
+
+    // Get the note number
+    if     (n == "c")  return 0;
+    else if(n == "d")  return 2;
+    else if(n == "e")  return 4;
+    else if(n == "f")  return 5;
+    else if(n == "g")  return 7;
+    else if(n == "a")  return 9;
+    else if(n == "b")  return 11;
+    else if(n == "cb") return 11;
+    else if(n == "c#") return 1;
+    else if(n == "db") return 1;
+    else if(n == "d#") return 3;
+    else if(n == "eb") return 3;
+    else if(n == "e#") return 5;
+    else if(n == "fb") return 4;
+    else if(n == "f#") return 6;
+    else if(n == "gb") return 6;
+    else if(n == "g#") return 8;
+    else if(n == "ab") return 8;
+    else if(n == "a#") return 10;
+    else if(n == "bb") return 10;
+    else if(n == "b#") return 0;
+
+    // Throw error
+    throw std::runtime_error("Error: getNoteNumber(): Unrecognized note: " + s);
+}
+
+
+
+
+
+
+
+
+
 // ----------------------------------------------------------------------- //
 // ----------------------------- Chord Class ----------------------------- //
 // ----------------------------------------------------------------------- //
@@ -321,8 +358,8 @@ public:
         else if(intervals.contains("b3 b5","3 5"  )){ chordSymbol = "dim"  ; intervals.remove("b3")          ; }
         else if(intervals.contains("3"            )){ chordSymbol = "maj"  ; intervals.remove("3"); maj=true ; }
         else if(intervals.contains("b3"           )){ chordSymbol = "min"  ; intervals.remove("b3")          ; }
-        else if(intervals.contains("2 5"          )){ chordSymbol = "sus2" ; intervals.remove("2")           ; }
-        else if(intervals.contains("4 5"          )){ chordSymbol = "sus4" ; intervals.remove("4")           ; }
+        else if(intervals.contains("2 5","3 b3"   )){ chordSymbol = "sus2" ; intervals.remove("2")           ; }
+        else if(intervals.contains("4 5","3 b3"   )){ chordSymbol = "sus4" ; intervals.remove("4")           ; }
         else if(intervals.contains("5"            )){ chordSymbol = "5"    ;                                 ; }
 
         // Add Extension
@@ -367,16 +404,16 @@ public:
         if(!intervals.containsDegree(1)) chordSymbol += " no1";
         else intervals.removeDegree(1);
 
-        //if(!intervals.containsDegree(5)) chordSymbol += " no5";
-        //else intervals.removeDegree(5);
+        if(!intervals.containsDegree(5)) chordSymbol += " no5";
+        else intervals.removeDegree(5);
 
 
-        // Check added notes - Naturals
+        // Check added notes
         static std::vector<std::string> addedNotes = {
             "b2" , "2" , "#2" , 
             "b3" , "3" , "#3" ,
             "b4" , "4" , "#4" ,
-            "b5" , "5" , "#5" ,
+            // "b5" , "5" , "#5" ,
             "b6" , "6" , "#6" ,
             "b7" , "7" , "#7" ,
             "b9" , "9" , "#9" ,
@@ -413,6 +450,7 @@ public:
     }
 
     // Get the chord tones with an inversion
+    /*
     std::vector<int> getChordTones(int inversion)
     {
         inversion = inversion % chordTones.size();
@@ -437,6 +475,7 @@ public:
 
         return notes;
     }
+    */
 
     // Overload the index operator
     int operator[](int index)
@@ -448,16 +487,53 @@ public:
         return chordTones[index];
     }
 
-    
 
-    // Get the chord tones from a chord symbol
-    std::vector<int> getChordTones(const std::string& aChordSymbol, int rootNote = 0){
+    // Get Voicing from a list of degrees in the wanted order
+    std::vector<int> getVoicing(std::vector<int> degrees, bool addRest=true)
+    {
+        auto intervals = this->chordIntervals;
+        std::vector<int> voicing = {};
+        voicing.push_back(getBass());
+        if(bassNote == rootNote) intervals.remove(1);
+        int last = -1;  
+        for(auto d : degrees){ 
+            if(intervals.containsDegree(d)){
+                auto i = intervals.getIntervalFromDegree(d);
+                intervals.remove(i);
+                auto n = i.getSemitones()+getRoot();
+                while(n < last) n += 12;
+                voicing.push_back(n);
+                last = n;
+            }
+        }
+        // Add the rest of the intervals
+        if(addRest){
+            for(auto i : intervals){
+                auto n = i.getSemitones()+getRoot();
+                while(n < last) n += 12;
+                voicing.push_back(n);
+                last = n;
+            }
+        }
+
+        return voicing;
+    }
+
+
+
+
+
+    // Get the chord tones from a chord symbol - rootNote only used for roman numerals
+    std::vector<int> getChordTones(const std::string& aChordSymbol, int aRoot = 0){
         auto chordSymbol = aChordSymbol;
         std::string rootName = "";
         chordIntervals.clear();
 
         // Test if the chors symbol is in roman numerals
         const bool isRoman = isRomanChordSymbol(chordSymbol);
+
+        // Get the root note
+        int rootNote = 0;
 
         // If the first character is a 'b' the the chord is flat and the root is lowered by 1 semitone. 
         // If the first character is a '#' then it is a flat or sharp chord and the root is raised by 1 semitone.
@@ -510,27 +586,27 @@ public:
         else if (removePrefix(chordSymbol, "i"   )){ rootNote += 0;  rootName += "I"  ; }
         else if (removePrefix(chordSymbol, "v"   )){ rootNote += 7;  rootName += "V"  ; }
         // Move the rootNote according according to the chord symbol --- Specific Chords
-        else if (removePrefix(chordSymbol, "c#"  )){ rootNote += 1;  rootName = "C#"; }
-        else if (removePrefix(chordSymbol, "db"  )){ rootNote += 1;  rootName = "Db"; }
-        else if (removePrefix(chordSymbol, "d#"  )){ rootNote += 3;  rootName = "D#"; }
-        else if (removePrefix(chordSymbol, "eb"  )){ rootNote += 3;  rootName = "Eb"; }
-        else if (removePrefix(chordSymbol, "e#"  )){ rootNote += 5;  rootName = "E#"; }
-        else if (removePrefix(chordSymbol, "fb"  )){ rootNote += 5;  rootName = "Fb"; }
-        else if (removePrefix(chordSymbol, "f#"  )){ rootNote += 6;  rootName = "F#"; }
-        else if (removePrefix(chordSymbol, "gb"  )){ rootNote += 6;  rootName = "Gb"; }
-        else if (removePrefix(chordSymbol, "g#"  )){ rootNote += 8;  rootName = "G#"; }
-        else if (removePrefix(chordSymbol, "ab"  )){ rootNote += 8;  rootName = "Ab"; }
-        else if (removePrefix(chordSymbol, "a#"  )){ rootNote += 10; rootName = "A#"; }
-        else if (removePrefix(chordSymbol, "bb"  )){ rootNote += 10; rootName = "Bb"; }
-        else if (removePrefix(chordSymbol, "cb"  )){ rootNote += 11; rootName = "Cb"; } 
-        else if (removePrefix(chordSymbol, "b#"  )){ rootNote += 0;  rootName = "B#"; }
-        else if (removePrefix(chordSymbol, "c"   )){ rootNote += 0;  rootName = "C" ; }
-        else if (removePrefix(chordSymbol, "d"   )){ rootNote += 2;  rootName = "D" ; }
-        else if (removePrefix(chordSymbol, "e"   )){ rootNote += 4;  rootName = "E" ; }
-        else if (removePrefix(chordSymbol, "f"   )){ rootNote += 5;  rootName = "F" ; }
-        else if (removePrefix(chordSymbol, "g"   )){ rootNote += 7;  rootName = "G" ; }
-        else if (removePrefix(chordSymbol, "a"   )){ rootNote += 9;  rootName = "A" ; }
-        else if (removePrefix(chordSymbol, "b"   )){ rootNote += 11; rootName = "B" ; }
+        else if (removePrefix(chordSymbol, "c#"  )){ rootNote = 1;  rootName = "C#"; }
+        else if (removePrefix(chordSymbol, "db"  )){ rootNote = 1;  rootName = "Db"; }
+        else if (removePrefix(chordSymbol, "d#"  )){ rootNote = 3;  rootName = "D#"; }
+        else if (removePrefix(chordSymbol, "eb"  )){ rootNote = 3;  rootName = "Eb"; }
+        else if (removePrefix(chordSymbol, "e#"  )){ rootNote = 5;  rootName = "E#"; }
+        else if (removePrefix(chordSymbol, "fb"  )){ rootNote = 5;  rootName = "Fb"; }
+        else if (removePrefix(chordSymbol, "f#"  )){ rootNote = 6;  rootName = "F#"; }
+        else if (removePrefix(chordSymbol, "gb"  )){ rootNote = 6;  rootName = "Gb"; }
+        else if (removePrefix(chordSymbol, "g#"  )){ rootNote = 8;  rootName = "G#"; }
+        else if (removePrefix(chordSymbol, "ab"  )){ rootNote = 8;  rootName = "Ab"; }
+        else if (removePrefix(chordSymbol, "a#"  )){ rootNote = 10; rootName = "A#"; }
+        else if (removePrefix(chordSymbol, "bb"  )){ rootNote = 10; rootName = "Bb"; }
+        else if (removePrefix(chordSymbol, "cb"  )){ rootNote = 11; rootName = "Cb"; } 
+        else if (removePrefix(chordSymbol, "b#"  )){ rootNote = 0;  rootName = "B#"; }
+        else if (removePrefix(chordSymbol, "c"   )){ rootNote = 0;  rootName = "C" ; }
+        else if (removePrefix(chordSymbol, "d"   )){ rootNote = 2;  rootName = "D" ; }
+        else if (removePrefix(chordSymbol, "e"   )){ rootNote = 4;  rootName = "E" ; }
+        else if (removePrefix(chordSymbol, "f"   )){ rootNote = 5;  rootName = "F" ; }
+        else if (removePrefix(chordSymbol, "g"   )){ rootNote = 7;  rootName = "G" ; }
+        else if (removePrefix(chordSymbol, "a"   )){ rootNote = 9;  rootName = "A" ; }
+        else if (removePrefix(chordSymbol, "b"   )){ rootNote = 11; rootName = "B" ; }
     
         // Change notes if the chord is diminished or augmented
         if      (removePrefix(chordSymbol, "°"       )){ chordQuality = Quality::Diminished;     }
@@ -601,101 +677,52 @@ public:
         {   
             found = false;
             // Flatten
-            if(removePrefix(chordSymbol, "b3"  )){ chordIntervals.setQuality( 3,-1,true); found = true; }
-            if(removePrefix(chordSymbol, "b5"  )){ chordIntervals.setQuality( 5,-1,true); found = true; }
-            if(removePrefix(chordSymbol, "b7"  )){ chordIntervals.setQuality( 7,-1,true); found = true; }
-            if(removePrefix(chordSymbol, "b9"  )){ chordIntervals.setQuality( 9,-1,true); found = true; }
-            if(removePrefix(chordSymbol, "b11" )){ chordIntervals.setQuality(11,-1,true); found = true; }
-            if(removePrefix(chordSymbol, "b13" )){ chordIntervals.setQuality(13,-1,true); found = true; }
+            if(removePrefix(chordSymbol, "b3"    )){ chordIntervals.setQuality( 3, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b5"    )){ chordIntervals.setQuality( 5, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b7"    )){ chordIntervals.setQuality( 7, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b9"    )){ chordIntervals.setQuality( 9, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b11"   )){ chordIntervals.setQuality(11, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b13"   )){ chordIntervals.setQuality(13, -1, true); found = true; }
             
             // Sharpen
-            if(removePrefix(chordSymbol, "#3"  )){ chordIntervals.setQuality(3 , 1,true); found = true; }
-            if(removePrefix(chordSymbol, "#5"  )){ chordIntervals.setQuality(5 , 1,true); found = true; }
-            if(removePrefix(chordSymbol, "#7"  )){ chordIntervals.setQuality(7 , 1,true); found = true; }
-            if(removePrefix(chordSymbol, "#9"  )){ chordIntervals.setQuality(9 , 1,true); found = true; }
-            if(removePrefix(chordSymbol, "#11" )){ chordIntervals.setQuality(11, 1,true); found = true; }
-            if(removePrefix(chordSymbol, "#13" )){ chordIntervals.setQuality(13, 1,true); found = true; }
-            
-            // Remove notes if required
-            if(removePrefix(chordSymbol, "no1" )){ chordIntervals.removeDegree( 1); found = true; }
-            if(removePrefix(chordSymbol, "no3" )){ chordIntervals.removeDegree( 3); found = true; }
-            if(removePrefix(chordSymbol, "no5" )){ chordIntervals.removeDegree( 5); found = true; }
-            if(removePrefix(chordSymbol, "no7" )){ chordIntervals.removeDegree( 7); found = true; }
-            if(removePrefix(chordSymbol, "no9" )){ chordIntervals.removeDegree( 9); found = true; }
-            if(removePrefix(chordSymbol, "no11")){ chordIntervals.removeDegree(11); found = true; }
-            if(removePrefix(chordSymbol, "no13")){ chordIntervals.removeDegree(13); found = true; }
+            if(removePrefix(chordSymbol, "#3"    )){ chordIntervals.setQuality(3 ,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#5"    )){ chordIntervals.setQuality(5 ,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#7"    )){ chordIntervals.setQuality(7 ,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#9"    )){ chordIntervals.setQuality(9 ,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#11"   )){ chordIntervals.setQuality(11,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#13"   )){ chordIntervals.setQuality(13,  1, true); found = true; }
 
-            // Add notes if required -TODO: With the I class this should be easier
-            if(removePrefix(chordSymbol, "add2"  )){ chordIntervals.add(Interval( 2));    found = true; }
-            if(removePrefix(chordSymbol, "add4"  )){ chordIntervals.add(Interval( 4));    found = true; }
-            if(removePrefix(chordSymbol, "add6"  )){ chordIntervals.add(Interval( 6));    found = true; }
-            if(removePrefix(chordSymbol, "add9"  )){ chordIntervals.add(Interval( 9));    found = true; }
-            if(removePrefix(chordSymbol, "add11" )){ chordIntervals.add(Interval(11));    found = true; }
-            if(removePrefix(chordSymbol, "add13" )){ chordIntervals.add(Interval(13));    found = true; }
-            if(removePrefix(chordSymbol, "addb2" )){ chordIntervals.add(Interval( 2,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb4" )){ chordIntervals.add(Interval( 4,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb6" )){ chordIntervals.add(Interval( 6,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb9" )){ chordIntervals.add(Interval( 9,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb11")){ chordIntervals.add(Interval(11,-1)); found = true; }
-            if(removePrefix(chordSymbol, "addb13")){ chordIntervals.add(Interval(13,-1)); found = true; }
-            if(removePrefix(chordSymbol, "add#2" )){ chordIntervals.add(Interval( 2, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#4" )){ chordIntervals.add(Interval( 4, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#6" )){ chordIntervals.add(Interval( 6, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#9" )){ chordIntervals.add(Interval( 9, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#11")){ chordIntervals.add(Interval(11, 1)); found = true; }
-            if(removePrefix(chordSymbol, "add#13")){ chordIntervals.add(Interval(13, 1)); found = true; }
+            // Add notes if required
+            if(removePrefix(chordSymbol, "add2"  )){ chordIntervals.add(Interval( 2));        found = true; }
+            if(removePrefix(chordSymbol, "add4"  )){ chordIntervals.add(Interval( 4));        found = true; }
+            if(removePrefix(chordSymbol, "add6"  )){ chordIntervals.add(Interval( 6));        found = true; }
+            if(removePrefix(chordSymbol, "add9"  )){ chordIntervals.add(Interval( 9));        found = true; }
+            if(removePrefix(chordSymbol, "add11" )){ chordIntervals.add(Interval(11));        found = true; }
+            if(removePrefix(chordSymbol, "add13" )){ chordIntervals.add(Interval(13));        found = true; }
+
+            // Remove notes if required
+            if(removePrefix(chordSymbol, "no1"   )){ chordIntervals.removeDegree( 1);         found = true; }
+            if(removePrefix(chordSymbol, "no3"   )){ chordIntervals.removeDegree( 3);         found = true; }
+            if(removePrefix(chordSymbol, "no5"   )){ chordIntervals.removeDegree( 5);         found = true; }
+            if(removePrefix(chordSymbol, "no7"   )){ chordIntervals.removeDegree( 7);         found = true; }
+            if(removePrefix(chordSymbol, "no9"   )){ chordIntervals.removeDegree( 9);         found = true; }
+            if(removePrefix(chordSymbol, "no11"  )){ chordIntervals.removeDegree(11);         found = true; }
+            if(removePrefix(chordSymbol, "no13"  )){ chordIntervals.removeDegree(13);         found = true; }
         }
 
         // Sort the chordIntervals
         chordIntervals.sort();
 
         // Print the noteNames
-        this->rootNote = rootNote;
-        this->bassNote = rootNote;
+        this->rootNote = rootNote+aRoot;
+        this->bassNote = rootNote+aRoot;
 
         // Handle slash chords
-        bool slash = false;
         if(removePrefix(chordSymbol,"/")){
-            // Get the note name
-            std::string slashNoteName = getNoteNameString(chordSymbol);
-            std::transform(slashNoteName.begin(), slashNoteName.end(), slashNoteName.begin(), ::tolower);
-
-            // Print Slash Note
-            std::cout << "Slash Note: " << slashNoteName << std::endl;
-
-            if(slashNoteName.size() > 0){
-
-                int slashNote = 0;
-                bool found = false;
-                for(auto interval : chordIntervals){
-                    std::string note = interval.getNoteName(rootNote, isRoman);
-                    // Note to_lower
-                    std::transform(note.begin(), note.end(), note.begin(), ::tolower);
-
-                    if(slashNoteName==note){
-                        found = true;
-                        break;
-                    }
-                    slashNote++;
-                }
-
-                // Move the slash note to the front. Not by rotating the noteNames vector, just by inserting the slash note at the front and removing it from where it was
-                if(found){
-                    // Same for chordIntervals
-                    chordIntervals.insert(0, chordIntervals[slashNote]);
-                    // Set the bass note
-                    bassNote = rootNote + slashNote;
-                
-                }
-                else // Add the note if not already present
-                {
-                    chordIntervals.insert(0,intervalFromNoteName(slashNoteName, rootNote));
-                }
-                // Set the slash flag
-                slash = true;
-            }
-                
-        }        
+            // Get the note number of the slash note
+            bassNote = getNoteNumber(chordSymbol,aRoot);
+            chordSymbol.clear();
+        }
 
         // Add the rest of the note names
         for(auto interval : chordIntervals){
@@ -705,16 +732,10 @@ public:
                 noteNames.push_back(rootName);
         }
         
-        // Print the noteNames
-        // for(auto note : noteNames){
-        //     std::cout << note << " ";
-        // }
-        // std::cout << std::endl;
-
         // Convert the chordIntervals to int and assign to chordTones
         std::vector<int> chordTones;
         for (auto interval : chordIntervals) {
-            chordTones.push_back(interval.getSemitones());
+            chordTones.push_back(interval.getSemitones()+aRoot);
         }
 
         // Sort the chord tones by shifting down an octave if the next value is lower
@@ -728,9 +749,6 @@ public:
         for (int i = 0; i < chordTones.size(); i++) {
             chordTones[i] += rootNote;
         }
-
-        // Store the bassnote to be used after inversion confusion
-        if(slash) bassNote = chordTones[0];
 
         if(chordSymbol.size() > 0){
             std::cerr << "getChordTones(): Warning: Error parsing chord symbol: " << aChordSymbol << " - Remaining: " << chordSymbol << std::endl;
@@ -837,9 +855,9 @@ public:
         return notes;
     }
 
-    int getBassNote(int min=0, int max=127)
+    int getBass(int min=0, int max=127)
     {
-        auto note = bassNote;
+        auto note = bassNote - 12 + mOctave*12;
         while(note < min) note += 12;
         while(note > max) note -= 12;
 
@@ -848,7 +866,7 @@ public:
 
     const int getRoot() const 
     {
-        return rootNote;
+        return rootNote+mOctave*12;
     }
 
     void zeroCollaps(std::vector<int>& chordTones)
@@ -891,10 +909,10 @@ public:
         std::cout << std::endl;
     }
 
-    void print(int inversion = 0)
+    void print()
     {
-        std::cout << getChordSymbol() << "_" << inversion << "\t";
-        const std::vector<int>& chordTones = getChordTones(inversion);
+        std::cout << getChordSymbol() << "\t";
+        const std::vector<int>& chordTones = getChordTones();
 
         for (int i = 0; i < chordTones.size(); i++) {
             std::cout << chordTones[i] << "\t";
@@ -902,12 +920,6 @@ public:
         std::cout << "BassNote: " << bassNote << "\t";
         std::cout << std::endl;
 
-    }
-
-    // Is the chord expressed in arabic numerals
-    bool isArabic(const std::string& chordSymbol)
-    {
-        return chordSymbol.find_first_of("1234567") < 2;
     }
 
     Chord& zeroCenter()
@@ -1065,6 +1077,8 @@ private:
     int rootNote = 0;
     // Bass Note
     int bassNote = 0;
+    // Octave
+    int mOctave = 3;
 
 
 };

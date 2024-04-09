@@ -135,7 +135,7 @@ public:
 
     int getBassNote(int min=0, int max=127)
     {
-        return chordProgression[index].getBassNote(min,max);
+        return chordProgression[index].getBass(min,max);
     }
 
     // Function to reset the sequencer

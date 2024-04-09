@@ -147,12 +147,21 @@ int main() {
     // i.print();
     // i.getNegativeHarmonic().print();
 
-    auto scale = Scale("Major");
-    scale.print();
+    // auto scale = Scale("Phrygian",2);
+    // scale.print();
+    // scale.getChordProgression({1,2}).print();
 
-    auto chord = Chord("ii7",2);
+
+
+    auto chord = Chord("i7no5");
     chord.print();
-    chord.printIntervals();
+    auto v = chord.getVoicing({1,5,6,7,2,3,4,1});
+    for(auto x : v) std::cout << x << " ";
+    std::cout << std::endl;
+
+
+
+    // chord.printIntervals();
 
 
     return 0;

@@ -111,7 +111,6 @@ int romanPitchToSemitone(std::string romanPitch, int root=0)
     // Get roman numeral value
     auto romanValue = romanToInt(romanPitch);
 
-
     // While the roman numeral is greater than 7, subtract 7
     while(romanValue > 7){ 
         romanValue -= 7;
@@ -139,6 +138,61 @@ inline bool isRomanChordSymbol(const std::string& chordSymbol)
     return chordSymbol.find_first_of("ivIV") != std::string::npos;
 }
 
+// -------------------------------------------------------------------------------------------- //
+// ---------------------------------- Arabic Numerals ----------------------------------------- //
+// -------------------------------------------------------------------------------------------- //
+
+
+// Is the string a chord symbol in arabic numerals
+inline bool isArabicChordSymbol(std::string chordSymbol)
+{
+    if(chordSymbol.empty()) return false;
+
+    // While the first character is a 'b' or '#' remove it
+    while(chordSymbol[0] == 'b' || chordSymbol[0] == '#'){
+        chordSymbol.erase(0,1);
+    }
+
+    // Now the first character must be a number
+    return chordSymbol.find_first_of("123456789") == 0;
+}
+
+// Function to convert a pitch expressed as an arabic numeral to a semitone value
+int arabicPitchToSemitone(std::string arabicPitch, int root=0)
+{
+    int semitone = root;
+
+    // Handle flat and sharp symbols
+    while(arabicPitch.front() == 'b' || arabicPitch.front() == '#')
+    {
+        if     (arabicPitch.front() == 'b') semitone--;
+        else if(arabicPitch.front() == '#') semitone++;
+        arabicPitch.erase(0,1);
+    }
+
+    // Convert the arabic pitch to an integer
+    int arabicValue = std::stoi(arabicPitch);
+
+    // While the arabic numeral is greater than 7, subtract 7
+    while(arabicValue > 7){ 
+        arabicValue -= 7;
+        semitone += 12;
+    }
+
+    // Convert the arabic pitch to an integer
+    switch(arabicValue)
+    {
+        case 1: semitone +=  0; break;
+        case 2: semitone +=  2; break;
+        case 3: semitone +=  4; break;
+        case 4: semitone +=  5; break;
+        case 5: semitone +=  7; break;
+        case 6: semitone +=  9; break;
+        case 7: semitone += 11; break;
+    }
+
+    return semitone;
+};
 
 
 
