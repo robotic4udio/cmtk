@@ -340,12 +340,6 @@ public:
         PowerChord,
     };
 
-    // Function to get the chord tones from a chord symbol
-    void setChord(std::string aChordSymbol, int aRootNote = 0)
-    {
-        chordSymbol = aChordSymbol;
-        chordTones = getChordTones(aChordSymbol, aRootNote);
-    }
 
     // Create a chord from a set of intervals
     void setChord(const Intervals& aIntervals, int aRootNote)
@@ -439,12 +433,6 @@ public:
         return chordSymbol;
     }
 
-    // Get the chord tones
-    std::vector<int> getChordTones()
-    {
-        return chordTones;
-    }
-
     const Intervals& getIntervals() const
     {
         return chordIntervals;
@@ -461,39 +449,11 @@ public:
         return std::move(voicing);
     }
 
-    // Get the chord tones with an inversion
-    /*
-    std::vector<int> getChordTones(int inversion)
-    {
-        inversion = inversion % chordTones.size();
-
-        auto notes = this->chordTones;
-        // If the inversion is positive, rotate the notes to the right
-        while(inversion > 0){
-            std::rotate(notes.begin(), notes.begin() + 1, notes.end());
-            inversion--;
-            // Add one octave to the last note
-            notes.back() += 12;
-        }
-        // If the inversion is negative, rotate the notes to the left
-        while(inversion < 0){
-            std::rotate(notes.rbegin(), notes.rbegin() + 1, notes.rend());
-            inversion++;
-            // Subtract one octave from the first note
-            notes.front() -= 12;
-        }
-        // Sort the notes
-        // std::sort(notes.begin(), notes.end());
-
-        return notes;
-    }
-    */
-
     // Overload the index operator
     int operator[](int index)
     {   
-        while(index < 0)                  index += chordIntervals.size();
-        while(index >= chordIntervals.size()) index -= chordIntervals.size();
+        while(index < 0)                      index += this->size();
+        while(index >= chordIntervals.size()) index -= this->size();
 
         return chordIntervals[index].getSemitones()+getRoot();
     }
@@ -547,8 +507,8 @@ public:
         return std::move(voicing);
     }
 
-    // Get the chord tones from a chord symbol - rootNote only used for roman numerals
-    std::vector<int> getChordTones(const std::string& aChordSymbol, int aRoot = 0){
+    // Set the chord from a chord symbol - rootNote only used for roman numerals
+    void setChord(const std::string& aChordSymbol, int aRoot = 0){
         auto chordSymbol = aChordSymbol;
         std::string rootName = "";
         chordIntervals.clear();
@@ -756,130 +716,14 @@ public:
                 noteNames.push_back(rootName);
         }
         
-        // Convert the chordIntervals to int and assign to chordTones
-        std::vector<int> chordTones;
-        for (auto interval : chordIntervals) {
-            chordTones.push_back(interval.getSemitones()+aRoot);
-        }
-
-        // Sort the chord tones by shifting down an octave if the next value is lower
-        for (int i = 0; i < chordTones.size()-1; i++) {
-            if (chordTones[i] > chordTones[i+1]) {
-                chordTones[i] -= 12;
-            }
-        }
-
-        // Add the rootNote to each of the chord tones
-        for (int i = 0; i < chordTones.size(); i++) {
-            chordTones[i] += rootNote;
-        }
-
         if(chordSymbol.size() > 0){
-            std::cerr << "getChordTones(): Warning: Error parsing chord symbol: " << aChordSymbol << " - Remaining: " << chordSymbol << std::endl;
+            std::cerr << "setChord(): Warning: Error parsing chord symbol: " << aChordSymbol << " - Remaining: " << chordSymbol << std::endl;
         }
-
-        // Return the chord tones
-        return chordTones;
 
     }
 
-    // Function to find the lowest chord tone
-    int lowest()
-    {
-        int lowest = 1000;
-        for(auto note : chordTones){
-            if(note < lowest) lowest = note;
-        }
-        return lowest;
-    }
-
-    // highest
-    int highest()
-    {
-        int highest = -1000;
-        for(auto note : chordTones){
-            if(note > highest) highest = note;
-        }
-        return highest;
-    }
-
-    // Mean
-    float mean()
-    {
-        float sum = 0;
-        for(auto note : chordTones){
-            sum += note;
-        }
-        return sum / chordTones.size();
-    }
-
-    // Median
-    int median(std::vector<int> vec)
-    {
-        std::sort(vec.begin(), vec.end());
-        return vec[vec.size()/2];
-    }
-
-    int smallestNoteDistance(std::vector<int> chordTones)
-    {
-        std::sort(chordTones.begin(), chordTones.end());
-        int smallest = 1000;
-        for (int i = 1; i < chordTones.size(); i++) {
-            int dist = abs(chordTones[i] - chordTones[i-1]);
-            // std::cout << "Dist: " << dist << std::endl;
-            if (dist < smallest){
-                smallest = dist;
-            }
-        }
-        // std::cout << "Smallest: " << smallest << std::endl;
-        return smallest;
-    }
-
-    // Group in range
-    std::vector<int> getGroupRange(int low=0, int high=127, int mindist=0, bool print=false)
-    {        
-        auto notes = chordTones;
-        // Sort the chord tones
-        std::sort(notes.begin(), notes.end());
-
-        // Move into the right octave
-        while(median(notes) < low){
-            for(auto& note : notes){
-                note += 12;
-                while(note < low ) note += 12;
-            }
-        }
-        
-        // If the distance to the previous note is less than 3, move it up an octave
-        while(mindist && smallestNoteDistance(notes) < mindist){
-            for (int i = 1; i < notes.size(); i++) {
-                int dist = notes[i] - notes[i-1];
-                // std::cout << "Dist: " << dist << std::endl;
-                if (dist < mindist){
-                    notes[i] += 12;
-                    std::sort(notes.begin(), notes.end());
-                    break;
-                }
-            }
-        }
-
-        for(auto& note : notes){
-            while(note > high) note -= 12;
-        }
-
-        std::sort(notes.begin(), notes.end());
-
-        if(print){
-            for(auto note : notes){
-                std::cout << note << " ";
-            }
-            std::cout << std::endl;
-        }
-
-        return notes;
-    }
-
-    int getBass(int min=0, int max=127)
+    // Get the semitone of the Bass Note, same as root if not a slash chord
+    int getBass(int min=0, int max=127) const
     {
         auto note = bassNote - 12 + mOctave*12;
         while(note < min) note += 12;
@@ -888,24 +732,9 @@ public:
         return note;
     }
 
-    const int getRoot() const 
+    int getRoot() const 
     {
         return rootNote+mOctave*12;
-    }
-
-    void zeroCollaps(std::vector<int>& chordTones)
-    {
-        for(auto& note : chordTones){
-            if(note >= 6) note -= 12;
-        }
-
-        // Sort the chord tones
-        std::sort(chordTones.begin(), chordTones.end());
-    }
-
-    void moveNthBy(int n, int by)
-    {
-        chordTones[n] += by;
     }
 
     void printIntervals()
@@ -936,164 +765,33 @@ public:
     void print()
     {
         std::cout << getChordSymbol() << "\t";
-        const std::vector<int>& chordTones = getChordTones();
+        const auto& chordTones = getSemitones();
 
         for (int i = 0; i < chordTones.size(); i++) {
             std::cout << chordTones[i] << "\t";
         }
         std::cout << "BassNote: " << bassNote << "\t";
         std::cout << std::endl;
-
-    }
-
-    Chord& zeroCenter()
-    {
-        // Zero Distance
-        for(auto& note : chordTones){
-            if(note > 6) note -= 12;
-        }
-
-        return *this;
-    }
-
-    // Function to add or subtract an octave to a specific note defined by the interval
-    bool moveInterval(Interval interval, int octaves)
-    {
-        int n = 0;
-        for(auto& i : chordIntervals){
-            if(i == interval){
-                moveNthBy(n, octaves*12);
-                return true;
-            }
-            n++;
-        }
-        return false;
-        // std::sort(chordTones.begin(), chordTones.end());
-    }
-    bool moveInterval(int deg, int octaves)
-    {
-        int n = 0;
-        for(auto i : chordIntervals){
-            if(i.getDegree() == deg){
-                moveNthBy(n, octaves*12);
-                return true;
-            }
-            n++;
-        }
-        return false;
-        // std::sort(chordTones.begin(), chordTones.end());
-    }
-
-
-    // Function to open the voicing of the chord
-    void openVoicing()
-    {
-        // Test if the chord has a 3rd
-        if     (moveInterval(3 , 1)){}
-
-        // Test if the chord has a 7th
-        if     (moveInterval(7 , 1)){}
-    }
-
-    // Function to voice lead the chord to another chord
-    std::vector<int> voiceLead(Chord other)
-    {
-        std::vector<int> newNotes;
-        std::vector<int> neededNotes = this->getChordTones();
-        std::vector<int> otherNotes = other.getChordTones();
-        // Sort the possible notes
-        std::sort(neededNotes.begin(), neededNotes.end());
-        std::sort(otherNotes.begin() , otherNotes.end());
-        /* Print the possible notes
-        for(auto& note : possibleNotes){
-            std::cout << note << " ";
-        }
-        std::cout << std::endl;
-        */
-
-        // Loop through the chord tones
-        while(!neededNotes.empty())
-        {
-            // Get the first note
-            int note = neededNotes.front();
-            // Remove the note from the needed notes
-            neededNotes.erase(neededNotes.begin());
-            // Loop through the other notes
-            for(int i = 0; i < otherNotes.size(); i++){
-                for(int octave=-2; octave<3; octave++){
-                    // If the note is within 3 semitones of the other note
-                    if(abs(note - otherNotes[i] + octave*12) < 3){
-                        // Add the note to the new notes
-                        newNotes.push_back(otherNotes[i] + octave*12);
-                        // Remove the note from the other notes
-                        otherNotes.erase(otherNotes.begin() + i);
-                        // Break the loop
-                        break;
-                    }
-                }
-
-            }
-        }
-
-
-        // Sort the new chord tones
-        otherNotes = other.getChordTones();
-        std::sort(otherNotes.begin(), otherNotes.end());
-        // Print the other notes
-        for(auto& note : otherNotes){
-            std::cout << note << " ";
-        }
-        std::cout << std::endl;
-        // Sort the new chord tones
-        std::sort(newNotes.begin(), newNotes.end());
-        // Print the new notes
-        for(auto& note : newNotes){
-            std::cout << note << " ";
-        }
-        std::cout << std::endl;
-
-        return newNotes;
-    }
-
-    // Function to change the order and octave of the chord tones such that no tones are closer than min semitones
-    void minDistVoicing(int min=6)
-    {
-        // Sort the chord tones
-        std::sort(chordTones.begin(), chordTones.end());
-        again:
-        for (int i = 1; i < chordTones.size(); i++) {
-            // If the distance between the notes is less than min
-            if(chordTones[i] - chordTones[i-1] < min){
-                // Move the note up an octave
-                chordTones[i] += 12;
-                // Sort the chord tones
-                std::sort(chordTones.begin(), chordTones.end());
-                // Return true
-                goto again;
-            }
-        }
+        printNoteNames();
     }
 
     // Size function
-    const size_t size() const
+    size_t size() const
     {
-        return chordTones.size();
+        return chordIntervals.size();
     }
 
     // Empty function
-    const bool empty() const
+    bool empty() const
     {
-        return chordTones.empty();
+        return chordIntervals.empty();
     }
 
 private:
     // Chord Symbol
     std::string      chordSymbol;
-    // Chord Tones
-    std::vector<int> chordTones;
     // Chord Intervals
-    Intervals chordIntervals;
-
+    Intervals        chordIntervals;
     // Note Names
     std::vector<std::string> noteNames;
 
@@ -1103,7 +801,6 @@ private:
     int bassNote = 0;
     // Octave
     int mOctave = 3;
-
 
 };
 

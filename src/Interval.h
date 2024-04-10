@@ -637,12 +637,6 @@ public:
         std::cout << std::endl;
     }
 
-    // Empty function
-    bool empty()
-    {
-        return IntervalVector::empty();
-    }
-
     // Sort function
     void sort()
     {

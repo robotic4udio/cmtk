@@ -153,7 +153,7 @@ int main() {
 
 
 
-    auto chord = Chord("C+");
+    auto chord = Chord("C+7b5");
     chord.print();
     std::vector<int> v = chord.getVoicing({5,3},true,true);
     for(auto x : v) std::cout << x << " ";

@@ -129,7 +129,7 @@ public:
         // Loop through the chord progression
         if(++index >= chordProgression.size()) index = 0;
         // Return the chord tones
-        current = chordProgression[index].getGroupRange(min,max,mindist);
+        current = chordProgression[index].getSemitones();
         return current;
     }
 
