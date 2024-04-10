@@ -153,11 +153,14 @@ int main() {
 
 
 
-    auto chord = Chord("C+13");
+    auto chord = Chord("C+");
     chord.print();
     std::vector<int> v = chord.getVoicing({5,3},true,true);
     for(auto x : v) std::cout << x << " ";
     std::cout << std::endl;
+
+
+    Scale::printDiatonicScales(ChordProgression("i|bVI7"),4);
 
 
 

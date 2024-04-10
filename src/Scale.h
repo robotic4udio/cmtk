@@ -126,6 +126,7 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
                 mStyle = "Majestic,Heroic,Powerful,Exotic,Eastern,Classical";
+                mProgressions.add("PrincessLeia","I|iv6");
             }
             // Dorian b5 - Harmonic Major 2nd Mode {1 2 ♭3 4 ♭5 6 ♭7}
             else if (mName == "Dorian b5")
@@ -236,10 +237,14 @@ namespace cmtk
                 mStyle = "Positive,Folk,World,Jazzy";
             }
             // Mixolydian b6 - Melodic Minor 5th Mode
+            // Valar Morghulis Theme-Game of Thrones, My Iron Lung-Radiohead,Univited-Alanis Morissette,Extraordinary Girl-Green Day, The Simpsons, The Fragile-Nine Inch Nails,  
+            // https://youtu.be/GTRDQeiLNck?si=uJKIR-BdlzOaXstT 
             else if (mName == "Mixolydian b6")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Sad,Sentimental";
+                mProgressions.add("Vamp","I|iv");
+                mProgressions.add("PrincessLeia","I|iv6");
             }
             // Locrian #2 - Melodic Minor 6th Mode
             else if (mName == "Half Diminished" || mName == "Locrian #2")
