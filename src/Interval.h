@@ -406,7 +406,6 @@ private:
             case 7: semitones += 11; break;
             default: break;
         }
-
     }
 
     // Get Degree as Roman Numeral
@@ -509,6 +508,32 @@ public:
         }
     }
 
+    // Add semitone
+    void addSemi(int semi, bool sharp=false)
+    {
+        add(Interval::newFromSemi(semi,sharp));
+    }
+
+    // Add semitones
+    void addSemi(std::vector<int> semi, bool sharp=false)
+    {
+        for(auto s : semi) add(Interval::newFromSemi(s,sharp));
+    }
+
+    // Remove semitone
+    void removeSemi(int semi)
+    {
+        // Remove the interval if semi is the same
+        auto it = std::remove_if(IntervalVector::begin(), IntervalVector::end(), [semi](Interval i){ return i.getSemitones() == semi; });
+        IntervalVector::erase(it, IntervalVector::end());
+    }
+
+    // Remove semitones
+    void removeSemi(std::vector<int> semi)
+    {
+        for(auto s : semi) removeSemi(s);
+    }
+    
     // Function to add an interval to the chord
     void add(const Interval& interval){
         // If an equal interval is already present, then do not add it, but replace it
@@ -563,27 +588,7 @@ public:
         return true;
     }
 
-    static Intervals fromString(std::string str)
-    {
-        // Replace double spaces with single spaces
-        str.erase(std::unique(str.begin(), str.end(), [](char a, char b){ return a == ' ' && b == ' '; }), str.end());
-        // Remove spaces at the beginning and end of the string
-        str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](int ch){ return !std::isspace(ch); }));
-        str.erase(std::find_if(str.rbegin(), str.rend(), [](int ch){ return !std::isspace(ch); }).base(), str.end());
 
-        // Create the Intervals object
-        Intervals res;
-
-        size_t pos = 0;
-        while((pos = str.find(" ")) != std::string::npos)
-        {
-            res.add(Interval(str.substr(0, pos)));
-            str.erase(0, pos + 1);
-        }
-        res.add(Interval(str));
-
-        return std::move(res);
-    }
 
     // Remove Interval by string, return true if changed
     bool remove(const std::string& str)
@@ -609,6 +614,30 @@ public:
     {
         IntervalVector::erase(std::remove_if(IntervalVector::begin(), IntervalVector::end(), [aDegree](Interval i){ return i.getDegree() == aDegree; }), IntervalVector::end());
     }
+
+    // Convert a string to a Intervals object
+    static Intervals fromString(std::string str)
+    {
+        // Replace double spaces with single spaces
+        str.erase(std::unique(str.begin(), str.end(), [](char a, char b){ return a == ' ' && b == ' '; }), str.end());
+        // Remove spaces at the beginning and end of the string
+        str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](int ch){ return !std::isspace(ch); }));
+        str.erase(std::find_if(str.rbegin(), str.rend(), [](int ch){ return !std::isspace(ch); }).base(), str.end());
+
+        // Create the Intervals object
+        Intervals res;
+
+        size_t pos = 0;
+        while((pos = str.find(" ")) != std::string::npos)
+        {
+            res.add(Interval(str.substr(0, pos)));
+            str.erase(0, pos + 1);
+        }
+        res.add(Interval(str));
+
+        return std::move(res);
+    }
+
 
     // Set Quality
     void setQuality(int aDegree, int aQuality, bool allowAdd = false)
@@ -811,30 +840,9 @@ public:
         // Add the intervals
         for(auto s : semitones)
         {
-            int octave = 0;
-            while(s >= 12)
-            {
-                s -= 12;
-                octave++;
-            }
-
-            switch(s)
-            {
-                case  0: add(octave*7 + 1)   ; break;
-                case  1: add(octave*7 + 2,-1); break;
-                case  2: add(octave*7 + 2)   ; break;
-                case  3: add(octave*7 + 3,-1); break;
-                case  4: add(octave*7 + 3)   ; break;
-                case  5: add(octave*7 + 4)   ; break;
-                case  6: add(octave*7 + 5,-1); break;
-                case  7: add(octave*7 + 5)   ; break;
-                case  8: add(octave*7 + 6,-1); break;
-                case  9: add(octave*7 + 6)   ; break;
-                case 10: add(octave*7 + 7,-1); break;
-                case 11: add(octave*7 + 7)   ; break;
-            }
-
+            addSemi(s);
         }
+
     }
 
     std::string getChordSymbol()

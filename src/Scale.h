@@ -770,7 +770,7 @@ namespace cmtk
         // Print the scale
         const void print(int size = 3) const
         {
-            std::cout << "Scale: " << mName << " : " << getWholeHalfPattern();
+            std::cout << mName << " : " << getWholeHalfPattern();
             if (!mStyle.empty())
                 std::cout << " - " << mStyle;
             std::cout << std::endl;
@@ -872,6 +872,8 @@ namespace cmtk
             return diatonicitySum / chordProgression.size();
         }
 
+      
+
         static std::vector<Scale> getAllScales()
         {
             std::vector<Scale> scales;
@@ -899,6 +901,79 @@ namespace cmtk
 
             return std::move(scales);
         }
+
+        static std::vector<std::string> getModeNames(std::string s = "Major")
+        {
+            //      Scale Name                       1st Mode                 2nd Mode                3rd Mode                     4th Mode              5th Mode              6th Mode               7th Mode
+            if(s == "Major"                ) return {"Ionian"               , "Dorian"             , "Phrygian"                 , "Lydian"             , "Mixolydian"       , "Aeolian"            , "Locrian"                 };
+            if(s == "Harmonic Major"       ) return {"Harmonic Major"       , "Dorian b5"          , "Phrygian b4"              , "Lydian b3"          , "Mixolydian b2"    , "Lydian Augmented"   , "Locrian Diminished"      };
+            if(s == "Harmonic Minor"       ) return {"Harmonic Minor"       , "Locrian n6"         , "Ionian #5"                , "Dorian #4"          , "Phrygian Dominant", "Lydian #2"          , "Super Locrian"           };
+            if(s == "Melodic Minor"        ) return {"Melodic Minor"        , "Dorian b2"          , "Lydian Augmented"         , "Lydian Dominant"    , "Mixolydian b6"    , "Locrian #2"         , "Altered"                 };
+            if(s == "Neopolitan Major"     ) return {"Neopolitan Major"     , "Lydian Augmented #6", "Lydian Augmented Dominant", "Lydian b6 Dominant" , "Major Locrian"    , "Super Locrian n2"   , "Super Locrian bb3"       };
+            if(s == "Neopolitan Minor"     ) return {"Neopolitan Minor"     , "Lydian #6"          , "Mixolydian Augmented"     , "Hungarian Gypsy"    , "Locrian n3"       , "Ionian #2"          , "Super-Locrian Diminished"};
+            if(s == "Double Harmonic Major") return {"Double Harmonic Major", "Lydian #2 #6"       , "Ultra Phrygian"           , "Hungarian Minor"    , "Oriental"         , "Ionian Augmented #2", "Locrian Diminished bb3"  };
+            if(s == "Major Pentatonic"     ) return {"Major Pentatonic"     , "Egyptian Pentatonic", "Man Gong Pentatonic"      , "Ritsusen Pentatonic", "Minor Pentatonic" };
+            if(s == "Blues"                ) return {"Major Blues"          , "Blues 2nd Mode"     , "Blues 3rd Mode"           , "Blues 4th Mode"     , "Blues 5th Mode"    , "Minor Blues"        };
+
+            // Return empty vector if no scales found
+            return {};
+        }
+
+        // Get the Modes of a scale
+        static std::vector<Scale> getModes(std::string s = "Major")
+        {
+            std::vector<Scale> modes;
+            for(auto modeName : getModeNames(s))
+            {
+                modes.push_back(Scale(modeName));
+            }
+
+            return std::move(modes);
+        }
+
+        // Print the names of the modes
+        static void printModeNames(std::string s = "", int size = 3)
+        {
+            if(s.empty()){
+                for(auto scaleName : {
+                    "Major", "Harmonic Major", "Harmonic Minor", "Melodic Minor", "Neopolitan Major", "Neopolitan Minor", "Double Harmonic Major", "Major Pentatonic", "Blues"
+                }){
+                    printModeNames(scaleName, size);
+                    std::cout << std::endl;
+                }
+                return;
+            }
+
+            // Print the ModeNames
+            int i = 1;
+            std::cout << s << " Modes: " << std::endl;
+            for(auto mode : getModeNames(s)){
+                std::cout << i++ << ": " << mode << std::endl;
+            } 
+        }
+
+        // Print the modes
+        static void printModes(std::string s = "", int size = 3)
+        {
+            if(s.empty()){
+                for(auto scaleName : {
+                    "Major", "Harmonic Major", "Harmonic Minor", "Melodic Minor", "Neopolitan Major", "Neopolitan Minor", "Double Harmonic Major", "Major Pentatonic", "Blues"
+                }){
+                    printModes(scaleName, size);
+                    std::cout << std::endl;
+                }
+                return;
+            }
+
+            // Print the Modes
+            int i = 1;
+            for(auto mode : getModes(s)){
+                std::cout << s << " Mode " << i++ << ": " << std::endl;
+                mode.print(size);
+            } 
+
+        }
+
 
         static void printAllScales(int size = 3)
         {

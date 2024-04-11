@@ -164,6 +164,9 @@ int main() {
 
 
 
+    Scale::printModes("Major");
+
+
 
     // chord.printIntervals();
 

@@ -435,7 +435,7 @@ public:
 
     const Intervals& getIntervals() const
     {
-        return chordIntervals;
+        return mIntervals;
     }
 
     // Get Voicing from a list of degrees in the wanted order
@@ -443,7 +443,7 @@ public:
     {
         auto root = getRoot();
         std::vector<int> voicing;
-        for(auto i : chordIntervals){
+        for(auto i : mIntervals){
             voicing.push_back(i.getSemitones()+root);
         }
         return std::move(voicing);
@@ -453,16 +453,16 @@ public:
     int operator[](int index)
     {   
         while(index < 0)                      index += this->size();
-        while(index >= chordIntervals.size()) index -= this->size();
+        while(index >= mIntervals.size()) index -= this->size();
 
-        return chordIntervals[index].getSemitones()+getRoot();
+        return mIntervals[index].getSemitones()+getRoot();
     }
 
 
     // Get Voicing from a list of degrees in the wanted order
     std::vector<int> getVoicing(std::vector<int> degrees, bool addBass=false, bool addRest=false)
     {
-        auto intervals = this->chordIntervals;
+        auto intervals = this->mIntervals;
         std::vector<int> voicing;
         if(addBass) voicing.push_back(getBass());
         int last = -1;  
@@ -501,7 +501,7 @@ public:
         std::vector<int> voicing;
         if(addBass) voicing.push_back(getBass());
         auto root = getRoot();
-        for(auto i : chordIntervals){
+        for(auto i : mIntervals){
             voicing.push_back(i.getSemitones()+root);
         }
         return std::move(voicing);
@@ -511,7 +511,7 @@ public:
     void setChord(const std::string& aChordSymbol, int aRoot = 0){
         auto chordSymbol = aChordSymbol;
         std::string rootName = "";
-        chordIntervals.clear();
+        mIntervals.clear();
 
         // Test if the chors symbol is in roman numerals
         const bool isRoman = isRomanChordSymbol(chordSymbol);
@@ -613,46 +613,46 @@ public:
         // Initialize the chord tones vector based on the chord type
         switch (chordQuality)
         {
-            case Quality::Major:          chordIntervals     = {Interval(1), Interval(3)   , Interval(5)             }; break;
-            case Quality::Minor:          chordIntervals     = {Interval(1), Interval(3,-1), Interval(5)             }; break;
-            case Quality::Diminished:     chordIntervals     = {Interval(1), Interval(3,-1), Interval(5,-1)          }; break;
-            case Quality::HalfDiminished: chordIntervals     = {Interval(1), Interval(3,-1), Interval(5,-1), Interval(7,-1) }; break;
-            case Quality::Augmented:      chordIntervals     = {Interval(1), Interval(3)   , Interval(5, 1)          }; break;
-            case Quality::Sus2:           chordIntervals     = {Interval(1), Interval(2)   , Interval(5)             }; break;
-            case Quality::Sus4:           chordIntervals     = {Interval(1), Interval(4)   , Interval(5)             }; break;
-            case Quality::PowerChord:     chordIntervals     = {Interval(1),          Interval(5)             }; break;
+            case Quality::Major:          mIntervals     = {Interval(1), Interval(3)   , Interval(5)             }; break;
+            case Quality::Minor:          mIntervals     = {Interval(1), Interval(3,-1), Interval(5)             }; break;
+            case Quality::Diminished:     mIntervals     = {Interval(1), Interval(3,-1), Interval(5,-1)          }; break;
+            case Quality::HalfDiminished: mIntervals     = {Interval(1), Interval(3,-1), Interval(5,-1), Interval(7,-1) }; break;
+            case Quality::Augmented:      mIntervals     = {Interval(1), Interval(3)   , Interval(5, 1)          }; break;
+            case Quality::Sus2:           mIntervals     = {Interval(1), Interval(2)   , Interval(5)             }; break;
+            case Quality::Sus4:           mIntervals     = {Interval(1), Interval(4)   , Interval(5)             }; break;
+            case Quality::PowerChord:     mIntervals     = {Interval(1),          Interval(5)             }; break;
         }
 
         // Add Extension
         if(removePrefix(chordSymbol, "6")){
-            chordIntervals.add(Interval(6));
+            mIntervals.add(Interval(6));
         }
         else if(removePrefix(chordSymbol, "7")){
-            chordIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
+            mIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
         }
         else if(removePrefix(chordSymbol, "9")){ 
-            chordIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
-            chordIntervals.add(Interval(9));
+            mIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
+            mIntervals.add(Interval(9));
         }
         else if(removePrefix(chordSymbol, "11")){ 
-            chordIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
-            chordIntervals.add(Interval(9),Interval(11));
+            mIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
+            mIntervals.add(Interval(9),Interval(11));
         }
         else if(removePrefix(chordSymbol, "13")){ 
-            chordIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
-            chordIntervals.add(Interval(9),Interval(11),Interval(13));
+            mIntervals.add(chordQuality == Quality::Diminished ? Interval(6) : Interval(7,-1));
+            mIntervals.add(Interval(9),Interval(11),Interval(13));
         }
         else if(removePrefix(chordSymbol, "maj7")){ 
-            chordIntervals.add(Interval(7));
+            mIntervals.add(Interval(7));
         }
         else if(removePrefix(chordSymbol, "maj9")){ 
-            chordIntervals.add(Interval(7),Interval(9));
+            mIntervals.add(Interval(7),Interval(9));
         }
         else if(removePrefix(chordSymbol, "maj11")){ 
-            chordIntervals.add(Interval(7),Interval(9),Interval(11));
+            mIntervals.add(Interval(7),Interval(9),Interval(11));
         }
         else if(removePrefix(chordSymbol, "maj13")){ 
-            chordIntervals.add(Interval(7),Interval(9),Interval(11),Interval(13));
+            mIntervals.add(Interval(7),Interval(9),Interval(11),Interval(13));
         }
 
         // Handle more complex chords
@@ -661,41 +661,41 @@ public:
         {   
             found = false;
             // Flatten
-            if(removePrefix(chordSymbol, "b3"    )){ chordIntervals.setQuality( 3, -1, true); found = true; }
-            if(removePrefix(chordSymbol, "b5"    )){ chordIntervals.setQuality( 5, -1, true); found = true; }
-            if(removePrefix(chordSymbol, "b7"    )){ chordIntervals.setQuality( 7, -1, true); found = true; }
-            if(removePrefix(chordSymbol, "b9"    )){ chordIntervals.setQuality( 9, -1, true); found = true; }
-            if(removePrefix(chordSymbol, "b11"   )){ chordIntervals.setQuality(11, -1, true); found = true; }
-            if(removePrefix(chordSymbol, "b13"   )){ chordIntervals.setQuality(13, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b3"    )){ mIntervals.setQuality( 3, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b5"    )){ mIntervals.setQuality( 5, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b7"    )){ mIntervals.setQuality( 7, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b9"    )){ mIntervals.setQuality( 9, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b11"   )){ mIntervals.setQuality(11, -1, true); found = true; }
+            if(removePrefix(chordSymbol, "b13"   )){ mIntervals.setQuality(13, -1, true); found = true; }
             
             // Sharpen
-            if(removePrefix(chordSymbol, "#3"    )){ chordIntervals.setQuality(3 ,  1, true); found = true; }
-            if(removePrefix(chordSymbol, "#5"    )){ chordIntervals.setQuality(5 ,  1, true); found = true; }
-            if(removePrefix(chordSymbol, "#7"    )){ chordIntervals.setQuality(7 ,  1, true); found = true; }
-            if(removePrefix(chordSymbol, "#9"    )){ chordIntervals.setQuality(9 ,  1, true); found = true; }
-            if(removePrefix(chordSymbol, "#11"   )){ chordIntervals.setQuality(11,  1, true); found = true; }
-            if(removePrefix(chordSymbol, "#13"   )){ chordIntervals.setQuality(13,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#3"    )){ mIntervals.setQuality(3 ,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#5"    )){ mIntervals.setQuality(5 ,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#7"    )){ mIntervals.setQuality(7 ,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#9"    )){ mIntervals.setQuality(9 ,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#11"   )){ mIntervals.setQuality(11,  1, true); found = true; }
+            if(removePrefix(chordSymbol, "#13"   )){ mIntervals.setQuality(13,  1, true); found = true; }
 
             // Add notes if required
-            if(removePrefix(chordSymbol, "add2"  )){ chordIntervals.add(Interval( 2));        found = true; }
-            if(removePrefix(chordSymbol, "add4"  )){ chordIntervals.add(Interval( 4));        found = true; }
-            if(removePrefix(chordSymbol, "add6"  )){ chordIntervals.add(Interval( 6));        found = true; }
-            if(removePrefix(chordSymbol, "add9"  )){ chordIntervals.add(Interval( 9));        found = true; }
-            if(removePrefix(chordSymbol, "add11" )){ chordIntervals.add(Interval(11));        found = true; }
-            if(removePrefix(chordSymbol, "add13" )){ chordIntervals.add(Interval(13));        found = true; }
+            if(removePrefix(chordSymbol, "add2"  )){ mIntervals.add(Interval( 2));        found = true; }
+            if(removePrefix(chordSymbol, "add4"  )){ mIntervals.add(Interval( 4));        found = true; }
+            if(removePrefix(chordSymbol, "add6"  )){ mIntervals.add(Interval( 6));        found = true; }
+            if(removePrefix(chordSymbol, "add9"  )){ mIntervals.add(Interval( 9));        found = true; }
+            if(removePrefix(chordSymbol, "add11" )){ mIntervals.add(Interval(11));        found = true; }
+            if(removePrefix(chordSymbol, "add13" )){ mIntervals.add(Interval(13));        found = true; }
 
             // Remove notes if required
-            if(removePrefix(chordSymbol, "no1"   )){ chordIntervals.removeDegree( 1);         found = true; }
-            if(removePrefix(chordSymbol, "no3"   )){ chordIntervals.removeDegree( 3);         found = true; }
-            if(removePrefix(chordSymbol, "no5"   )){ chordIntervals.removeDegree( 5);         found = true; }
-            if(removePrefix(chordSymbol, "no7"   )){ chordIntervals.removeDegree( 7);         found = true; }
-            if(removePrefix(chordSymbol, "no9"   )){ chordIntervals.removeDegree( 9);         found = true; }
-            if(removePrefix(chordSymbol, "no11"  )){ chordIntervals.removeDegree(11);         found = true; }
-            if(removePrefix(chordSymbol, "no13"  )){ chordIntervals.removeDegree(13);         found = true; }
+            if(removePrefix(chordSymbol, "no1"   )){ mIntervals.removeDegree( 1);         found = true; }
+            if(removePrefix(chordSymbol, "no3"   )){ mIntervals.removeDegree( 3);         found = true; }
+            if(removePrefix(chordSymbol, "no5"   )){ mIntervals.removeDegree( 5);         found = true; }
+            if(removePrefix(chordSymbol, "no7"   )){ mIntervals.removeDegree( 7);         found = true; }
+            if(removePrefix(chordSymbol, "no9"   )){ mIntervals.removeDegree( 9);         found = true; }
+            if(removePrefix(chordSymbol, "no11"  )){ mIntervals.removeDegree(11);         found = true; }
+            if(removePrefix(chordSymbol, "no13"  )){ mIntervals.removeDegree(13);         found = true; }
         }
 
-        // Sort the chordIntervals
-        chordIntervals.sort();
+        // Sort the mIntervals
+        mIntervals.sort();
 
         // Print the noteNames
         this->rootNote = rootNote+aRoot;
@@ -709,7 +709,7 @@ public:
         }
 
         // Add the rest of the note names
-        for(auto interval : chordIntervals){
+        for(auto interval : mIntervals){
             if(interval.getDegree() != 1)
                 noteNames.push_back(interval.getNoteName(rootNote, isRoman));
             else 
@@ -739,14 +739,12 @@ public:
 
     void printIntervals()
     {
-        chordIntervals.print();
+        mIntervals.print();
     }
-
-
 
     void printSemitones(){
         // Print the chord intervals
-        for(auto interval : chordIntervals){
+        for(auto interval : mIntervals){
             std::cout << interval.getSemitones() << " ";
         }
         std::cout << std::endl;        
@@ -756,7 +754,7 @@ public:
     {
         // Convert the intervals to chord tones
         std::vector<std::string> noteNames;
-        for(auto interval : chordIntervals){
+        for(auto interval : mIntervals){
             std::cout << interval.getNoteName(rootNote) << " ";
         }
         std::cout << std::endl;
@@ -778,20 +776,20 @@ public:
     // Size function
     size_t size() const
     {
-        return chordIntervals.size();
+        return mIntervals.size();
     }
 
     // Empty function
     bool empty() const
     {
-        return chordIntervals.empty();
+        return mIntervals.empty();
     }
 
 private:
     // Chord Symbol
     std::string      chordSymbol;
     // Chord Intervals
-    Intervals        chordIntervals;
+    Intervals        mIntervals;
     // Note Names
     std::vector<std::string> noteNames;
 
