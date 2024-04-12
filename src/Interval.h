@@ -133,7 +133,7 @@ public:
     }
 
     // Function to get the interval as a string
-    const std::string getString() const
+    std::string toString() const
     {
         auto quality = this->quality;
         std::string res = "";
@@ -154,7 +154,7 @@ public:
     // Function to get the interval as a string
     const std::string getName() const
     {
-        return std::move(getString());
+        return std::move(toString());
     }
 
     // Function to get the number of semitones
@@ -166,7 +166,7 @@ public:
     // Print the interval
     void print()
     {
-        std::cout << "(" << getString() << "~" << getSemitones() << ")" << std::endl;   
+        std::cout << "(" << toString() << "~" << getSemitones() << ")" << std::endl;   
     }
 
     // Print name
@@ -263,7 +263,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Interval& i)
     {
         auto tmp = i;
-        os << tmp.getString();
+        os << tmp.toString();
         return os;
     }
 
@@ -590,6 +590,30 @@ public:
 
 
 
+    // Stream operator
+    friend std::ostream& operator<<(std::ostream& os, const Intervals& intervals)
+    {
+        for(const auto& interval : intervals)
+        {
+            if(interval == intervals.back()) os << interval;
+            else                             os << interval << " ";
+        } 
+        return os;
+    }
+
+    // toString
+    std::string toString() const
+    {
+        std::string res = "";
+        for(auto& interval : *this)
+        {
+            if(interval == this->back()) res += interval.toString();
+            else                         res += interval.toString() + " ";            
+        }
+
+        return std::move(res);
+    }
+
     // Remove Interval by string, return true if changed
     bool remove(const std::string& str)
     {
@@ -661,7 +685,7 @@ public:
     // Print the chord intervals
     void print(){
         for(auto& interval : *this){
-            std::cout << "(" << interval.getString() << "~" << interval.getSemitones() << ") ";
+            std::cout << "(" << interval.toString() << "~" << interval.getSemitones() << ") ";
         }
         std::cout << std::endl;
     }
@@ -673,7 +697,7 @@ public:
     }
 
     // Test if an interval is present
-    const bool contains(const Interval& n) const
+    bool contains(const Interval& n) const
     {
         // Test if interval is present - both Degree and Quality must match
         return std::find_if(IntervalVector::begin(), IntervalVector::end(), [n](Interval i){ return i.getDegree() == n.getDegree() && i.getQuality() == n.getQuality(); }) != IntervalVector::end();
@@ -721,20 +745,6 @@ public:
             if(at(i) != other.at(i)) return false;
         }
         return true;
-    }
-
-
-    // Stream operator
-    friend std::ostream& operator<<(std::ostream& os, const Intervals& intervals)
-    {
-        for(const auto& interval : intervals)
-        {
-            if(interval == intervals.back()) os << interval;
-            else                             os << interval << " ";
-        } 
-
-
-        return os;
     }
 
     const std::vector<int> getSemitones(int offset=0) const

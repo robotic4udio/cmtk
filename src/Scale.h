@@ -350,7 +350,7 @@ namespace cmtk
             }
 
             // ----------------------- Double Harmonic Modes ----------------------- //
-            // Double Harmonic Major - Double Harmonic Major 1st Mode
+            // Double Harmonic Major - Double Harmonic Major 1st Mode - Dune-Hans Zimmer, Misirlou
             else if (mName == "Double Harmonic Major")
             {
                 mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
@@ -508,6 +508,20 @@ namespace cmtk
 
             res += mIntervals[index].getSemitones();
             return res;
+        }
+
+        static Scale getScale(const Intervals& intervals)
+        {
+            for(auto& scale : getAllScales())
+            {
+                if(scale.getIntervals() == intervals)
+                {
+                    return std::move(scale);
+                }
+            }
+
+            // Throw exception if scale not found
+            throw std::runtime_error("Scale::getScale(): Scale not found with intervals: " + intervals.toString());
         }
 
         // Function to get the semi-tones of the scale at given indexes
@@ -779,7 +793,7 @@ namespace cmtk
             std::cout << "Int\tSemi\tChord\n";
             for (auto interval : mIntervals)
             {
-                std::cout << interval.getString() << "\t" << interval.getSemitones() << "\t" << getChordSymbol(i++, size) << "\n";
+                std::cout << interval.toString() << "\t" << interval.getSemitones() << "\t" << getChordSymbol(i++, size) << "\n";
             }
             std::cout << std::endl;
         }

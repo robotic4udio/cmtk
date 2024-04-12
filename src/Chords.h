@@ -719,8 +719,10 @@ public:
         if(chordSymbol.size() > 0){
             std::cerr << "setChord(): Warning: Error parsing chord symbol: " << aChordSymbol << " - Remaining: " << chordSymbol << std::endl;
         }
-
     }
+
+    
+
 
     // Get the semitone of the Bass Note, same as root if not a slash chord
     int getBass(int min=0, int max=127) const
@@ -799,6 +801,9 @@ private:
     int bassNote = 0;
     // Octave
     int mOctave = 3;
+    // Tonic
+    int mTonic = 0; // If the tonic is 0
+
 
 };
 
