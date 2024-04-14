@@ -3,14 +3,16 @@
 #include "../libraries/SimpleJSON/json.hpp"
 #include "Interval.h"
 #include "Scale.h"
-#include "Roman.h"
 #include "ChordProgression.h"
-
+#include "Note.h"
 
 #define API_KEY "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"
 
 using json::JSON;
 using namespace cmtk;
+
+
+
 
 int main() {
   /*   // Major Scale (Ionian Mode)
@@ -153,22 +155,23 @@ int main() {
 
 
 
-    auto chord = Chord("C+7b5");
+    auto chord = Chord("I7");
     chord.print();
-    std::vector<int> v = chord.getVoicing({5,3},true,true);
-    for(auto x : v) std::cout << x << " ";
-    std::cout << std::endl;
-
-
-    Scale::printDiatonicScales(ChordProgression("i|bVI7"),4);
 
 
 
-    Scale::printModes("Major");
+ 
 
 
+    // Print the major scale
+    // std::cout << "Major Scale: " << std::endl;
+    // Notes(MajorNoteMap["F"]).print();
 
-    // chord.printIntervals();
+    auto scale = Scale("Double Harmonic Major", "C");
+    scale.print();
+
+    scale.getChord(2).print();
+
 
 
     return 0;

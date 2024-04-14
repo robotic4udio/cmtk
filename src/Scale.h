@@ -4,53 +4,92 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <map>
 #include <algorithm>
 #include <cctype>
 #include "Chords.h"
 #include "ChordProgression.h"
 #include "Interval.h"
+#include "CMTK.h"
+#include "Note.h"
 
 namespace cmtk
-{    
+{   
+
+    
+
+    // Major Scales overview: https://www.pianoscales.org/major.html
+    // C   :  C , D , E  , F , G , A  , B  , C 
+    // C#  :  C#, D#, E# , F#, G#, A# , B# , C#
+    // Db  :  Db, Eb, F  , Gb, Ab, Bb , C  , Db 
+    // D   :  D , E , F# , G , A , B  , C# , D  
+    // D#  :  D#, E#, F##, G#, A#, B# , C##, D# 
+    // Eb  :  Eb, F , G  , Ab, Bb, C  , D  , Eb 
+    // E   :  E , F#, G# , A , B , C# , D# , E  
+    // F   :  F , G , A  , Bb, C , D  , E  , F  
+    // F#  :  F#, G#, A# , B , C#, D# , E# , F# 
+    // Gb  :  Gb, Ab, Bb , Cb, Db, Eb , F  , Gb 
+    // G:     G , A , B  , C , D , E  , F# , G  
+    // G#  :  G#, A#, B# , C#, D#, E# , F##, G#  
+    // Ab  :  Ab, Bb, C  , Db, Eb, F  , G  , Ab 
+    // A   :  A , B , C# , D , E , F# , G# , A  
+    // A#  :  A#, B#, C##, D#, E#, F##, G##, A#
+    // Bb  :  Bb, C , D  , Eb, F , G  , A  , Bb
+    // B   :  B , C#, D# , E , F#, G# , A# , B 
+    // Cb  :  Cb, Db, Eb , Fb, Gb, Ab , Bb , Cb
+
+
+
+
+
+
+
+
+
     // ----------------------------------------------------------------------- //
     // ----------------------------- Scale Class ----------------------------- //
     // ----------------------------------------------------------------------- //
-    class Scale
+    class Scale : public CMTK
     {
     public:
-        // Constructor
-        Scale()
-        {
-            setScale("Major");
-        }
-
-        Scale(std::string aName, int aRootNote = 0)
+        Scale(std::string aName, Note aRootNote = Note("C1"))
         {
             setRoot(aRootNote);
             setScale(aName);
         }
 
-        Scale(std::string aName, std::string aRootKey)
+        Scale(std::string aName, std::string aRootNote)
         {
-            setScale(aName,aRootKey);
+            setRoot(aRootNote);
+            setScale(aName);
         }
 
-        void setRoot(int aRootNote)
+        void setRoot(const Note& aRootNote)
         {
             mRootNote = aRootNote;
         }
 
-        int getRoot()
+        const Note& getRoot() const
         {
             return mRootNote;
         }
 
-        // Function to set the scale
-        void setScale(std::string aScaleName, std::string rootKey="")
+        void clear()
         {
-            mName = aScaleName;
+            mName.clear();
+            mNotes.clear();
+            mIntervals.clear();
             mProgressions.clear();
+            mStyle.clear();
+        }
+
+        // Function to set the scale
+        void setScale(std::string aScaleName)
+        {
+            clear();
+            mName = aScaleName; // TODO: Move this to end and set only if everything is ok
+
             // ----------------------- Major Modes ----------------------- //
             // Ionian Mode - Major Scale 1st Mode {1 2 3 4 5 6 7}
             if (mName == "Ionian" || mName == "Major")
@@ -479,10 +518,15 @@ namespace cmtk
                 mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(5, -1), Interval(5), Interval(7, -1)};
             }
 
-            else
+            // Set Notes
+            mNotes = mRootNote.getNoteFromInterval(mIntervals);
+
+            // Scale Unknown?
+            if(mIntervals.empty())
             {
                 std::cerr << "Error: Unrecognized scale name" << std::endl;
             }
+
         }
 
         // Overload the [] operator to get the semi-tone of the scale
@@ -570,7 +614,7 @@ namespace cmtk
         }
 
         // Function to get the chord symbol of the scale at a given index
-        const std::string getChordSymbol(int index, int size = 3) const
+        std::string getChordSymbol(int index, int size = 3, bool roman=false) const
         {
             // Check that size is valid
             if (size < 3 || size > 7)
@@ -597,7 +641,7 @@ namespace cmtk
             // Triads
             if      (inVec(semitones, {4, 7})){                                           }
             else if (inVec(semitones, {4, 6})){ toAppend = "b5"     ;                     }
-            else if (inVec(semitones, {3, 7})){                       uppercase = false;  }
+            else if (inVec(semitones, {3, 7})){ if(!roman) chordSymbol = "m" ; uppercase = false;  }
             else if (inVec(semitones, {3, 6})){ chordSymbol = "°"   ; uppercase = false;  }
             else if (inVec(semitones, {4, 8})){ chordSymbol = "+"   ;                     }
             else if (inVec(semitones, {2, 7})){ toAppend = "sus2"   ;                     }
@@ -670,8 +714,11 @@ namespace cmtk
                 }
             }
 
+            mRootNote.getNoteFromInterval(chordIntervals);
+
             // Insert the roman numeral at beginning of the chord symbol
-            chordSymbol.insert(0, chordIntervals.front().getRomanName(uppercase));
+            if(roman) chordSymbol.insert(0, chordIntervals.front().getRomanName(uppercase));
+            else      chordSymbol.insert(0, mRootNote.getNoteFromInterval(chordIntervals.front()).toString(false));
 
             // Append
             if (!toAppend.empty())
@@ -691,13 +738,14 @@ namespace cmtk
         // Get chord at index
         Chord getChord(int index, int size = 3)
         {
+            index--;
             const auto& chordSymbol = getChordSymbol(index, size);
             auto chord = Chord(chordSymbol);
             return std::move(chord);
         }
 
         // Get all the chord symbols
-        std::vector<std::string> getChordSymbols(int size = 3)
+        std::vector<std::string> getChordSymbols(int size = 3, bool roman=false)
         {
             std::vector<std::string> chordSymbols;
             for (int i = 0; i < mIntervals.size(); i++)
@@ -709,12 +757,12 @@ namespace cmtk
         }
 
         // Get ChordProgression from a vector of indexes
-        ChordProgression getChordProgression(const std::vector<int> &indexes, int size = 3)
+        ChordProgression getChordProgression(const std::vector<int> &indexes, int size = 3, bool roman=false)
         {
             ChordProgression chordProgression;
             for (auto index : indexes)
             {
-                chordProgression.addChord(getChord(index-1, size));
+                chordProgression.addChord(getChord(index, size));
             }
 
             return std::move(chordProgression);
@@ -776,24 +824,37 @@ namespace cmtk
         }
 
         // Get Intervals
-        const Intervals &getIntervals() const
+        const Intervals& getIntervals() const
         {
             return mIntervals;
         }
 
-        // Print the scale
-        const void print(int size = 3) const
+        // Get Notes
+        const Notes& getNotes() const
         {
-            std::cout << mName << " : " << getWholeHalfPattern();
+            return mNotes;
+        }
+
+        // Print the scale
+        void print(int size = 3) const
+        {
+            std::cout << mRootNote.toString(false) << "-" << mName << " : " << getWholeHalfPattern();
             if (!mStyle.empty())
                 std::cout << " - " << mStyle;
             std::cout << std::endl;
 
             int i = 0;
-            std::cout << "Int\tSemi\tChord\n";
+            printf("%-6s%-6s%-6s%-10s\t%-10s\t%-6s\t%-6s\n", "Deg", "Int", "Semi", "Roman", "Chord", "Note", "Midi");
             for (auto interval : mIntervals)
             {
-                std::cout << interval.toString() << "\t" << interval.getSemitones() << "\t" << getChordSymbol(i++, size) << "\n";
+                std::cout << std::left << std::setw(6) << i+1
+                          << std::left << std::setw(6) << interval.toString()
+                          << std::left << std::setw(6) << interval.getSemitones()
+                          << std::left << std::setw(10) << getChordSymbol(i, size, true  ) << "\t"
+                          << std::left << std::setw(10) << getChordSymbol(i, size, false ) << "\t" 
+                          << mNotes.at(i).toString() << "\t" << mNotes.semiAt(i) 
+                          << std::endl;
+                i++;
             }
             std::cout << std::endl;
         }
@@ -886,8 +947,6 @@ namespace cmtk
             return diatonicitySum / chordProgression.size();
         }
 
-      
-
         static std::vector<Scale> getAllScales()
         {
             std::vector<Scale> scales;
@@ -915,79 +974,6 @@ namespace cmtk
 
             return std::move(scales);
         }
-
-        static std::vector<std::string> getModeNames(std::string s = "Major")
-        {
-            //      Scale Name                       1st Mode                 2nd Mode                3rd Mode                     4th Mode              5th Mode              6th Mode               7th Mode
-            if(s == "Major"                ) return {"Ionian"               , "Dorian"             , "Phrygian"                 , "Lydian"             , "Mixolydian"       , "Aeolian"            , "Locrian"                 };
-            if(s == "Harmonic Major"       ) return {"Harmonic Major"       , "Dorian b5"          , "Phrygian b4"              , "Lydian b3"          , "Mixolydian b2"    , "Lydian Augmented"   , "Locrian Diminished"      };
-            if(s == "Harmonic Minor"       ) return {"Harmonic Minor"       , "Locrian n6"         , "Ionian #5"                , "Dorian #4"          , "Phrygian Dominant", "Lydian #2"          , "Super Locrian"           };
-            if(s == "Melodic Minor"        ) return {"Melodic Minor"        , "Dorian b2"          , "Lydian Augmented"         , "Lydian Dominant"    , "Mixolydian b6"    , "Locrian #2"         , "Altered"                 };
-            if(s == "Neopolitan Major"     ) return {"Neopolitan Major"     , "Lydian Augmented #6", "Lydian Augmented Dominant", "Lydian b6 Dominant" , "Major Locrian"    , "Super Locrian n2"   , "Super Locrian bb3"       };
-            if(s == "Neopolitan Minor"     ) return {"Neopolitan Minor"     , "Lydian #6"          , "Mixolydian Augmented"     , "Hungarian Gypsy"    , "Locrian n3"       , "Ionian #2"          , "Super-Locrian Diminished"};
-            if(s == "Double Harmonic Major") return {"Double Harmonic Major", "Lydian #2 #6"       , "Ultra Phrygian"           , "Hungarian Minor"    , "Oriental"         , "Ionian Augmented #2", "Locrian Diminished bb3"  };
-            if(s == "Major Pentatonic"     ) return {"Major Pentatonic"     , "Egyptian Pentatonic", "Man Gong Pentatonic"      , "Ritsusen Pentatonic", "Minor Pentatonic" };
-            if(s == "Blues"                ) return {"Major Blues"          , "Blues 2nd Mode"     , "Blues 3rd Mode"           , "Blues 4th Mode"     , "Blues 5th Mode"    , "Minor Blues"        };
-
-            // Return empty vector if no scales found
-            return {};
-        }
-
-        // Get the Modes of a scale
-        static std::vector<Scale> getModes(std::string s = "Major")
-        {
-            std::vector<Scale> modes;
-            for(auto modeName : getModeNames(s))
-            {
-                modes.push_back(Scale(modeName));
-            }
-
-            return std::move(modes);
-        }
-
-        // Print the names of the modes
-        static void printModeNames(std::string s = "", int size = 3)
-        {
-            if(s.empty()){
-                for(auto scaleName : {
-                    "Major", "Harmonic Major", "Harmonic Minor", "Melodic Minor", "Neopolitan Major", "Neopolitan Minor", "Double Harmonic Major", "Major Pentatonic", "Blues"
-                }){
-                    printModeNames(scaleName, size);
-                    std::cout << std::endl;
-                }
-                return;
-            }
-
-            // Print the ModeNames
-            int i = 1;
-            std::cout << s << " Modes: " << std::endl;
-            for(auto mode : getModeNames(s)){
-                std::cout << i++ << ": " << mode << std::endl;
-            } 
-        }
-
-        // Print the modes
-        static void printModes(std::string s = "", int size = 3)
-        {
-            if(s.empty()){
-                for(auto scaleName : {
-                    "Major", "Harmonic Major", "Harmonic Minor", "Melodic Minor", "Neopolitan Major", "Neopolitan Minor", "Double Harmonic Major", "Major Pentatonic", "Blues"
-                }){
-                    printModes(scaleName, size);
-                    std::cout << std::endl;
-                }
-                return;
-            }
-
-            // Print the Modes
-            int i = 1;
-            for(auto mode : getModes(s)){
-                std::cout << s << " Mode " << i++ << ": " << std::endl;
-                mode.print(size);
-            } 
-
-        }
-
 
         static void printAllScales(int size = 3)
         {
@@ -1049,21 +1035,19 @@ namespace cmtk
             }
         }
 
-        
-
     private:
         // The scale name
         std::string mName;
         // The scale intervals
         Intervals mIntervals;
         // The scale root note
-        int mRootNote = 0;
+        Note mRootNote = Note("C1");
+        // The Notes of the scale
+        Notes mNotes;
         // The styles of music the mode is usually used for
         std::string mStyle = "";
         // Some useful progressions for the scale
         ChordProgressions mProgressions;
-        // RootKey
-        std::string mRootKey = "";
 
         // Function to test is a vector contains the values given in the arguments
         const bool inVec(const std::vector<int> &vec, const std::vector<int> &values) const 

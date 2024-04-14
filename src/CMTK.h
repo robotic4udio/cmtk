@@ -1,15 +1,44 @@
 #pragma once
-// Classes to handle the creation of the music
-
 #include <string>
 #include <vector>
 #include <iostream>
 #include <map>
 #include <algorithm>
-#include <cctype>
-#include "Interval.h"
+#include <set>
 
 namespace cmtk {
+
+// -------------------------------------------------------------------------------------------- //
+// ---------------------------------- Constants ---------------------------------------------- //
+// -------------------------------------------------------------------------------------------- //
+static constexpr const int C0 = 24;
+static constexpr const int OCTAVES_BELOW_ZERO = C0/12;
+
+
+// ----------------------------------------------------------------------- //
+// ----------------------------- Helper Functions ------------------------ //
+// ----------------------------------------------------------------------- //
+// Test if string starts with prefix string. If it does then remove the prefix and return true.
+inline bool removePrefix(std::string& s, const std::string& prefix)
+{
+    if(s.size() >= prefix.size() && s.compare(0, prefix.size(), prefix) == 0){
+        s.erase(0,prefix.size());
+        return true;
+    }
+    return false;
+}
+
+// Test if string starts with prefix string. If it does then replace the prefix and return true.
+inline bool replacePrefix(std::string& s, const std::string& prefix, const std::string& to)
+{
+    if(s.size() >= prefix.size() && s.compare(0, prefix.size(), prefix) == 0){
+        s.replace(0, prefix.length(), to);
+        return true;
+    }
+    return false;
+}
+
+
 
 // Function to convert a roman numeral to an integer
 int romanToInt(std::string romanNumeral)
@@ -135,7 +164,7 @@ int romanPitchToSemitone(std::string romanPitch, int root=0)
 // Is the string a chord symbol in roman numerals
 inline bool isRomanChordSymbol(const std::string& chordSymbol)
 {
-    return chordSymbol.find_first_of("ivIV") != std::string::npos;
+    return chordSymbol.find_first_of("ivIVXL") != std::string::npos;
 }
 
 // -------------------------------------------------------------------------------------------- //
@@ -194,5 +223,55 @@ int arabicPitchToSemitone(std::string arabicPitch, int root=0)
 };
 
 
+// Create a static std::map<std::vector<Notes>> with all the above notes:
+static std::map<std::string, std::vector<std::string>> MajorNoteMap = {
+    {"C" , { "C"  , "D"  , "E"  , "F"  , "G"  , "A"  , "B"   }},
+    {"C#", { "C#" , "D#" , "E#" , "F#" , "G#" , "A#" , "B#"  }},
+    {"Db", { "Db" , "Eb" , "F"  , "Gb" , "Ab" , "Bb" , "C"   }},
+    {"D" , { "D"  , "E"  , "F#" , "G"  , "A"  , "B"  , "C#"  }},
+    {"D#", { "D#" , "E#" , "F##", "G#" , "A#" , "B#" , "C##" }},
+    {"Eb", { "Eb" , "F"  , "G"  , "Ab" , "Bb" , "C"  , "D"   }},
+    {"E" , { "E"  , "F#" , "G#" , "A"  , "B"  , "C#" , "D#"  }},
+    {"F" , { "F"  , "G"  , "A"  , "Bb" , "C"  , "D"  , "E"   }},
+    {"F#", { "F#" , "G#" , "A#" , "B"  , "C#" , "D#" , "E#"  }},
+    {"Gb", { "Gb" , "Ab" , "Bb" , "Cb" , "Db" , "Eb" , "F"   }},
+    {"G" , { "G"  , "A"  , "B"  , "C"  , "D"  , "E"  , "F#"  }},
+    {"G#", { "G#" , "A#" , "B#" , "C#" , "D#" , "E#" , "F##" }},
+    {"Ab", { "Ab" , "Bb" , "C"  , "Db" , "Eb" , "F"  , "G"   }},
+    {"A" , { "A"  , "B"  , "C#" , "D"  , "E"  , "F#" , "G#"  }},
+    {"A#", { "A#" , "B#" , "C##", "D#" , "E#" , "F##", "G##" }},
+    {"Bb", { "Bb" , "C"  , "D"  , "Eb" , "F"  , "G"  , "A"   }},
+    {"B" , { "B"  , "C#" , "D#" , "E"  , "F#" , "G#" , "A#"  }},
+    {"Cb", { "Cb" , "Db" , "Eb" , "Fb" , "Gb" , "Ab" , "Bb"  }}
+};
 
-} // namespace cmtk
+inline static std::string MajorNoteMapAt(std::string key, int index) 
+{
+    while(index <  0) index += 6;
+    while(index >  6) index -= 6;
+    return MajorNoteMap[key][index];
+}
+
+
+
+// Base Class for all CMTK Objects
+class CMTK
+{
+public:
+
+    
+
+
+    bool mPreferSharp = false;
+
+
+};
+
+
+
+
+
+
+
+
+};

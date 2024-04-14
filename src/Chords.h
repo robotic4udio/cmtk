@@ -9,32 +9,11 @@
 #include <set>
 #include <cctype>
 #include "Interval.h"
-#include "Roman.h" 
+#include "CMTK.h"
+#include "Note.h"
 
 namespace cmtk {
 
-// ----------------------------------------------------------------------- //
-// ----------------------------- Helper Functions ------------------------ //
-// ----------------------------------------------------------------------- //
-// Test if string starts with prefix string. If it does then remove the prefix and return true.
-inline bool removePrefix(std::string& s, const std::string& prefix)
-{
-    if(s.size() >= prefix.size() && s.compare(0, prefix.size(), prefix) == 0){
-        s.erase(0,prefix.size());
-        return true;
-    }
-    return false;
-}
-
-// Test if string starts with prefix string. If it does then replace the prefix and return true.
-inline bool replacePrefix(std::string& s, const std::string& prefix, const std::string& to)
-{
-    if(s.size() >= prefix.size() && s.compare(0, prefix.size(), prefix) == 0){
-        s.replace(0, prefix.length(), to);
-        return true;
-    }
-    return false;
-}
 
 
 
@@ -340,7 +319,6 @@ public:
         PowerChord,
     };
 
-
     // Create a chord from a set of intervals
     void setChord(const Intervals& aIntervals, int aRootNote)
     {
@@ -430,7 +408,7 @@ public:
     // Get the chord symbol
     std::string getChordSymbol()
     {
-        return chordSymbol;
+        return mChordSymbol;
     }
 
     const Intervals& getIntervals() const
@@ -510,6 +488,8 @@ public:
     // Set the chord from a chord symbol - rootNote only used for roman numerals
     void setChord(const std::string& aChordSymbol, int aRoot = 0){
         auto chordSymbol = aChordSymbol;
+        mChordSymbol = chordSymbol;
+
         std::string rootName = "";
         mIntervals.clear();
 
@@ -694,7 +674,7 @@ public:
             if(removePrefix(chordSymbol, "no13"  )){ mIntervals.removeDegree(13);         found = true; }
         }
 
-        // Sort the mIntervals
+        // Sort the chordIntervals
         mIntervals.sort();
 
         // Print the noteNames
@@ -720,9 +700,6 @@ public:
             std::cerr << "setChord(): Warning: Error parsing chord symbol: " << aChordSymbol << " - Remaining: " << chordSymbol << std::endl;
         }
     }
-
-    
-
 
     // Get the semitone of the Bass Note, same as root if not a slash chord
     int getBass(int min=0, int max=127) const
@@ -772,7 +749,6 @@ public:
         }
         std::cout << "BassNote: " << bassNote << "\t";
         std::cout << std::endl;
-        printNoteNames();
     }
 
     // Size function
@@ -789,7 +765,7 @@ public:
 
 private:
     // Chord Symbol
-    std::string      chordSymbol;
+    std::string      mChordSymbol;
     // Chord Intervals
     Intervals        mIntervals;
     // Note Names
@@ -801,8 +777,6 @@ private:
     int bassNote = 0;
     // Octave
     int mOctave = 3;
-    // Tonic
-    int mTonic = 0; // If the tonic is 0
 
 
 };

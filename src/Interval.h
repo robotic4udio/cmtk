@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cctype>
 #include "Chords.h"
+#include "CMTK.h"
 
 namespace cmtk {
 
@@ -15,7 +16,7 @@ namespace cmtk {
 // ----------------------------------------------------------------------- //
 // ----------------------------- Interval Class -------------------------- //
 // ----------------------------------------------------------------------- //
-class Interval {
+class Interval : public CMTK {
 public:
     // Constructor
     Interval() = default;
@@ -441,7 +442,7 @@ private:
 // ---------------------------------------- Intervals Class --------------------------------------- //
 // ------------------------------------------------------------------------------------------------ //
 using IntervalVector = std::vector<Interval>;
-class Intervals : public IntervalVector {
+class Intervals : public CMTK, public IntervalVector {
 public:
     // Constructor
     Intervals() = default;

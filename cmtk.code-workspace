@@ -79,7 +79,8 @@
 			"set": "cpp",
 			"stack": "cpp",
 			"thread": "cpp",
-			"functional": "cpp"
+			"functional": "cpp",
+			"version": "cpp"
 		}
 	}
 }
