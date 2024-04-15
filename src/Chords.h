@@ -14,236 +14,6 @@
 
 namespace cmtk {
 
-
-
-
-
-
-
-
-// Interval between two notes
-inline 
-Interval intervalFromNoteName(std::string n, int rootNote)
-{   
-    // Convert to lower case
-    std::transform(n.begin(), n.end(), n.begin(), ::tolower);
-
-    // Get the note number
-    switch(rootNote){
-        case 0:{ // The key of C
-            if(n == "c")  return Interval(1);
-            if(n == "d")  return Interval(2);
-            if(n == "e")  return Interval(3);
-            if(n == "f")  return Interval(4);
-            if(n == "g")  return Interval(5);
-            if(n == "a")  return Interval(6);
-            if(n == "b")  return Interval(7);
-            if(n == "cb") return Interval(7);
-            if(n == "c#") return Interval(1, 1);
-            if(n == "db") return Interval(2,-1);
-            if(n == "d#") return Interval(2, 1);
-            if(n == "eb") return Interval(3,-1);
-            if(n == "e#") return Interval(4);
-            if(n == "fb") return Interval(3);
-            if(n == "f#") return Interval(4, 1);
-            if(n == "gb") return Interval(5,-1);
-            if(n == "g#") return Interval(5, 1);
-            if(n == "ab") return Interval(6,-1);
-            if(n == "a#") return Interval(6, 1);
-            if(n == "bb") return Interval(7,-1);
-            if(n == "b#") return Interval(7, 1);
-        }
-        break;
-        case 1:{ // The key of C# or Db
-            if(n == "c#") return Interval(1);
-            if(n == "db") return Interval(1);
-            if(n == "d")  return Interval(2,-1);
-            if(n == "d#") return Interval(2);
-            if(n == "eb") return Interval(2);
-            if(n == "e")  return Interval(3,-1);
-            if(n == "fb") return Interval(3,-1);
-            if(n == "e#") return Interval(3);
-            if(n == "f")  return Interval(3);
-            if(n == "f#") return Interval(4);
-            if(n == "gb") return Interval(4);
-            if(n == "g")  return Interval(5,-1);
-            if(n == "g#") return Interval(5);
-            if(n == "ab") return Interval(5);
-            if(n == "a")  return Interval(6,-1);
-            if(n == "a#") return Interval(6);
-            if(n == "bb") return Interval(6);
-            if(n == "b")  return Interval(7,-1);
-            if(n == "b#") return Interval(7);
-            if(n == "c")  return Interval(7);
-            if(n == "cb") return Interval(7,-1);
-        }
-        break;
-        case 2:{ // The key of D
-            if(n == "d")  return Interval(1);
-            if(n == "e")  return Interval(2);
-            if(n == "f#") return Interval(3);
-            if(n == "g")  return Interval(4);
-            if(n == "a")  return Interval(5);
-            if(n == "b")  return Interval(6);
-            if(n == "c#") return Interval(7);
-            if(n == "db") return Interval(7);
-            if(n == "d#") return Interval(1, 1);
-            if(n == "eb") return Interval(2,-1);
-            if(n == "e#") return Interval(2, 1);
-            if(n == "f")  return Interval(3,-1);
-            if(n == "fb") return Interval(2);
-            if(n == "gb") return Interval(3);
-            if(n == "g#") return Interval(4, 1);
-            if(n == "ab") return Interval(5,-1);
-            if(n == "a#") return Interval(5, 1);
-            if(n == "bb") return Interval(6,-1);
-            if(n == "b#") return Interval(6, 1);
-            if(n == "c")  return Interval(7,-1);
-            if(n == "cb") return Interval(6);
-        }
-        break;
-        case 3:{ // The key of D# or Eb
-            if(n == "d#") return Interval(1);
-            if(n == "eb") return Interval(1);
-            if(n == "e")  return Interval(2,-1);
-            if(n == "f")  return Interval(2);
-            if(n == "f#") return Interval(3,-1);
-            if(n == "gb") return Interval(3,-1);
-            if(n == "g")  return Interval(3);
-            if(n == "g#") return Interval(4, 1);
-            if(n == "ab") return Interval(5,-1);
-            if(n == "a")  return Interval(5);
-            if(n == "a#") return Interval(5, 1);
-            if(n == "bb") return Interval(6,-1);
-            if(n == "b")  return Interval(6);
-            if(n == "b#") return Interval(6, 1);
-            if(n == "c")  return Interval(7,-1);
-            if(n == "c#") return Interval(7);
-            if(n == "db") return Interval(7);
-            if(n == "d")  return Interval(1, 1);
-            if(n == "fb") return Interval(2,-1);
-        }
-
-    }
-
-    // Print error message
-    std::cerr << "Error: intervalFromNoteName(): Unrecognized note: " << n << ", with root: " << rootNote << std::endl;
-
-    // Return the root note
-    return Interval(1);
-
-}
-
-// Get NoteName from beginnign of string
-inline std::string getNoteNameString(std::string& s)
-{
-    if(s.empty()){
-        // Print error message
-        std::cerr << "Error: Unrecognized note" << std::endl;
-        return "";
-    }
-
-    // Convert to string s to lower case
-    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-
-    // Is the note expressed in roman numerals
-    if(isRomanChordSymbol(s))
-    {
-        // Create empty string for result
-        std::string result = "";
-
-        // While the first character is a 'b' or '#' add it to the result
-        while(s[0] == 'b' || s[0] == '#'){
-            if(s[0] == 'b'){ result += "b"; s.erase(0,1); }
-            if(s[0] == '#'){ result += "#"; s.erase(0,1); }
-        }
-
-        // Loop until no more symbols are found
-        bool found = !s.empty();
-        while(found){
-            found = !s.empty();
-            if(s[0] == 'i'){ result += "I"; s.erase(0,1); found = true; }
-            if(s[0] == 'v'){ result += "V"; s.erase(0,1); found = true; }
-        }
-
-        return result;
-    } 
-
-    // Is the note expressed in arabic numerals
-    if(isArabicChordSymbol(s))
-    {
-        // Create empty string for result
-        std::string result = "";
-
-        // Check for sharp or flat
-        // While the first character is a 'b' or '#' add it to the result
-        while(s[0] == 'b' || s[0] == '#'){
-            if(s[0] == 'b'){ result += "b"; s.erase(0,1); }
-            if(s[0] == '#'){ result += "#"; s.erase(0,1); }
-        }
-
-        // Return if empty
-        if(s.empty()){ return ""; }
-
-        // Loop until no more symbols are found
-        bool found = !s.empty();
-        while(found){
-            found = !s.empty();
-            if(s[0] == '1'){ result += "I";   s.erase(0,1); found = true; }
-            if(s[0] == '3'){ result += "III"; s.erase(0,1); found = true; }
-            if(s[0] == '2'){ result += "II";  s.erase(0,1); found = true; }
-            if(s[0] == '4'){ result += "IV";  s.erase(0,1); found = true; }
-            if(s[0] == '5'){ result += "V";   s.erase(0,1); found = true; }
-            if(s[0] == '6'){ result += "VI";  s.erase(0,1); found = true; }
-            if(s[0] == '7'){ result += "VII"; s.erase(0,1); found = true; }
-        }
-
-        return result;
-    }
-    else 
-    {
-        // Convert to lower case
-        char s0 = s[0];
-        char s1 = s[1];
-
-        if(s.size() >= 2){
-            if(s1 == '#'){
-                if(s0 == 'c'){ s.erase(0,2); return "C#"; };
-                if(s0 == 'd'){ s.erase(0,2); return "D#"; };
-                if(s0 == 'e'){ s.erase(0,2); return "E#"; };
-                if(s0 == 'f'){ s.erase(0,2); return "F#"; };
-                if(s0 == 'g'){ s.erase(0,2); return "G#"; };
-                if(s0 == 'a'){ s.erase(0,2); return "A#"; };
-                if(s0 == 'b'){ s.erase(0,2); return "B#"; };
-            }
-            else if(s1 == 'b'){
-                if(s0 == 'c'){ s.erase(0,2); return "Cb"; };
-                if(s0 == 'd'){ s.erase(0,2); return "Db"; };
-                if(s0 == 'e'){ s.erase(0,2); return "Eb"; };
-                if(s0 == 'f'){ s.erase(0,2); return "Fb"; };
-                if(s0 == 'g'){ s.erase(0,2); return "Gb"; };
-                if(s0 == 'a'){ s.erase(0,2); return "Ab"; };
-                if(s0 == 'b'){ s.erase(0,2); return "Bb"; };
-            }
-        }
-        else if(s.size() >= 1){
-            if(s0 == 'c'){ s.erase(0,1); return "C"; };
-            if(s0 == 'd'){ s.erase(0,1); return "D"; };
-            if(s0 == 'e'){ s.erase(0,1); return "E"; };
-            if(s0 == 'f'){ s.erase(0,1); return "F"; };
-            if(s0 == 'g'){ s.erase(0,1); return "G"; };
-            if(s0 == 'a'){ s.erase(0,1); return "A"; };
-            if(s0 == 'b'){ s.erase(0,1); return "B"; };
-        }
-    }
-
-
-    // Print error message
-    std::cerr << "Error: getNoteNameString(): Unrecognized note" << std::endl;
-    return "";
-}
-
-
 // Get Note Number from beginnign of string
 inline int getNoteNumber(const std::string& s, int root=0)
 {
@@ -290,8 +60,9 @@ inline int getNoteNumber(const std::string& s, int root=0)
 
 
 // ----------------------------------------------------------------------- //
-// ---------------------------- ChordType Class --------------------------- //
-class ChordType : public Intervals {
+// ---------------------------- ChordType Class -------------------------- //
+// ----------------------------------------------------------------------- //
+class ChordType : public CMTK {
 public:
     // Constructor
     ChordType() = default;
@@ -319,11 +90,18 @@ public:
         auto chordType = aChordType;
         mChordType = chordType;
 
+        // Initialize the quality of the chord
         Quality quality = Quality::NA;
 
-        if     (removePrefix(chordType, "maj" ,false)){ quality = Quality::Major;          }
+        // Check for the quality of the chord
+        if     (chordType.empty()                    ){ quality = Quality::Major;          }
+        else if(removePrefix(chordType, "maj" ,false)){ quality = Quality::Major;          }
+        else if(removePrefix(chordType, "M"         )){ quality = Quality::Major;          }
         else if(removePrefix(chordType, "min" ,false)){ quality = Quality::Minor;          }
+        else if(removePrefix(chordType, "m"         )){ quality = Quality::Minor;          }
+        else if(removePrefix(chordType, "5"   ,false)){ quality = Quality::PowerChord;     }
         else if(removePrefix(chordType, "dom" ,false)){ quality = Quality::Dominant;       }
+        else if(startsWithNumber(chordType)          ){ quality = Quality::Dominant;       }
         else if(removePrefix(chordType, "aug" ,false)){ quality = Quality::Augmented;      }
         else if(removePrefix(chordType, "+"   ,false)){ quality = Quality::Augmented;      }
         else if(removePrefix(chordType, "dim" ,false)){ quality = Quality::Diminished;     }
@@ -332,64 +110,56 @@ public:
         else if(removePrefix(chordType, "ø"   ,false)){ quality = Quality::HalfDiminished; }
         else if(removePrefix(chordType, "sus2",false)){ quality = Quality::Sus2;           }
         else if(removePrefix(chordType, "sus4",false)){ quality = Quality::Sus4;           }
-        else if(removePrefix(chordType, "5th" ,false)){ quality = Quality::PowerChord;     }
-        else if(removePrefix(chordType, "M"         )){ quality = Quality::Major;          }
-        else if(removePrefix(chordType, "m"         )){ quality = Quality::Minor;          }
 
         // Remove stuff from the chord symbol
-        const std::string chars = " ^()";
-        // Remove the chars
-        for (char c: chars) {
-            chordType.erase(std::remove(chordType.begin(), chordType.end(), c), chordType.end());
-        }
+        removeChars(chordType, " ^()"); // Remove spaces
 
         // Initialize the chord tones vector based on the chord type
-        switch (quality)
-        {
-            case Quality::Major:          Intervals::set({Interval(1), Interval(3)   , Interval(5)                    }); break;
-            case Quality::Dominant:       Intervals::set({Interval(1), Interval(3)   , Interval(5)                    }); break;
-            case Quality::Minor:          Intervals::set({Interval(1), Interval(3,-1), Interval(5)                    }); break;
-            case Quality::Diminished:     Intervals::set({Interval(1), Interval(3,-1), Interval(5,-1)                 }); break;
-            case Quality::HalfDiminished: Intervals::set({Interval(1), Interval(3,-1), Interval(5,-1), Interval(7,-1) }); break;
-            case Quality::Augmented:      Intervals::set({Interval(1), Interval(3)   , Interval(5, 1)                 }); break;
-            case Quality::Sus2:           Intervals::set({Interval(1), Interval(2)   , Interval(5)                    }); break;
-            case Quality::Sus4:           Intervals::set({Interval(1), Interval(4)   , Interval(5)                    }); break;
-            case Quality::PowerChord:     Intervals::set({Interval(1),                 Interval(5)                    }); break;
+        switch (quality){
+            case Quality::Major:          mIntervals.set({Interval(1), Interval(3)   , Interval(5)                    }); break;
+            case Quality::Dominant:       mIntervals.set({Interval(1), Interval(3)   , Interval(5)                    }); break;
+            case Quality::Minor:          mIntervals.set({Interval(1), Interval(3,-1), Interval(5)                    }); break;
+            case Quality::Diminished:     mIntervals.set({Interval(1), Interval(3,-1), Interval(5,-1)                 }); break;
+            case Quality::HalfDiminished: mIntervals.set({Interval(1), Interval(3,-1), Interval(5,-1), Interval(7,-1) }); break;
+            case Quality::Augmented:      mIntervals.set({Interval(1), Interval(3)   , Interval(5, 1)                 }); break;
+            case Quality::Sus2:           mIntervals.set({Interval(1), Interval(2)   , Interval(5)                    }); break;
+            case Quality::Sus4:           mIntervals.set({Interval(1), Interval(4)   , Interval(5)                    }); break;
+            case Quality::PowerChord:     mIntervals.set({Interval(1),                 Interval(5)                    }); break;
             case Quality::NA: break;            // TODO: Throw Error;
         }
+
+        // Add Extension to the intervals
         const bool maj = quality == Quality::Major;
         const bool dim = quality == Quality::Diminished;
-
-        // Add Extension
         if(removePrefix(chordType, "6")){
-            Intervals::add(Interval(6));
+            mIntervals.add(Interval(6));
         }
         else if(removePrefix(chordType, "7")){
-            Intervals::add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
+            mIntervals.add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
         }
         else if(removePrefix(chordType, "9")){ 
-            Intervals::add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
-            Intervals::add(Interval(9));
+            mIntervals.add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
+            mIntervals.add(Interval(9));
         }
         else if(removePrefix(chordType, "11")){ 
-            Intervals::add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
-            Intervals::add(Interval(9),Interval(11));
+            mIntervals.add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
+            mIntervals.add(Interval(9),Interval(11));
         }
         else if(removePrefix(chordType, "13")){ 
-            Intervals::add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
-            Intervals::add(Interval(9),Interval(11),Interval(13));
+            mIntervals.add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
+            mIntervals.add(Interval(9),Interval(11),Interval(13));
         }
-        else if(removePrefix(chordType,"Maj7",false),removePrefix(chordType,"M7")){
-            Intervals::add(Interval(7));
+        else if(removePrefix(chordType,"Maj7",false) || removePrefix(chordType,"M7")){
+            mIntervals.add(Interval(7));
         }
-        else if(removePrefix(chordType,"Maj9",false),removePrefix(chordType,"M9")){
-            Intervals::add(Interval(7),Interval(9));
+        else if(removePrefix(chordType,"Maj9",false) || removePrefix(chordType,"M9")){
+            mIntervals.add(Interval(7),Interval(9));
         }
-        else if(removePrefix(chordType,"Maj11",false),removePrefix(chordType,"M11")){
-            Intervals::add(Interval(7),Interval(9),Interval(11));
+        else if(removePrefix(chordType,"Maj11",false) || removePrefix(chordType,"M11")){
+            mIntervals.add(Interval(7),Interval(9),Interval(11));
         }
-        else if(removePrefix(chordType,"Maj13",false),removePrefix(chordType,"M13")){
-            Intervals::add(Interval(7),Interval(9),Interval(11),Interval(13));
+        else if(removePrefix(chordType,"Maj13",false) || removePrefix(chordType,"M13")){
+            mIntervals.add(Interval(7),Interval(9),Interval(11),Interval(13));
         }
 
         // Handle more complex chords
@@ -398,41 +168,41 @@ public:
         {   
             found = false;
             // Flatten
-            if(removePrefix(chordType, "b3"    )){ Intervals::setQuality( 3, -1, true); found = true; }
-            if(removePrefix(chordType, "b5"    )){ Intervals::setQuality( 5, -1, true); found = true; }
-            if(removePrefix(chordType, "b7"    )){ Intervals::setQuality( 7, -1, true); found = true; }
-            if(removePrefix(chordType, "b9"    )){ Intervals::setQuality( 9, -1, true); found = true; }
-            if(removePrefix(chordType, "b11"   )){ Intervals::setQuality(11, -1, true); found = true; }
-            if(removePrefix(chordType, "b13"   )){ Intervals::setQuality(13, -1, true); found = true; }
+            if(removePrefix(chordType, "b3"    )){ mIntervals.setQuality( 3, -1, true); found = true; }
+            if(removePrefix(chordType, "b5"    )){ mIntervals.setQuality( 5, -1, true); found = true; }
+            if(removePrefix(chordType, "b7"    )){ mIntervals.setQuality( 7, -1, true); found = true; }
+            if(removePrefix(chordType, "b9"    )){ mIntervals.setQuality( 9, -1, true); found = true; }
+            if(removePrefix(chordType, "b11"   )){ mIntervals.setQuality(11, -1, true); found = true; }
+            if(removePrefix(chordType, "b13"   )){ mIntervals.setQuality(13, -1, true); found = true; }
             
             // Sharpen
-            if(removePrefix(chordType, "#3"    )){ Intervals::setQuality(3 ,  1, true); found = true; }
-            if(removePrefix(chordType, "#5"    )){ Intervals::setQuality(5 ,  1, true); found = true; }
-            if(removePrefix(chordType, "#7"    )){ Intervals::setQuality(7 ,  1, true); found = true; }
-            if(removePrefix(chordType, "#9"    )){ Intervals::setQuality(9 ,  1, true); found = true; }
-            if(removePrefix(chordType, "#11"   )){ Intervals::setQuality(11,  1, true); found = true; }
-            if(removePrefix(chordType, "#13"   )){ Intervals::setQuality(13,  1, true); found = true; }
+            if(removePrefix(chordType, "#3"    )){ mIntervals.setQuality(3 ,  1, true); found = true; }
+            if(removePrefix(chordType, "#5"    )){ mIntervals.setQuality(5 ,  1, true); found = true; }
+            if(removePrefix(chordType, "#7"    )){ mIntervals.setQuality(7 ,  1, true); found = true; }
+            if(removePrefix(chordType, "#9"    )){ mIntervals.setQuality(9 ,  1, true); found = true; }
+            if(removePrefix(chordType, "#11"   )){ mIntervals.setQuality(11,  1, true); found = true; }
+            if(removePrefix(chordType, "#13"   )){ mIntervals.setQuality(13,  1, true); found = true; }
 
             // Add notes if required
-            if(removePrefix(chordType, "add2"  )){ Intervals::add(Interval( 2));        found = true; }
-            if(removePrefix(chordType, "add4"  )){ Intervals::add(Interval( 4));        found = true; }
-            if(removePrefix(chordType, "add6"  )){ Intervals::add(Interval( 6));        found = true; }
-            if(removePrefix(chordType, "add9"  )){ Intervals::add(Interval( 9));        found = true; }
-            if(removePrefix(chordType, "add11" )){ Intervals::add(Interval(11));        found = true; }
-            if(removePrefix(chordType, "add13" )){ Intervals::add(Interval(13));        found = true; }
+            if(removePrefix(chordType, "add2"  )){ mIntervals.add(Interval( 2));        found = true; }
+            if(removePrefix(chordType, "add4"  )){ mIntervals.add(Interval( 4));        found = true; }
+            if(removePrefix(chordType, "add6"  )){ mIntervals.add(Interval( 6));        found = true; }
+            if(removePrefix(chordType, "add9"  )){ mIntervals.add(Interval( 9));        found = true; }
+            if(removePrefix(chordType, "add11" )){ mIntervals.add(Interval(11));        found = true; }
+            if(removePrefix(chordType, "add13" )){ mIntervals.add(Interval(13));        found = true; }
 
             // Remove notes if required
-            if(removePrefix(chordType, "no1"   )){ Intervals::removeDegree( 1);         found = true; }
-            if(removePrefix(chordType, "no3"   )){ Intervals::removeDegree( 3);         found = true; }
-            if(removePrefix(chordType, "no5"   )){ Intervals::removeDegree( 5);         found = true; }
-            if(removePrefix(chordType, "no7"   )){ Intervals::removeDegree( 7);         found = true; }
-            if(removePrefix(chordType, "no9"   )){ Intervals::removeDegree( 9);         found = true; }
-            if(removePrefix(chordType, "no11"  )){ Intervals::removeDegree(11);         found = true; }
-            if(removePrefix(chordType, "no13"  )){ Intervals::removeDegree(13);         found = true; }
+            if(removePrefix(chordType, "no1"   )){ mIntervals.removeDegree( 1);         found = true; }
+            if(removePrefix(chordType, "no3"   )){ mIntervals.removeDegree( 3);         found = true; }
+            if(removePrefix(chordType, "no5"   )){ mIntervals.removeDegree( 5);         found = true; }
+            if(removePrefix(chordType, "no7"   )){ mIntervals.removeDegree( 7);         found = true; }
+            if(removePrefix(chordType, "no9"   )){ mIntervals.removeDegree( 9);         found = true; }
+            if(removePrefix(chordType, "no11"  )){ mIntervals.removeDegree(11);         found = true; }
+            if(removePrefix(chordType, "no13"  )){ mIntervals.removeDegree(13);         found = true; }
         }
 
         // Sort the chordIntervals
-        Intervals::sort();
+        mIntervals.sort();
 
         // Print warning if there are still characters left
         if(chordType.size() > 0){
@@ -446,21 +216,298 @@ public:
         return mChordType;
     }
 
-    // Print the chordType
-    void printChordType()
+    // Get the intervals
+    const Intervals& getIntervals() const
     {
-        std::cout << "ChordType: " << mChordType << std::endl;
+        return mIntervals;
     }
 
+    // ChordType to string
+    std::string toString() const
+    {
+        return mChordType;
+    }
 
+    // Stream operator
+    friend std::ostream& operator<<(std::ostream& os, const ChordType& ct)
+    {
+        os << ct.mChordType;
+        return os;
+    }
+
+    // Print the chordType
+    void print()
+    {
+        std::cout << "ChordType: " << mChordType << " ---> (" << mIntervals << ")" << std::endl;
+    }
 
 private:
-    std::string mChordType;
-
-
+    std::string mChordType = "";
+    Intervals mIntervals = Intervals({Interval(1), Interval(3), Interval(5)});
 };
 
 
+// ----------------------------------------------------------------------- //
+// ---------------------------- Chrd Class ------------------------------- //
+// ----------------------------------------------------------------------- //
+// The Chrd Class is a class that represents a chord. It is the composition of a Note and a ChordType
+class Chrd : public CMTK {
+public:
+    // Constructor
+    Chrd() = default;
+
+    // Constructor from RootNote, ChordType and BassNote
+    Chrd(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote)
+    {
+        setChord(aRootNote,chordType,aBassNote);
+    }
+
+    // Constructor from RootNote and ChordType - BassNote is set to the RootNote
+    Chrd(const Note& aRootNote, const ChordType& chordType)
+    {
+        setChord(aRootNote,chordType);
+    }
+
+    // Constructor from note and chordType expressed as strings
+    Chrd(const std::string& note, const std::string& chordType, const std::string& aBassNote = "")
+    {
+        if(aBassNote.empty()) setChord(note,chordType);
+        else                  setChord(note,chordType,aBassNote);
+    }
+
+    // Constructor from a combined chord symbol
+    Chrd(const std::string& chordSymbol)
+    {
+        setChord(chordSymbol);
+    }
+
+    // Set the chord from a Note and a ChordType
+    Chrd& setChord(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote)
+    {
+        mRootNote = aRootNote;
+        mChordType = chordType;
+        mBassNote = aBassNote;
+        return *this;
+    }
+
+    // Set the chord from a Note and a ChordType
+    Chrd& setChord(const Note& aRootNote, const ChordType& chordType)
+    {
+        return setChord(aRootNote,chordType,aRootNote);
+    }
+
+    // Set from a note and a chordType expressed as strings
+    Chrd& setChord(const std::string& aRootNote, const std::string& aChordType, const std::string& aBassNote = "")
+    {
+        const auto& rootNote  = Note(aRootNote);
+        const auto& chordType = ChordType(aChordType);
+        const auto& bassNote  = aBassNote.empty() ? rootNote : Note(aBassNote).setOctave(rootNote.getOctave()-1);
+        return setChord(rootNote,chordType,bassNote);
+    }
+
+    Chrd& setChord(const std::string& chordSymbol)
+    {
+        // Find the first non note character
+        auto pos = chordSymbol.find_first_not_of("ABCDEFGb#");
+        // Split the string into Note and ChordType
+        std::string noteString  = chordSymbol.substr(0,pos);
+        std::string chordString = pos == chordSymbol.npos ? "" : chordSymbol.substr(pos);
+        // Set the chord
+        return setChord(noteString,chordString);
+    }
+
+    // Set Chord Type
+    Chrd& setType(const ChordType& chordType)
+    {
+        mChordType = chordType;
+        return *this;
+    }
+
+    // Set Chord Type
+    Chrd& setType(const std::string& chordType)
+    {
+        mChordType = ChordType(chordType);
+        return *this;
+    }
+    
+    // Get the chord type
+    const ChordType& getType() const
+    {
+        return mChordType;
+    }
+
+    // Set the RootNote
+    Chrd& setRoot(const Note& note, bool keepOctave=false)
+    {
+        bool bassEqualRoot = mRootNote == mBassNote;
+        auto rootOctave    = mRootNote.getOctave();
+        auto bassOctave    = mBassNote.getOctave();
+
+        auto diff = note-mRootNote;
+
+        mBassNote.transpose(diff);
+        mRootNote = note;
+        if(keepOctave){
+            mRootNote.setOctave(rootOctave);
+            mBassNote.setOctave(bassOctave);
+        }
+
+        return *this;
+    }
+
+    // Set the RootNote
+    Chrd& setRoot(const std::string& note)
+    {
+        // Keep the octave if none is given in the string
+        return setRoot(Note(note),!isdigit(note.back()));
+    }
+
+    Chrd& setRoot(int note)
+    {
+        return setRoot(Note(note));
+    }
+
+    // Get the note
+    const Note& getRoot() const
+    {
+        return mRootNote;
+    }
+
+    // Set the BassNote
+    Chrd& setBass(const Note& note, bool keepOctave=false)
+    {
+        mBassNote = note;
+        if(keepOctave) mBassNote.setOctave(mRootNote.getOctave());
+        return *this;
+    }
+
+    // Set the BassNote
+    Chrd& setBass(const std::string& note)
+    {
+        // Keep the octave if none is given in the string
+        return setBass(Note(note),!isdigit(note.back()));
+    }
+
+    // Set Bass from Semitone
+    Chrd& setBass(int note)
+    {
+        return setBass(Note(note));
+    }
+
+    // Set Bass from Interval with respect to the root note
+    Chrd& setBass(const Interval& interval, bool keepOctave=false)
+    {
+        mBassNote = mRootNote.getNoteFromInterval(interval);
+        if(keepOctave) mBassNote.setOctave(mBassNote.getOctave()  );
+        else           mBassNote.setOctave(mRootNote.getOctave()-1);
+        return *this;
+    }
+
+    // Set Bass from Root
+    Chrd& rootBass()
+    {
+        mBassNote = mRootNote;
+        return *this;
+    }
+
+    // Force bass into range
+    Chrd& forceBassInRange(int min=0, int max=127)
+    {
+        while(mBassNote.getMidiPitch() < min) mBassNote.shiftOctave( 1);
+        while(mBassNote.getMidiPitch() > max) mBassNote.shiftOctave(-1);
+        return *this;
+    }
+
+    // Get the Bass note
+    const Note& getBass() const
+    {
+        return mBassNote;
+    }
+
+    // Set Octave
+    Chrd& setOctave(int octave)
+    {
+        mRootNote.setOctave(octave);
+        return *this;
+    }
+
+    // Get Octave
+    int getOctave() const
+    {
+        return mRootNote.getOctave();
+    }
+
+    // Get Intervals
+    const Intervals& getIntervals() const
+    {
+        return mChordType.getIntervals();
+    }
+
+    // Get the Notes of the chord
+    Notes getNotes()
+    {
+        return mRootNote.getNoteFromInterval(getIntervals());
+    }
+
+    // Get the Bass note
+    Chrd& transpose(int semitones)
+    {
+        mRootNote.transpose(semitones);
+        mBassNote.transpose(semitones);
+        return *this;
+    }
+
+    Chrd& transpose(const Interval& interval)
+    {
+        mRootNote.transpose(interval);
+        mBassNote.transpose(interval);
+        return *this;
+    }
+
+    // Stream operator
+    friend std::ostream& operator<<(std::ostream& os, const Chrd& chrd)
+    {
+        os << chrd.mRootNote << " " << chrd.mChordType;
+        return os;
+    }
+
+    // Get Chord as string
+    std::string toString() const
+    {
+        std::string res;
+        res += getRoot().toString(false);
+        res += mChordType.toString();
+        if(mBassNote != mRootNote){
+            res += "/";
+            res += mBassNote.toString(false);
+        }
+
+        return std::move(res);
+    }
+
+    // Print the chord
+    Chrd& print(bool simplify=true)
+    {
+        bool slashBass = mBassNote != mRootNote;
+        std::cout << getRoot().toString(false) << mChordType;        
+        if(slashBass) std::cout << "/" << mBassNote.toString(false);
+        std::cout << " -> (" << getIntervals() << ")" 
+                  << " -> (";
+        std::cout <<  getNotes().toString(false,simplify) << ")" 
+                  << " -> (" << getNotes().getPitchString() << ")";
+
+        if(slashBass) std::cout << "\tBass: " << mBassNote.toString(true,simplify) << " -> " << mBassNote.getMidiPitch();
+
+        std::cout << std::endl;
+
+        return *this;
+    }
+
+private:
+    ChordType mChordType;
+    Note mRootNote;
+    Note mBassNote;
+};
 
 
 

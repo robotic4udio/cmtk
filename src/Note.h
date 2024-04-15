@@ -17,6 +17,9 @@ class Notes;
 class Note : public CMTK
 {
 public:
+    // Constructor
+    Note() = default;
+
     // Constructor to create a note from a string
     Note(const std::string& note)
     {
@@ -52,6 +55,12 @@ public:
         return *this;
     }
 
+    Note& shiftOctave(int octaves)
+    {
+        mNote += octaves * 12;
+        return *this;
+    }
+
     // Function to set the note from a string
     void set(std::string noteSymbol)
     {
@@ -81,7 +90,7 @@ public:
         }
 
         // Add the octave
-        mNote += noteSymbol.empty() ? C0 : C0 +std::stoi(noteSymbol) * 12;
+        mNote += noteSymbol.empty() ? C1 : C0 +std::stoi(noteSymbol) * 12;
     }
 
     std::string toString(bool includeOctave=true, bool simplify=false) const
@@ -127,11 +136,12 @@ public:
         return *const_cast<Note*>(this);
     }
 
-    void clear()
+    Note& clear()
     {
-        mNote = 0;
+        mNote = C1;
         mNoteString.clear();
         mSharp = 0;
+        return *this;
     }
 
     // Equality operator
@@ -177,11 +187,20 @@ public:
     }
 
     // Transpose
-    void transpose(int semitones)
+    Note& transpose(int semitones)
     {
+        if(semitones == 0) return *this;
         int n = mNote + semitones;
         clear();
         set(n);
+        return *this;
+    }
+
+    // Transpose Interval
+    Note& transpose(const Interval& interval)
+    {
+        *this = getNoteFromInterval(interval);
+        return *this;
     }
 
     Note operator+(const int& semitones) const
@@ -208,6 +227,12 @@ public:
         return *this;
     }
 
+    // - operator
+    int operator-(const Note& other) const
+    {
+        return mNote - other.mNote;
+    }
+
     // Stream operator
     friend std::ostream& operator<<(std::ostream& os, const Note& note)
     {
@@ -220,7 +245,7 @@ public:
         return toString(false) == key;
     }
 
-    void flatten()
+    Note& flatten()
     {
         if(mNoteString.back() == '#')
         {
@@ -232,9 +257,10 @@ public:
         }
         mNote-- ;
         mSharp--;
+        return *this;
     }
 
-    void sharpen()
+    Note& sharpen()
     {
         if(mNoteString.back() == 'b')
         {
@@ -246,6 +272,7 @@ public:
         }
         mNote++ ;
         mSharp++;
+        return *this;
     }
 
     std::vector<Note> getMajorNotes()
@@ -259,11 +286,18 @@ public:
 
     Note getNoteFromInterval(const Interval& interval) const
     {
+        auto octave = getOctave();
         const auto& key = toString(false);
-        const auto& deg = interval.getDegree();
+        auto deg = interval.getDegree();
+        if(deg > 7){
+            octave++;
+            deg -= 7;
+        }
+
         const auto& s   = MajorNoteMapAt(key, deg-1);
+
         Note note(s);
-        note.setOctave(getOctave());
+        note.setOctave(octave);
         auto q = interval.getQuality();
         while(q > 0)
         {
@@ -288,7 +322,7 @@ public:
 
 
 private:
-    int mNote = 0;
+    int mNote = C1;
     std::string mNoteString = "";
     
     int mSharp = 0;
@@ -329,7 +363,7 @@ public:
         set(notes);
     }
 
-    Notes(const Intervals& intervals, const Note& root = C0)
+    Notes(const Intervals& intervals, const Note& root = C1)
     {
         set(intervals,root);
     }
@@ -366,7 +400,7 @@ public:
         }
     }
 
-    void set(const Intervals& intervals, const Note& root = C0)
+    void set(const Intervals& intervals, const Note& root = C1)
     {
         clear();
         for(auto& interval : intervals)
@@ -391,13 +425,47 @@ public:
         push_back(note);
     }
 
-    void print() const
+    // Get a string with the pitch vector
+    std::string getPitchString() const
+    {
+        std::string res;
+        for(const auto& note : *this) res += std::to_string(note.getMidiPitch()) + " ";
+        if(!res.empty()) res.pop_back();
+        return std::move(res);
+    }
+
+    // To string
+    std::string toString(bool octave=false, bool simplify=false) const
+    {
+        std::string res;
+        auto it = begin();
+        while(it != end())
+        {
+            res += it->toString(octave,simplify);
+            if(++it != end()) res += " ";
+        }
+        return std::move(res);
+    }
+
+    // Stream operator
+    friend std::ostream& operator<<(std::ostream& os, const Notes& notes)
+    {        
+        auto it = notes.begin();
+        while(it != notes.end())
+        {
+            os << it->toString(false,false);
+            if(++it != notes.end()) os << " ";
+        }
+        return os;
+    }
+
+    void print(bool octave=false, bool simplify=false) const
     {
         std::cout << "Notes(";
         auto it = begin();
         while(it != end())
         {
-            std::cout << it->toString(false);
+            std::cout << it->toString(octave,simplify);
             if(++it != end()) std::cout << " ";
         }
         std::cout << ")" << std::endl;
@@ -451,6 +519,14 @@ public:
     int semiAt(int i) const
     {
         return at(i).getMidiPitch();
+    }
+
+    // Get Vector of semitones
+    std::vector<int> getMidiPitches() const
+    {
+        std::vector<int> semis;
+        for(auto& note : *this) semis.push_back(note.getMidiPitch());
+        return std::move(semis);
     }
 
 };

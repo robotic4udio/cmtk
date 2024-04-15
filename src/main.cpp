@@ -155,25 +155,21 @@ int main() {
 
 
 
-    auto chord = Chord("D7");
-    chord.print();
-
-
-
- 
-
 
     // Print the major scale
     // std::cout << "Major Scale: " << std::endl;
     // Notes(MajorNoteMap["F"]).print();
 
-    auto scale = Scale("Lydian", "Gb");
-    scale.print(3,true);
+    // auto scale = Scale("Lydian", "Gb");
+    // scale.print(3,true);
 
 
-    auto ct = ChordType("M b11");
-    ct.printChordType();
+    auto ct = Chrd("C","m7","Eb"); // Cm7/Eb
     ct.print();
+    ct.setRoot("F").print().setBass(Interval("b7")).print().setRoot("Eb").print().transpose(2).print().setRoot("C").print();
+
+
+
 
     return 0;
 }

@@ -12,6 +12,16 @@ namespace cmtk {
 // ---------------------------------- Constants ---------------------------------------------- //
 // -------------------------------------------------------------------------------------------- //
 static constexpr const int C0 = 24;
+static constexpr const int C1 = C0+12;
+static constexpr const int C2 = C0+24;
+static constexpr const int C3 = C0+36;
+static constexpr const int C4 = C0+48;
+static constexpr const int C5 = C0+60;
+static constexpr const int C6 = C0+72;
+static constexpr const int C7 = C0+84;
+static constexpr const int C8 = C0+96;
+static constexpr const int C9 = C0+108;
+
 static constexpr const int OCTAVES_BELOW_ZERO = C0/12;
 
 
@@ -79,6 +89,45 @@ inline bool removeSubstring(std::string& s, const std::string& sub)
     return false;
 }
 
+// Same as removeSubstring but case insensitive option
+inline bool removeSubstring(std::string& s, const std::string& sub, bool caseSensitive)
+{
+    if(caseSensitive) return removeSubstring(s, sub);
+    std::string s1 = s;
+    std::string s2 = sub;
+    std::transform(s1.begin(), s1.end(), s1.begin(), ::tolower);
+    std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
+    size_t pos = s1.find(s2);
+    if(pos != std::string::npos){
+        s.erase(pos, s2.size());
+        return true;
+    }
+    return false;
+}
+
+inline bool isNumber(const std::string& s)
+{
+    return !s.empty() && std::all_of(s.begin(), s.end(), ::isdigit);
+}
+
+// Starts with a number
+inline bool startsWithNumber(const std::string& s)
+{
+    return !s.empty() && std::isdigit(s[0]);
+}
+
+// Remove all instances of the characters from a string
+inline bool removeChars(std::string& s, const std::string& chars)
+{
+    auto size = s.size();
+    // Remove the chars
+    for (char c: chars) {
+        s.erase(std::remove(s.begin(), s.end(), c), s.end());
+    }
+    // Return true if the size has changed
+    if(size != s.size()) return true;
+    return false;
+}
 
 // Function to convert a roman numeral to an integer
 int romanToInt(std::string romanNumeral)
@@ -319,9 +368,6 @@ inline void simplifyNoteName(std::string& note)
         if(removeSubstring(note, "#b")) found = true;
     
     }
-    // Replace b with flat symbol and # with sharp symbol
-    replacePrefix(note, "b" , "♭");
-    replacePrefix(note, "#" , "♯");
 }
 
 
