@@ -614,7 +614,7 @@ namespace cmtk
         }
 
         // Function to get the chord symbol of the scale at a given index
-        std::string getChordSymbol(int index, int size = 3, bool roman=false) const
+        std::string getChordSymbol(int index, int size = 3, bool roman=false, bool simplify=false) const
         {
             // Check that size is valid
             if (size < 3 || size > 7)
@@ -714,11 +714,9 @@ namespace cmtk
                 }
             }
 
-            mRootNote.getNoteFromInterval(chordIntervals);
-
             // Insert the roman numeral at beginning of the chord symbol
             if(roman) chordSymbol.insert(0, chordIntervals.front().getRomanName(uppercase));
-            else      chordSymbol.insert(0, mRootNote.getNoteFromInterval(chordIntervals.front()).toString(false));
+            else      chordSymbol.insert(0, mRootNote.getNoteFromInterval(chordIntervals.front()).toString(false,simplify));
 
             // Append
             if (!toAppend.empty())
@@ -836,9 +834,9 @@ namespace cmtk
         }
 
         // Print the scale
-        void print(int size = 3) const
+        void print(int size = 3, bool simplify = false) const
         {
-            std::cout << mRootNote.toString(false) << "-" << mName << " : " << getWholeHalfPattern();
+            std::cout << mRootNote.toString(false,false) << "-" << mName << " : " << getWholeHalfPattern();
             if (!mStyle.empty())
                 std::cout << " - " << mStyle;
             std::cout << std::endl;
@@ -851,8 +849,8 @@ namespace cmtk
                           << std::left << std::setw(6) << interval.toString()
                           << std::left << std::setw(6) << interval.getSemitones()
                           << std::left << std::setw(10) << getChordSymbol(i, size, true  ) << "\t"
-                          << std::left << std::setw(10) << getChordSymbol(i, size, false ) << "\t" 
-                          << mNotes.at(i).toString() << "\t" << mNotes.semiAt(i) 
+                          << std::left << std::setw(10) << getChordSymbol(i, size, false, simplify ) << "\t" 
+                          << mNotes.at(i).toString(true,simplify) << "\t" << mNotes.semiAt(i) 
                           << std::endl;
                 i++;
             }
@@ -977,7 +975,7 @@ namespace cmtk
 
         static std::vector<std::string> getModeNames(std::string s = "Major")
         {
-            //      Scale Name                       1st Mode                 2nd Mode                3rd Mode                     4th Mode              5th Mode              6th Mode               7th Mode
+            //      Scale Name                       1st Mode                 2nd Mode               3rd Mode                     4th Mode               5th Mode             6th Mode               7th Mode
             if(s == "Major"                ) return {"Ionian"               , "Dorian"             , "Phrygian"                 , "Lydian"             , "Mixolydian"       , "Aeolian"            , "Locrian"                 };
             if(s == "Harmonic Major"       ) return {"Harmonic Major"       , "Dorian b5"          , "Phrygian b4"              , "Lydian b3"          , "Mixolydian b2"    , "Lydian Augmented"   , "Locrian Diminished"      };
             if(s == "Harmonic Minor"       ) return {"Harmonic Minor"       , "Locrian n6"         , "Ionian #5"                , "Dorian #4"          , "Phrygian Dominant", "Lydian #2"          , "Super Locrian"           };
@@ -993,12 +991,12 @@ namespace cmtk
         }
 
         // Get the Modes of a scale
-        static std::vector<Scale> getModes(std::string s = "Major")
+        static std::vector<Scale> getModes(std::string s = "Major", const Note& root = Note("C"))
         {
             std::vector<Scale> modes;
             for(auto modeName : getModeNames(s))
             {
-                modes.push_back(Scale(modeName));
+                modes.push_back(Scale(modeName,root));
             }
 
             return std::move(modes);
@@ -1026,13 +1024,13 @@ namespace cmtk
         }
 
         // Print the modes
-        static void printModes(std::string s = "", int size = 3)
+        static void printModes(std::string s = "",  Note root = Note("C"), int size = 3)
         {
             if(s.empty()){
                 for(auto scaleName : {
                     "Major", "Harmonic Major", "Harmonic Minor", "Melodic Minor", "Neopolitan Major", "Neopolitan Minor", "Double Harmonic Major", "Major Pentatonic", "Blues"
                 }){
-                    printModes(scaleName, size);
+                    printModes(scaleName, root, size);
                     std::cout << std::endl;
                 }
                 return;
@@ -1040,7 +1038,7 @@ namespace cmtk
 
             // Print the Modes
             int i = 1;
-            for(auto mode : getModes(s)){
+            for(auto mode : getModes(s,root)){
                 std::cout << s << " Mode " << i++ << ": " << std::endl;
                 mode.print(size);
             } 

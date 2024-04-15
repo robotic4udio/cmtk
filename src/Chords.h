@@ -17,6 +17,10 @@ namespace cmtk {
 
 
 
+
+
+
+
 // Interval between two notes
 inline 
 Interval intervalFromNoteName(std::string n, int rootNote)
@@ -284,6 +288,177 @@ inline int getNoteNumber(const std::string& s, int root=0)
 
 
 
+
+// ----------------------------------------------------------------------- //
+// ---------------------------- ChordType Class --------------------------- //
+class ChordType : public Intervals {
+public:
+    // Constructor
+    ChordType() = default;
+    ChordType(const std::string& chordSymbol)
+    {
+        setChordType(chordSymbol);
+    }
+
+    // Enum class to represent the quality of the chord
+    enum class Quality {
+        Major,
+        Minor,
+        Diminished,
+        HalfDiminished,
+        Augmented,
+        Sus2,
+        Sus4,
+        PowerChord,
+        Dominant,
+        NA
+    };
+
+    // Create a chord from a set of intervals
+    void setChordType(const std::string& aChordType){
+        auto chordType = aChordType;
+        mChordType = chordType;
+
+        Quality quality = Quality::NA;
+
+        if     (removePrefix(chordType, "maj" ,false)){ quality = Quality::Major;          }
+        else if(removePrefix(chordType, "min" ,false)){ quality = Quality::Minor;          }
+        else if(removePrefix(chordType, "dom" ,false)){ quality = Quality::Dominant;       }
+        else if(removePrefix(chordType, "aug" ,false)){ quality = Quality::Augmented;      }
+        else if(removePrefix(chordType, "+"   ,false)){ quality = Quality::Augmented;      }
+        else if(removePrefix(chordType, "dim" ,false)){ quality = Quality::Diminished;     }
+        else if(removePrefix(chordType, "°"   ,false)){ quality = Quality::Diminished;     }
+        else if(removePrefix(chordType, "hdim",false)){ quality = Quality::HalfDiminished; }
+        else if(removePrefix(chordType, "ø"   ,false)){ quality = Quality::HalfDiminished; }
+        else if(removePrefix(chordType, "sus2",false)){ quality = Quality::Sus2;           }
+        else if(removePrefix(chordType, "sus4",false)){ quality = Quality::Sus4;           }
+        else if(removePrefix(chordType, "5th" ,false)){ quality = Quality::PowerChord;     }
+        else if(removePrefix(chordType, "M"         )){ quality = Quality::Major;          }
+        else if(removePrefix(chordType, "m"         )){ quality = Quality::Minor;          }
+
+        // Remove stuff from the chord symbol
+        const std::string chars = " ^()";
+        // Remove the chars
+        for (char c: chars) {
+            chordType.erase(std::remove(chordType.begin(), chordType.end(), c), chordType.end());
+        }
+
+        // Initialize the chord tones vector based on the chord type
+        switch (quality)
+        {
+            case Quality::Major:          Intervals::set({Interval(1), Interval(3)   , Interval(5)                    }); break;
+            case Quality::Dominant:       Intervals::set({Interval(1), Interval(3)   , Interval(5)                    }); break;
+            case Quality::Minor:          Intervals::set({Interval(1), Interval(3,-1), Interval(5)                    }); break;
+            case Quality::Diminished:     Intervals::set({Interval(1), Interval(3,-1), Interval(5,-1)                 }); break;
+            case Quality::HalfDiminished: Intervals::set({Interval(1), Interval(3,-1), Interval(5,-1), Interval(7,-1) }); break;
+            case Quality::Augmented:      Intervals::set({Interval(1), Interval(3)   , Interval(5, 1)                 }); break;
+            case Quality::Sus2:           Intervals::set({Interval(1), Interval(2)   , Interval(5)                    }); break;
+            case Quality::Sus4:           Intervals::set({Interval(1), Interval(4)   , Interval(5)                    }); break;
+            case Quality::PowerChord:     Intervals::set({Interval(1),                 Interval(5)                    }); break;
+            case Quality::NA: break;            // TODO: Throw Error;
+        }
+        const bool maj = quality == Quality::Major;
+        const bool dim = quality == Quality::Diminished;
+
+        // Add Extension
+        if(removePrefix(chordType, "6")){
+            Intervals::add(Interval(6));
+        }
+        else if(removePrefix(chordType, "7")){
+            Intervals::add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
+        }
+        else if(removePrefix(chordType, "9")){ 
+            Intervals::add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
+            Intervals::add(Interval(9));
+        }
+        else if(removePrefix(chordType, "11")){ 
+            Intervals::add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
+            Intervals::add(Interval(9),Interval(11));
+        }
+        else if(removePrefix(chordType, "13")){ 
+            Intervals::add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
+            Intervals::add(Interval(9),Interval(11),Interval(13));
+        }
+        else if(removePrefix(chordType,"Maj7",false),removePrefix(chordType,"M7")){
+            Intervals::add(Interval(7));
+        }
+        else if(removePrefix(chordType,"Maj9",false),removePrefix(chordType,"M9")){
+            Intervals::add(Interval(7),Interval(9));
+        }
+        else if(removePrefix(chordType,"Maj11",false),removePrefix(chordType,"M11")){
+            Intervals::add(Interval(7),Interval(9),Interval(11));
+        }
+        else if(removePrefix(chordType,"Maj13",false),removePrefix(chordType,"M13")){
+            Intervals::add(Interval(7),Interval(9),Interval(11),Interval(13));
+        }
+
+        // Handle more complex chords
+        bool found = true;
+        while(found)
+        {   
+            found = false;
+            // Flatten
+            if(removePrefix(chordType, "b3"    )){ Intervals::setQuality( 3, -1, true); found = true; }
+            if(removePrefix(chordType, "b5"    )){ Intervals::setQuality( 5, -1, true); found = true; }
+            if(removePrefix(chordType, "b7"    )){ Intervals::setQuality( 7, -1, true); found = true; }
+            if(removePrefix(chordType, "b9"    )){ Intervals::setQuality( 9, -1, true); found = true; }
+            if(removePrefix(chordType, "b11"   )){ Intervals::setQuality(11, -1, true); found = true; }
+            if(removePrefix(chordType, "b13"   )){ Intervals::setQuality(13, -1, true); found = true; }
+            
+            // Sharpen
+            if(removePrefix(chordType, "#3"    )){ Intervals::setQuality(3 ,  1, true); found = true; }
+            if(removePrefix(chordType, "#5"    )){ Intervals::setQuality(5 ,  1, true); found = true; }
+            if(removePrefix(chordType, "#7"    )){ Intervals::setQuality(7 ,  1, true); found = true; }
+            if(removePrefix(chordType, "#9"    )){ Intervals::setQuality(9 ,  1, true); found = true; }
+            if(removePrefix(chordType, "#11"   )){ Intervals::setQuality(11,  1, true); found = true; }
+            if(removePrefix(chordType, "#13"   )){ Intervals::setQuality(13,  1, true); found = true; }
+
+            // Add notes if required
+            if(removePrefix(chordType, "add2"  )){ Intervals::add(Interval( 2));        found = true; }
+            if(removePrefix(chordType, "add4"  )){ Intervals::add(Interval( 4));        found = true; }
+            if(removePrefix(chordType, "add6"  )){ Intervals::add(Interval( 6));        found = true; }
+            if(removePrefix(chordType, "add9"  )){ Intervals::add(Interval( 9));        found = true; }
+            if(removePrefix(chordType, "add11" )){ Intervals::add(Interval(11));        found = true; }
+            if(removePrefix(chordType, "add13" )){ Intervals::add(Interval(13));        found = true; }
+
+            // Remove notes if required
+            if(removePrefix(chordType, "no1"   )){ Intervals::removeDegree( 1);         found = true; }
+            if(removePrefix(chordType, "no3"   )){ Intervals::removeDegree( 3);         found = true; }
+            if(removePrefix(chordType, "no5"   )){ Intervals::removeDegree( 5);         found = true; }
+            if(removePrefix(chordType, "no7"   )){ Intervals::removeDegree( 7);         found = true; }
+            if(removePrefix(chordType, "no9"   )){ Intervals::removeDegree( 9);         found = true; }
+            if(removePrefix(chordType, "no11"  )){ Intervals::removeDegree(11);         found = true; }
+            if(removePrefix(chordType, "no13"  )){ Intervals::removeDegree(13);         found = true; }
+        }
+
+        // Sort the chordIntervals
+        Intervals::sort();
+
+        // Print warning if there are still characters left
+        if(chordType.size() > 0){
+            std::cerr << "setChord(): Warning: Error parsing chord symbol: " << aChordType << " - Remaining: " << chordType << std::endl;
+        }
+    }
+
+    // Get the chord symbol
+    std::string getChordType()
+    {
+        return mChordType;
+    }
+
+    // Print the chordType
+    void printChordType()
+    {
+        std::cout << "ChordType: " << mChordType << std::endl;
+    }
+
+
+
+private:
+    std::string mChordType;
+
+
+};
 
 
 

@@ -17,18 +17,16 @@ class Notes;
 class Note : public CMTK
 {
 public:
-    Note() = default;
-
     // Constructor to create a note from a string
     Note(const std::string& note)
     {
         set(note);
-    }    
+    }
 
-    // Constructor to create a note from a midinote value
-    Note(int midinote)
+    // Constructor to create a note from a midinote
+    Note(int note)
     {
-        set(midinote);
+        set(note);
     }
 
     // Function to set the note from a midinote
@@ -86,7 +84,7 @@ public:
         mNote += noteSymbol.empty() ? C0 : C0 +std::stoi(noteSymbol) * 12;
     }
 
-    std::string toString(bool includeOctave=true) const
+    std::string toString(bool includeOctave=true, bool simplify=false) const
     {        
         int octave = -OCTAVES_BELOW_ZERO;
         int note = mNote;
@@ -114,6 +112,8 @@ public:
                 case 11: res = "B";                   break;
             }
         }
+
+        if(simplify) simplifyNoteName(res);
 
         if(includeOctave) res += std::to_string(octave);
 

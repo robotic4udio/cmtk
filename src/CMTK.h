@@ -28,6 +28,21 @@ inline bool removePrefix(std::string& s, const std::string& prefix)
     return false;
 }
 
+// Same as removePrefix but case insensitive option
+inline bool removePrefix(std::string& s, const std::string& prefix, bool caseSensitive)
+{
+    if(caseSensitive) return removePrefix(s, prefix);
+    std::string s1 = s;
+    std::string s2 = prefix;
+    std::transform(s1.begin(), s1.end(), s1.begin(), ::tolower);
+    std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
+    if(s1.size() >= s2.size() && s1.compare(0, s2.size(), s2) == 0){
+        s.erase(0,s2.size());
+        return true;
+    }
+    return false;
+}
+
 // Test if string starts with prefix string. If it does then replace the prefix and return true.
 inline bool replacePrefix(std::string& s, const std::string& prefix, const std::string& to)
 {
@@ -38,6 +53,31 @@ inline bool replacePrefix(std::string& s, const std::string& prefix, const std::
     return false;
 }
 
+// Same as replacePrefix but case insensitive option
+inline bool replacePrefix(std::string& s, const std::string& prefix, const std::string& to, bool caseSensitive)
+{
+    if(caseSensitive) return replacePrefix(s, prefix, to);
+    std::string s1 = s;
+    std::string s2 = prefix;
+    std::transform(s1.begin(), s1.end(), s1.begin(), ::tolower);
+    std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
+    if(s1.size() >= s2.size() && s1.compare(0, s2.size(), s2) == 0){
+        s.replace(0, s2.length(), to);
+        return true;
+    }
+    return false;
+}
+
+// If a string contains another string, then remove it and return true
+inline bool removeSubstring(std::string& s, const std::string& sub)
+{
+    size_t pos = s.find(sub);
+    if(pos != std::string::npos){
+        s.erase(pos, sub.size());
+        return true;
+    }
+    return false;
+}
 
 
 // Function to convert a roman numeral to an integer
@@ -250,6 +290,38 @@ inline static std::string MajorNoteMapAt(std::string key, int index)
     while(index <  0) index += 6;
     while(index >  6) index -= 6;
     return MajorNoteMap[key][index];
+}
+
+inline void simplifyNoteName(std::string& note)
+{
+    // Flats that can be replaced with note
+    bool found = true;
+    while(found){
+        found = false;
+        if(replacePrefix(note, "Cb" , "B")) found = true;
+        if(replacePrefix(note, "Dbb", "C")) found = true;
+        if(replacePrefix(note, "Ebb", "D")) found = true;
+        if(replacePrefix(note, "Fb" , "E")) found = true;
+        if(replacePrefix(note, "Gbb", "F")) found = true;
+        if(replacePrefix(note, "Abb", "G")) found = true;
+        if(replacePrefix(note, "Bbb", "A")) found = true;
+
+        // Sharps that can be replaced with note
+        if(replacePrefix(note, "C##", "D")) found = true;
+        if(replacePrefix(note, "D##", "E")) found = true;
+        if(replacePrefix(note, "E#" , "F")) found = true;
+        if(replacePrefix(note, "F##", "G")) found = true;
+        if(replacePrefix(note, "G##", "A")) found = true;
+        if(replacePrefix(note, "A##", "B")) found = true;
+        if(replacePrefix(note, "B#" , "C")) found = true;
+
+        if(removeSubstring(note, "b#")) found = true;
+        if(removeSubstring(note, "#b")) found = true;
+    
+    }
+    // Replace b with flat symbol and # with sharp symbol
+    replacePrefix(note, "b" , "♭");
+    replacePrefix(note, "#" , "♯");
 }
 
 

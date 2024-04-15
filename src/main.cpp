@@ -155,7 +155,7 @@ int main() {
 
 
 
-    auto chord = Chord("I7");
+    auto chord = Chord("D7");
     chord.print();
 
 
@@ -167,12 +167,13 @@ int main() {
     // std::cout << "Major Scale: " << std::endl;
     // Notes(MajorNoteMap["F"]).print();
 
-    auto scale = Scale("Double Harmonic Major", "C");
-    scale.print();
-
-    scale.getChord(2).print();
+    auto scale = Scale("Lydian", "Gb");
+    scale.print(3,true);
 
 
+    auto ct = ChordType("M b11");
+    ct.printChordType();
+    ct.print();
 
     return 0;
 }
