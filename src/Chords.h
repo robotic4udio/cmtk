@@ -348,12 +348,14 @@ public:
         std::string chordString = pos == chordSymbol.npos ? "" : chordSymbol.substr(pos,slashPos-1);
         std::string slashString = slashPos == chordSymbol.npos ? "" : chordSymbol.substr(slashPos+1);
 
-        // Print Slash
+        #ifdef CMTK_DEBUG
+        // Print Debug Info
         std::cout << "NoteString: " << noteString 
                   << ", ChordString: " << chordString
                   << ", Slash: " << slashString 
                   << std::endl;
-        
+        #endif
+
         // Set the chord
         return setChord(noteString,chordString,slashString);
     }
@@ -474,15 +476,15 @@ public:
             res += bassInterval.toString();
         }
 
-
-        std::cout << "Roman: " << res << std::endl;
-
-        // Get the chord symbol
-
-
-
         // Return the result
         return std::move(res);
+    }
+
+    // Print the Roman Chord
+    Chord& printRoman(const Note& aTonic)
+    {
+        std::cout << "Roman: " << getRoman(aTonic) << std::endl;
+        return *this;
     }
 
     // Set Chord Type
@@ -618,7 +620,7 @@ public:
     }
 
     // Get the Notes of the chord
-    Notes getNotes()
+    Notes getNotes() const
     {
         return mRootNote.getNoteFromInterval(getIntervals());
     }
@@ -683,61 +685,10 @@ public:
     }
 
 private:
-    ChordType mChordType; // Object representing the chord type, i.e. the basic structure of the chord
-    Note mRootNote;       // The root note of the chord
-    Note mBassNote;       // The bass note of the chord, this is only different from the root note if the chord is a slash chord
+    ChordType mChordType;  // Object representing the chord type, i.e. the basic structure of the chord
+    Note mRootNote;        // The root note of the chord
+    Note mBassNote;        // The bass note of the chord, this is only different from the root note if the chord is a slash chord
     ChordVoicing mVoicing; // TODO: Make a ChordVoicing class that contains the voicing of the chord
-};
-
-class RomanChord : public Chord {
-public:
-    RomanChord(const std::string& aRomanSymbol, const Note& aTonic = Note("C"))
-    {
-        setRoman(aRomanSymbol,aTonic);
-    }
-
-    RomanChord& setRoman(const std::string& aRomanSymbol, const Note& aTonic = Note("C"))
-    {
-        mTonic = aTonic;
-        mRomanSymbol = aRomanSymbol;
-        Chord::setRoman(aRomanSymbol,aTonic);
-        return *this;
-    }
-
-    // Get the Roman
-    const std::string& getRoman()
-    {
-        if(mRomanSymbol.empty()) 
-            mRomanSymbol = Chord::getRoman(mTonic);
-        
-        return mRomanSymbol;
-    }
-
-    // Set Tonic
-    RomanChord& setTonic(Note aTonic)
-    {
-        mTonic = aTonic;
-        Chord::setRoman(mRomanSymbol,mTonic);
-        return *this;
-    }
-
-    // Get Tonic
-    const Note& getTonic() const
-    {
-        return mTonic;
-    }
-
-    RomanChord& print()
-    {
-        std::cout << "RomanChord(" << getRoman() << ", "  << mTonic.toString(false) << "): ";
-        Chord::print();
-        return *this;
-    }
-
-private:
-    std::string mRomanSymbol = "";
-    Note mTonic = Note();
-
 };
 
 
