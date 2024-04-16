@@ -361,6 +361,9 @@ static std::map<std::string, std::vector<std::string>> MajorNoteMap = {
     {"Cb", { "Cb" , "Db" , "Eb" , "Fb" , "Gb" , "Ab" , "Bb"  }}
 };
 
+// An array with the 12 keys
+static const std::vector<std::string> sKeyNames = {"C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"};
+
 inline static std::string MajorNoteMapAt(std::string key, int index) 
 {
     while(index <  0) index += 6;
@@ -368,25 +371,9 @@ inline static std::string MajorNoteMapAt(std::string key, int index)
     return MajorNoteMap[key][index];
 }
 
-inline std::string keyFromPitch(int pitch)
+inline const std::string& KeyNameAt(int pitch)
 {
-    switch(pitch % 12)
-    {
-        case 0: return "C";
-        case 1: return "Db";
-        case 2: return "D";
-        case 3: return "Eb";
-        case 4: return "E";
-        case 5: return "F";
-        case 6: return "F#";
-        case 7: return "G";
-        case 8: return "Ab";
-        case 9: return "A";
-        case 10: return "Bb";
-        case 11: return "B";
-    }
-
-    return "NA";
+    return sKeyNames[pitch % 12];
 }
 
 inline void simplifyNoteName(std::string& note)

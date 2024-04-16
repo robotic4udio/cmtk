@@ -17,26 +17,18 @@ using namespace cmtk;
 int main() {
 
 
-    // auto scale = Scale("Major", "D");
-    // scale.print(3,true);
-    // for(int i=1; i<=7; i++)
-    //   scale.getChord(i).print();
+    auto scale = Scale("Major", "D");
+    scale.print(3,true);
+    for(int i=1; i<=7; i++)
+      scale.getChord(i).print();
 
 
-    auto ct = Chord("C"); // Cm7/Eb
-    ct.setRoman("iv7/2",Note("C")).print();
-
-    ct.getRoman(Note("C"));
 
 
-    auto rc = RomanChord("iv7");
-    rc.print();
-    rc.setTonic(Note("A")).print();
+    std::cout << "-------------------" << std::endl;    
+    auto prog = ChordProgression("Cm|Ab7|B|G").print().printRoman(Note("C"));
+    Scale::printDiatonicScales(prog);
 
-
-    ChordProgression("ii7|V7|I7",Note("G")).print();
-    
-    ChordProgression("C|F|A|G7").print();
 
     return 0;
 }

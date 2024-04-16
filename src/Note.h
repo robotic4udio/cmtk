@@ -95,7 +95,7 @@ public:
         }
 
         // Add the octave
-        mNote += noteSymbol.empty() ? C1 : C0 +std::stoi(noteSymbol) * 12;
+        mNote += noteSymbol.empty() ? C1 : C0 + std::stoi(noteSymbol) * 12;
 
         return *this;
     }
@@ -151,9 +151,9 @@ public:
 
     }
 
-    Note& print() const
+    Note& print(bool includeOctave=true, bool simplify=false) const
     {
-        std::cout << toString(true) << ": " << getMidiPitch() << std::endl;
+        std::cout << toString(includeOctave,simplify) << ": " << getMidiPitch() << std::endl;
         return *const_cast<Note*>(this);
     }
 
@@ -308,7 +308,7 @@ public:
     Note getNoteFromInterval(const Interval& interval) const
     {
         auto octave = getOctave();
-        const auto& key = toString(false);
+        const auto& key = toString(false,true);
         auto deg = interval.getDegree();
         if(deg > 7){
             octave++;
@@ -334,38 +334,32 @@ public:
         return std::move(note);
     }
 
+    // Get the interval to another note. Can I get the sharps and flats right?
+    // Interval getIntervalTo(Note otherNote) const
+    // {
+    //     auto thisNote = *this;
+    //     thisNote .setOctave(0);
+    //     otherNote.setOctave(0);
 
-    Interval getIntervalTo(Note otherNote) const
+    //     auto diff = otherNote-thisNote;
+
+    //     std::cout << "Diff: " << diff << std::endl;
+
+    //     while(diff < 0)
+    //     {
+    //         diff += 12;
+    //     }
+
+    //     auto res = Interval::newFromSemi(diff);
+
+    //     return std::move(res);
+    // } 
+
+    Interval getIntervalTo(const Note& otherNote) const
     {
-        auto thisNote = *this;
-        
-        std::cout << "This: " << thisNote.toString(false) 
-                  << ", Other: " << otherNote.toString(false) 
-                    << std::endl;
-
-
-        return getIntervalToSimp(otherNote);
+        int semitones = otherNote.getMidiPitch() - getMidiPitch();
+        return Interval::newFromSemi(semitones);
     }
-
-    Interval getIntervalToSimp(Note otherNote) const
-    {
-        auto thisNote = *this;
-        thisNote .setOctave(0);
-        otherNote.setOctave(0);
-
-        auto diff = otherNote-thisNote;
-
-        std::cout << "Diff: " << diff << std::endl;
-
-        while(diff < 0)
-        {
-            diff += 12;
-        }
-
-        auto res = Interval::newFromSemi(diff);
-
-        return std::move(res);
-    } 
 
     std::vector<Note> getNoteFromInterval(const Intervals& interval) const
     {
@@ -582,6 +576,55 @@ public:
         return std::move(semis);
     }
 
+    // Get Vector of N
+    static Notes allKeys()
+    {
+        Notes notes;
+        for(auto& s : sKeyNames) notes.push_back(Note(s));
+        return std::move(notes);
+    }
+
+    // Contains a specific note
+    bool contains(const Note& note) const
+    {
+        return std::find(begin(),end(),note) != end();
+    }
+
+    // Contains a specific note ignoring octave
+    bool contains(const Note& note, bool ignoreOctave) const
+    {
+        auto it = std::find_if(begin(),end(),[&note,ignoreOctave](const Note& n){
+            return ignoreOctave ? n.getPitchWrap() == note.getPitchWrap() : n == note;
+        });
+
+        return it != end();
+    }
+
+    // Contains all the notes in another vector
+    bool contains(const Notes& notes) const
+    {
+        auto it = notes.begin();
+        while(it != notes.end())
+        {
+            if(!contains(*it)) return false;
+            it++;
+        }
+        return true;
+    }
+
+    // Contains all the notes in another vector ignoring octave
+    bool contains(const Notes& notes, bool ignoreOctave) const
+    {
+        auto it = notes.begin();
+        while(it != notes.end())
+        {
+            if(!contains(*it,ignoreOctave)) return false;
+            it++;
+        }
+        return true;
+    }
+
+    
 };
 
 

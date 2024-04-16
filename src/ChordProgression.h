@@ -32,12 +32,10 @@ public:
     // Constructor to create a chord progression from a string of chord symbols
     ChordProgression(const std::string& chordSymbols, const Note& aTonic = Note("C"))
     {
-        if(isRomanChordSymbol(chordSymbols)){
+        if(isRomanChordSymbol(chordSymbols))
             this->setRoman(chordSymbols,aTonic);
-        } 
-        else {
+        else 
             this->set(chordSymbols);
-        }
     }
 
     // Function to set the chord progression from a vector of chords
@@ -68,7 +66,7 @@ public:
     }
 
     // Function to set the chord progression from string of chord symbols
-    ChordProgression& set(std::string chordSymbols)
+    ChordProgression& set(const std::string& chordSymbols)
     {
         // Use the vector-based set function
         set(chordStringToVector(chordSymbols));
@@ -76,7 +74,7 @@ public:
     }
 
     // Function to set the chord progression from string of chord symbols
-    ChordProgression& setRoman(std::string chordSymbols, const Note& aTonic)
+    ChordProgression& setRoman(const std::string& chordSymbols, const Note& aTonic)
     {
         // Use the vector-based set function
         setRoman(chordStringToVector(chordSymbols),aTonic);
@@ -114,9 +112,33 @@ public:
     // Print the chord progression
     ChordProgression& print()
     {
-        for(auto& chord : *this) chord.print(); // TODO: Use iterator
+        auto it = this->begin();
+        while (it != this->end()) {
+            it->print();
+            it++;
+        }
         return *this;
     }
+
+    // Get Roman Chord Symbols
+    std::string getRoman(const Note& aTonic = Note("C")) const
+    {
+        std::string romanChordSymbols;
+        auto it = this->begin();
+        while (it != this->end()) {
+            romanChordSymbols += it->getRoman(aTonic);
+            if(++it != this->end()) romanChordSymbols += "|";
+        }
+        return romanChordSymbols;
+    }
+
+    // Print the chord progression as Roman Chords
+    ChordProgression& printRoman(const Note& aTonic = Note("C"))
+    {
+        std::cout << "Roman: (" << getRoman(aTonic) << ")" << std::endl;
+        return *this;
+    }
+
 
 private:
     // Function to convert a string of chord symbols to a vector of chord symbols

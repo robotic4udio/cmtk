@@ -65,27 +65,45 @@ namespace cmtk
             setScale(aName);
         }
 
-        void setRoot(const Note& aRootNote)
+        Scale& setRoot(const Note& aRootNote)
         {
             mRootNote = aRootNote;
+            updateNotes();
+            return *this;
         }
+
+        Scale& setRoot(std::string aRootNote)
+        {
+            mRootNote = Note(aRootNote);
+            updateNotes();
+            return *this;
+        }
+
+        Scale& setRoot(int aRootNote)
+        {
+            mRootNote = Note(aRootNote);
+            updateNotes();
+            return *this;
+        }
+
 
         const Note& getRoot() const
         {
             return mRootNote;
         }
 
-        void clear()
+        Scale& clear()
         {
             mName.clear();
             mNotes.clear();
             mIntervals.clear();
             //mProgressions.clear();
             mStyle.clear();
+            return *this;
         }
 
         // Function to set the scale
-        void setScale(std::string aScaleName)
+        Scale& setScale(std::string aScaleName)
         {
             clear();
             mName = aScaleName; // TODO: Move this to end and set only if everything is ok
@@ -527,6 +545,8 @@ namespace cmtk
                 std::cerr << "Error: Unrecognized scale name" << std::endl;
             }
 
+            return *this;
+
         }
 
         // Overload the [] operator to get the semi-tone of the scale
@@ -694,20 +714,10 @@ namespace cmtk
             }
 
             // 13th Chords
-            if (size > 6)
-            {
-                if (inVec(semitones, Intervals("13").getSemitones()))
-                {
-                    replaceBack(chordSymbol, "13", endsWith(chordSymbol, "11") ? 2 : 1);
-                }
-                else if (inVec(semitones, Intervals("b13").getSemitones()))
-                {
-                    toAppend += "b13";
-                }
-                else if (inVec(semitones, Intervals("#13").getSemitones()))
-                {
-                    toAppend += "#13";
-                }
+            if (size > 6){
+                if      (inVec(semitones, Intervals("13" ).getSemitones())){ replaceBack(chordSymbol, "13", endsWith(chordSymbol, "11") ? 2 : 1); }
+                else if (inVec(semitones, Intervals("b13").getSemitones())){ toAppend += "b13"; }
+                else if (inVec(semitones, Intervals("#13").getSemitones())){ toAppend += "#13"; }
                 else
                 {
                     throw std::runtime_error("Scale::getChordSymbol(): Unknown 13th chord with Semitones: " + toString(semitones));
@@ -729,7 +739,7 @@ namespace cmtk
         }
 
         // Get chord at index
-        Chord getChord(int index, int size = 3)
+        Chord getChord(int index, int size=3)
         {
             index--;
             const auto& chordSymbol = getChordSymbol(index, size);
@@ -749,7 +759,6 @@ namespace cmtk
             return std::move(chordSymbols);
         }
 
-        /*
         // Get ChordProgression from a vector of indexes
         ChordProgression getChordProgression(const std::vector<int> &indexes, int size = 3, bool roman=false)
         {
@@ -775,7 +784,7 @@ namespace cmtk
 
             return std::move(chordProgression);
         }
-        */
+        
 
 
 
@@ -884,35 +893,22 @@ namespace cmtk
         }
 
         // Function to test if a chord is diatonic to the scale
-        bool isDiatonic(const Chord &chord, bool useRoot=true)
+        bool isDiatonic(const Chord &chord) const
         {
-            std::vector<int> chordNotes;
-            for (auto interval : chord.getIntervals())
-            {   
-                auto semitones = interval.getSemitones();
-                if(useRoot) semitones += chord.getRoot();
-                semitones %= 12;
-                // Check if the interval is in the scale
-                if (std::find_if(mIntervals.begin(), mIntervals.end(), [semitones, this](Interval i)
-                                 { return i.getSemitones() == semitones; }) == mIntervals.end())
-                {
-                    return false;
-                }
-            }
-            return true;
+            return mNotes.contains(chord.getNotes(), true);
         }
 
-        /*
-        bool isDiatonic(const ChordProgression& chordProgression, bool useRoot=true)
+        
+        bool isDiatonic(const ChordProgression& chordProgression) const
         {
             for(const auto& chord : chordProgression)
             {
-                if(!isDiatonic(chord,useRoot)) return false;
+                if(!isDiatonic(chord)) return false;
             }
 
             return true;
         }
-        */
+        
 
         // Function to calculate the diatonicity of a chord to the scale
         float diatonicity(const Chord &chord)
@@ -932,7 +928,7 @@ namespace cmtk
             return static_cast<float>(diatonicNotes) / chord.size();
         }
 
-        /*
+        
         // Function to calculate the diatonicity of a chordProgression to the scale
         float diatonicity(const ChordProgression& chordProgression)
         {
@@ -944,7 +940,7 @@ namespace cmtk
 
             return diatonicitySum / chordProgression.size();
         }
-        */
+        
 
         static std::vector<Scale> getAllScales()
         {
@@ -1046,8 +1042,6 @@ namespace cmtk
 
         }
 
-
-
         static void printAllScales(int size = 3)
         {
             for (auto scale : getAllScales())
@@ -1064,11 +1058,12 @@ namespace cmtk
             return std::move(scales);
         }
 
-        static std::vector<Scale> getDiatonicScales(const Chord& chord)
+        static std::vector<Scale> getDiatonicScales(const Chord& chord, const Note& aTonic)
         {
             std::vector<Scale> diatonicScales;
             for (auto scale : getAllScales())
             {
+                scale.setRoot(aTonic);
                 if (scale.isDiatonic(chord))
                 {
                     diatonicScales.push_back(scale);
@@ -1078,12 +1073,12 @@ namespace cmtk
             return std::move(diatonicScales);
         }
 
-        /*
-        static std::vector<Scale> getDiatonicScales(const ChordProgression& chordProgression)
+        static std::vector<Scale> getDiatonicScales(const ChordProgression& chordProgression, const Note& aTonic)
         {
             std::vector<Scale> diatonicScales;
             for (auto scale : getAllScales())
-            {
+            {   
+                scale.setRoot(aTonic);
                 if (scale.isDiatonic(chordProgression))
                 {
                     diatonicScales.push_back(scale);
@@ -1092,25 +1087,41 @@ namespace cmtk
 
             return std::move(diatonicScales);
         }
-        */
+        
+
+        static void printDiatonicScales(const Chord& chord, const Note& aTonic, int size = 3)
+        {
+            for(const auto& scale : getDiatonicScales(chord,aTonic))
+            {
+                scale.print(size);
+            }
+        }
 
         static void printDiatonicScales(const Chord& chord, int size = 3)
         {
-            for(const auto& scale : getDiatonicScales(chord))
+            for(const auto& key : Notes::allKeys())
+            {
+                printDiatonicScales(chord, key, size);
+            }
+        }        
+
+
+        static void printDiatonicScales(const ChordProgression& chordProgression, const Note& aTonic, int size = 3)
+        {
+            for(const auto& scale : getDiatonicScales(chordProgression, aTonic))
             {
                 scale.print(size);
-            }
+            }   
         }
 
-        /*
         static void printDiatonicScales(const ChordProgression& chordProgression, int size = 3)
         {
-            for(const auto& scale : getDiatonicScales(chordProgression))
+            for(const auto& key : Notes::allKeys())
             {
-                scale.print(size);
+                printDiatonicScales(chordProgression, key, size);
             }
         }
-        */
+        
 
     private:
         // The scale name
@@ -1125,6 +1136,11 @@ namespace cmtk
         std::string mStyle = "";
         // Some useful progressions for the scale
         // ChordProgressions mProgressions;
+
+        void updateNotes()
+        {
+            mNotes = mRootNote.getNoteFromInterval(mIntervals);
+        }
 
         // Function to test is a vector contains the values given in the arguments
         const bool inVec(const std::vector<int> &vec, const std::vector<int> &values) const 
