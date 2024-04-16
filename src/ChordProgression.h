@@ -12,7 +12,6 @@
 
 namespace cmtk {
 
-
 // ----------------------------------------------------------------------- //
 // ----------------------- ChordProgression Class ------------------------ //
 // ----------------------------------------------------------------------- //
@@ -26,33 +25,102 @@ public:
         this->set(chords);
     }
     // Constructor to create a chord progression from a vector of chord symbols
-    ChordProgression(const std::vector<std::string>& chordSymbols, const int rootNote = 0)
+    ChordProgression(const std::vector<std::string>& chordSymbols)
     {
-        this->set(chordSymbols, rootNote);
+        this->set(chordSymbols);
     }
     // Constructor to create a chord progression from a string of chord symbols
-    ChordProgression(const std::string& chordSymbols, const int rootNote = 0)
+    ChordProgression(const std::string& chordSymbols, const Note& aTonic = Note("C"))
     {
-        this->set(chordSymbols, rootNote);
-    }
-
-    // Function to set the chord progression from a vector of chords
-    void set(const ChordVector& chords)
-    {
-        *this = chords; // TODO: Access in a different way
-    }
-
-    // Function to set the chord progression from a vector of chord symbols
-    void set(const std::vector<std::string>& chordSymbols, const int rootNote = 0)
-    {
-        this->clear();
-        for (int i = 0; i < chordSymbols.size(); i++) {
-            this->push_back(Chord(chordSymbols[i], rootNote));
+        if(isRomanChordSymbol(chordSymbols)){
+            this->setRoman(chordSymbols,aTonic);
+        } 
+        else {
+            this->set(chordSymbols);
         }
     }
 
+    // Function to set the chord progression from a vector of chords
+    ChordProgression& set(const ChordVector& chords)
+    {
+        *this = chords;
+        return *this;
+    }
+
+    // Function to set the chord progression from a vector of chord symbols
+    ChordProgression& set(const std::vector<std::string>& chordSymbols)
+    {
+        this->clear();
+        for (int i = 0; i < chordSymbols.size(); i++) {
+            this->push_back(Chord(chordSymbols[i]));
+        }
+        return *this;
+    }
+
+    // Function to set the chord progression from a vector of chord symbols
+    ChordProgression& setRoman(const std::vector<std::string>& chordSymbols, const Note& aTonic)
+    {
+        this->clear();
+        for (int i = 0; i < chordSymbols.size(); i++) {
+            this->push_back(Chord::newRoman(chordSymbols[i], aTonic));
+        }
+        return *this;
+    }
+
     // Function to set the chord progression from string of chord symbols
-    void set(std::string chordSymbols, const int rootNote = 0)
+    ChordProgression& set(std::string chordSymbols)
+    {
+        // Use the vector-based set function
+        set(chordStringToVector(chordSymbols));
+        return *this;
+    }
+
+    // Function to set the chord progression from string of chord symbols
+    ChordProgression& setRoman(std::string chordSymbols, const Note& aTonic)
+    {
+        // Use the vector-based set function
+        setRoman(chordStringToVector(chordSymbols),aTonic);
+        return *this;
+    }
+
+    // Function to add a chord to the progression
+    ChordProgression& addChord(const Chord& chord)
+    {
+        ChordVector::push_back(chord);
+        return *this;
+    }
+
+    // Function to add a chord to the progression
+    ChordProgression& addChord(const std::string& chordSymbol)
+    {
+        ChordVector::push_back(Chord(chordSymbol));
+        return *this;
+    }
+
+    // Function to add a Roman chord to the progression
+    ChordProgression& addRoman(const std::string& romanChordSymbol, const Note& tonic)
+    {
+        ChordVector::push_back(Chord::newRoman(romanChordSymbol, tonic));
+        return *this;
+    }
+
+    // Function to clear the progression
+    ChordProgression& clear()
+    {
+        ChordVector::clear();
+        return *this;
+    }
+
+    // Print the chord progression
+    ChordProgression& print()
+    {
+        for(auto& chord : *this) chord.print(); // TODO: Use iterator
+        return *this;
+    }
+
+private:
+    // Function to convert a string of chord symbols to a vector of chord symbols
+    std::vector<std::string> chordStringToVector(std::string chordSymbols)
     {
         // Remove all spaces from the chord symbols
         chordSymbols.erase(std::remove(chordSymbols.begin(), chordSymbols.end(), ' '), chordSymbols.end());
@@ -75,37 +143,14 @@ public:
         if(chordSymbol.size() > 0) chordSymbolsVector.push_back(chordSymbol);
 
         // Use the vector-based set function
-        set(chordSymbolsVector, rootNote);
+        return std::move(chordSymbolsVector);
     }
-
-    // Function to add a chord to the progression
-    void addChord(const Chord& chord)
-    {
-        ChordVector::push_back(chord);
-    }
-
-    // Function to add a chord to the progression
-    void addChord(const std::string& chordSymbol, int rootNote = 0)
-    {
-        ChordVector::push_back(Chord(chordSymbol, rootNote));
-    }
-
-    // Function to clear the progression
-    void clear()
-    {
-        ChordVector::clear();
-    }
-
-    // Print the chord progression
-    void print()
-    {
-        for(auto& chord : *this) chord.print(); // TODO: Use iterator
-    }
-
-private:
-
 
 };
+
+/*
+
+
 
 // ----------------------------------------------------------------------- //
 // ----------------------- ChordSequencer Class -------------------------- //
@@ -149,6 +194,7 @@ private:
     int index = -1;
     std::vector<int> current = {};
 };
+
 
 
 // ----------------------------------------------------------------------- //
@@ -259,7 +305,7 @@ private:
 };
 
 
-
+*/
 
 
 

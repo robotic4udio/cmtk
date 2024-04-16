@@ -68,7 +68,7 @@ public:
     ChordType() = default;
     ChordType(const std::string& chordSymbol)
     {
-        setChordType(chordSymbol);
+        set(chordSymbol);
     }
 
     // Enum class to represent the quality of the chord
@@ -85,8 +85,8 @@ public:
         NA
     };
 
-    // Create a chord from a set of intervals
-    void setChordType(const std::string& aChordType){
+    // Set the ChordType from a set string representing the ChordType
+    void set(const std::string& aChordType){
         auto chordType = aChordType;
         mChordType = chordType;
 
@@ -210,6 +210,21 @@ public:
         }
     }
 
+    // Is the Chord a Minor Chord
+    bool isKindOfMinor() const
+    {   
+        if(mIntervals.contains(Interval(3,-1))) return true;
+        if(mIntervals.contains(Interval(3)))    return false;
+        if(startsWithNumber(mChordType))        return false;
+        if(startsWith      (mChordType,"min" )) return true;
+        if(startsWith      (mChordType,"m"   )) return true;
+        if(startsWith      (mChordType,"dim" )) return true;
+        if(startsWith      (mChordType,"°"   )) return true;
+        if(startsWith      (mChordType,"hdim")) return true;
+        if(startsWith      (mChordType,"ø"   )) return true;
+        return false;
+    }
+
     // Get the chord symbol
     std::string getChordType()
     {
@@ -241,48 +256,65 @@ public:
         std::cout << "ChordType: " << mChordType << " ---> (" << mIntervals << ")" << std::endl;
     }
 
+    // Size of ChordType
+    size_t size() const 
+    {
+        return mIntervals.size();
+    }
+
 private:
     std::string mChordType = "";
     Intervals mIntervals = Intervals({Interval(1), Interval(3), Interval(5)});
 };
 
+// ----------------------------------------------------------------------- //
+// ---------------------------- ChordVoicing Class ----------------------- //
+// ----------------------------------------------------------------------- //
+class ChordVoicing : std::vector<int>  {
+public:
+    // For now it is just a vector of ints representing the order of degrees in the intervals
+
+
+private:
+
+};
 
 // ----------------------------------------------------------------------- //
-// ---------------------------- Chrd Class ------------------------------- //
+// ---------------------------- Chord Class ------------------------------ //
 // ----------------------------------------------------------------------- //
-// The Chrd Class is a class that represents a chord. It is the composition of a Note and a ChordType
-class Chrd : public CMTK {
+// The Chord Class is a class that represents a chord. It is the composition of a Note and a ChordType
+class Chord : public CMTK {
 public:
     // Constructor
-    Chrd() = default;
+    Chord() = default;
 
     // Constructor from RootNote, ChordType and BassNote
-    Chrd(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote)
+    Chord(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote)
     {
         setChord(aRootNote,chordType,aBassNote);
     }
 
     // Constructor from RootNote and ChordType - BassNote is set to the RootNote
-    Chrd(const Note& aRootNote, const ChordType& chordType)
+    Chord(const Note& aRootNote, const ChordType& chordType)
     {
         setChord(aRootNote,chordType);
     }
 
     // Constructor from note and chordType expressed as strings
-    Chrd(const std::string& note, const std::string& chordType, const std::string& aBassNote = "")
+    Chord(const std::string& note, const std::string& chordType, const std::string& aBassNote = "")
     {
         if(aBassNote.empty()) setChord(note,chordType);
         else                  setChord(note,chordType,aBassNote);
     }
 
     // Constructor from a combined chord symbol
-    Chrd(const std::string& chordSymbol)
+    Chord(const std::string& chordSymbol)
     {
         setChord(chordSymbol);
     }
 
     // Set the chord from a Note and a ChordType
-    Chrd& setChord(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote)
+    Chord& setChord(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote)
     {
         mRootNote = aRootNote;
         mChordType = chordType;
@@ -291,13 +323,13 @@ public:
     }
 
     // Set the chord from a Note and a ChordType
-    Chrd& setChord(const Note& aRootNote, const ChordType& chordType)
+    Chord& setChord(const Note& aRootNote, const ChordType& chordType)
     {
         return setChord(aRootNote,chordType,aRootNote);
     }
 
     // Set from a note and a chordType expressed as strings
-    Chrd& setChord(const std::string& aRootNote, const std::string& aChordType, const std::string& aBassNote = "")
+    Chord& setChord(const std::string& aRootNote, const std::string& aChordType, const std::string& aBassNote = "")
     {
         const auto& rootNote  = Note(aRootNote);
         const auto& chordType = ChordType(aChordType);
@@ -305,26 +337,163 @@ public:
         return setChord(rootNote,chordType,bassNote);
     }
 
-    Chrd& setChord(const std::string& chordSymbol)
+    Chord& setChord(const std::string& chordSymbol)
     {
         // Find the first non note character
         auto pos = chordSymbol.find_first_not_of("ABCDEFGb#");
+        auto slashPos = chordSymbol.find_first_of('/');
+
         // Split the string into Note and ChordType
         std::string noteString  = chordSymbol.substr(0,pos);
-        std::string chordString = pos == chordSymbol.npos ? "" : chordSymbol.substr(pos);
+        std::string chordString = pos == chordSymbol.npos ? "" : chordSymbol.substr(pos,slashPos-1);
+        std::string slashString = slashPos == chordSymbol.npos ? "" : chordSymbol.substr(slashPos+1);
+
+        // Print Slash
+        std::cout << "NoteString: " << noteString 
+                  << ", ChordString: " << chordString
+                  << ", Slash: " << slashString 
+                  << std::endl;
+        
         // Set the chord
-        return setChord(noteString,chordString);
+        return setChord(noteString,chordString,slashString);
+    }
+
+    static Chord newRoman(const std::string& chordSymbol, const Note& aTonic)
+    {
+        Chord chord;
+        chord.setRoman(chordSymbol,aTonic);
+        return std::move(chord);
+    }
+
+    static Chord newRoman(const std::string& chordSymbol, const std::string& aTonic)
+    {
+        return newRoman(chordSymbol,Note(aTonic));
+    }
+
+    // Set the Chord from a Roman Chord String 
+    Chord& setRoman(const std::string& romanChordSymbol, const Note& aTonic)
+    {
+         
+        // Find the first non note character
+        auto pos  = romanChordSymbol.find_first_not_of("iIvVxXb#");
+        auto spos = romanChordSymbol.find("/");
+
+        // Split the string into Note and ChordType
+        std::string romanString  = romanChordSymbol.substr(0,pos);
+        std::string chordString = (pos  == romanChordSymbol.npos) ? "" : romanChordSymbol.substr(pos,spos-pos);
+        std::string slashString = (spos == romanChordSymbol.npos) ? "" : romanChordSymbol.substr(spos+1);
+
+        // Get the root note from the tonic using the roman string
+        const Note& rootNote = aTonic.getNoteFromInterval(Interval::newFromRoman(romanString));
+
+        // Find out if the chordString is minor or major, it is minor is the iv symbols are lowercase
+        if(!isRomanMajorSymbol(romanString))
+        {   
+            // Find out if chordString starts with minor symbol, i.e. m,°,ø,min,dim,hdim using a std function
+            if(chordString.empty() || isdigit(chordString[0]) || chordString[0] == 'M') chordString.insert(0,"m");
+        }  
+
+        #ifdef CMTK_DEBUG
+        std::cout << "Roman: ("   << romanString << ")"
+                  << ", Chord: (" << chordString << ")"
+                  << ", Slash: (" << slashString << ")"
+                  << ", Tonic: (" << aTonic.toString(false) << ")"
+                  << ", Root: ("  << rootNote.toString(false) << ")"
+                  << std::endl;
+        #endif
+
+        // Create ChordType Object
+        const auto& chordType = ChordType(chordString);
+
+        // Set Chord if no Slash
+        if(slashString.empty())
+        {
+            setChord(rootNote,chordType);
+            return *this;
+        }
+
+        // Set Chord if Symbol after slash is Arabic
+        if(isArabicChordSymbol(slashString))
+        {
+            const Note& bassNote = aTonic.getNoteFromInterval(Interval(slashString));
+            setChord(rootNote,chordType,bassNote);
+            return *this;
+        } 
+
+        // Set Chord if Symbol after slash is Roman
+        if(isRomanChordSymbol(slashString))
+        {
+            const Note& bassNote = aTonic.getNoteFromInterval(Interval::newFromRoman(slashString));
+            setChord(rootNote,chordType,bassNote);
+            return *this;
+        }
+
+        return *this;
+    }
+
+    // Set the Chord from a Roman Chord String
+    Chord& setRoman(const std::string& aRomanChordSymbol, const std::string& aTonic)
+    {
+        return setRoman(aRomanChordSymbol,Note(aTonic));
+    }
+
+    // Set the Chord from a Roman Chord String
+    Chord& setRoman(const std::string& aRomanChordSymbol, int aTonic)
+    {
+        return setRoman(aRomanChordSymbol,Note(aTonic));
+    }
+
+    // Set the Chord from a Roman Chord String
+    Chord& setRoman(const std::string& aRomanChordSymbol)
+    {
+        return setRoman(aRomanChordSymbol,mRootNote);
+    }
+
+    // Get Roman Chord Symbol from Chord and Tonic
+    std::string getRoman(const Note& aTonic) const
+    {
+        // Get the interval from the tonic to the root note
+        const auto& interval = aTonic.getIntervalTo(mRootNote);
+
+        // Get the roman numeral from the interval
+        const auto& romanString = interval.getRoman(!mChordType.isKindOfMinor());
+
+        auto chordTypeString = mChordType.toString();
+        removePrefix(chordTypeString,"min");
+        removePrefix(chordTypeString,"m"  );
+
+        // The Result String
+        std::string res = romanString + chordTypeString;
+
+        // Handle the Slash Chord
+        if(isSlashChord())
+        {
+            // Get the BassInterval from the tonic to the root note
+            const auto& bassInterval = aTonic.getIntervalTo(mBassNote);
+            res += "/";
+            res += bassInterval.toString();
+        }
+
+
+        std::cout << "Roman: " << res << std::endl;
+
+        // Get the chord symbol
+
+
+
+        // Return the result
+        return std::move(res);
     }
 
     // Set Chord Type
-    Chrd& setType(const ChordType& chordType)
+    Chord& setType(const ChordType& chordType)
     {
         mChordType = chordType;
         return *this;
     }
 
     // Set Chord Type
-    Chrd& setType(const std::string& chordType)
+    Chord& setType(const std::string& chordType)
     {
         mChordType = ChordType(chordType);
         return *this;
@@ -337,7 +506,7 @@ public:
     }
 
     // Set the RootNote
-    Chrd& setRoot(const Note& note, bool keepOctave=false)
+    Chord& setRoot(const Note& note, bool keepOctave=false)
     {
         bool bassEqualRoot = mRootNote == mBassNote;
         auto rootOctave    = mRootNote.getOctave();
@@ -356,13 +525,13 @@ public:
     }
 
     // Set the RootNote
-    Chrd& setRoot(const std::string& note)
+    Chord& setRoot(const std::string& note)
     {
         // Keep the octave if none is given in the string
         return setRoot(Note(note),!isdigit(note.back()));
     }
 
-    Chrd& setRoot(int note)
+    Chord& setRoot(int note)
     {
         return setRoot(Note(note));
     }
@@ -374,7 +543,7 @@ public:
     }
 
     // Set the BassNote
-    Chrd& setBass(const Note& note, bool keepOctave=false)
+    Chord& setBass(const Note& note, bool keepOctave=false)
     {
         mBassNote = note;
         if(keepOctave) mBassNote.setOctave(mRootNote.getOctave());
@@ -382,20 +551,20 @@ public:
     }
 
     // Set the BassNote
-    Chrd& setBass(const std::string& note)
+    Chord& setBass(const std::string& note)
     {
         // Keep the octave if none is given in the string
         return setBass(Note(note),!isdigit(note.back()));
     }
 
     // Set Bass from Semitone
-    Chrd& setBass(int note)
+    Chord& setBass(int note)
     {
         return setBass(Note(note));
     }
 
     // Set Bass from Interval with respect to the root note
-    Chrd& setBass(const Interval& interval, bool keepOctave=false)
+    Chord& setBass(const Interval& interval, bool keepOctave=false)
     {
         mBassNote = mRootNote.getNoteFromInterval(interval);
         if(keepOctave) mBassNote.setOctave(mBassNote.getOctave()  );
@@ -404,14 +573,19 @@ public:
     }
 
     // Set Bass from Root
-    Chrd& rootBass()
+    Chord& rootBass()
     {
         mBassNote = mRootNote;
         return *this;
     }
 
+    bool isSlashChord() const
+    {
+        return mBassNote.getPitchWrap() != mRootNote.getPitchWrap();
+    }
+
     // Force bass into range
-    Chrd& forceBassInRange(int min=0, int max=127)
+    Chord& forceBassInRange(int min=0, int max=127)
     {
         while(mBassNote.getMidiPitch() < min) mBassNote.shiftOctave( 1);
         while(mBassNote.getMidiPitch() > max) mBassNote.shiftOctave(-1);
@@ -425,7 +599,7 @@ public:
     }
 
     // Set Octave
-    Chrd& setOctave(int octave)
+    Chord& setOctave(int octave)
     {
         mRootNote.setOctave(octave);
         return *this;
@@ -450,14 +624,14 @@ public:
     }
 
     // Get the Bass note
-    Chrd& transpose(int semitones)
+    Chord& transpose(int semitones)
     {
         mRootNote.transpose(semitones);
         mBassNote.transpose(semitones);
         return *this;
     }
 
-    Chrd& transpose(const Interval& interval)
+    Chord& transpose(const Interval& interval)
     {
         mRootNote.transpose(interval);
         mBassNote.transpose(interval);
@@ -465,9 +639,9 @@ public:
     }
 
     // Stream operator
-    friend std::ostream& operator<<(std::ostream& os, const Chrd& chrd)
+    friend std::ostream& operator<<(std::ostream& os, const Chord& Chord)
     {
-        os << chrd.mRootNote << " " << chrd.mChordType;
+        os << Chord.mRootNote << " " << Chord.mChordType;
         return os;
     }
 
@@ -477,7 +651,7 @@ public:
         std::string res;
         res += getRoot().toString(false);
         res += mChordType.toString();
-        if(mBassNote != mRootNote){
+        if(isSlashChord()){
             res += "/";
             res += mBassNote.toString(false);
         }
@@ -486,9 +660,9 @@ public:
     }
 
     // Print the chord
-    Chrd& print(bool simplify=true)
+    Chord& print(bool simplify=true)
     {
-        bool slashBass = mBassNote != mRootNote;
+        bool slashBass = isSlashChord();
         std::cout << getRoot().toString(false) << mChordType;        
         if(slashBass) std::cout << "/" << mBassNote.toString(false);
         std::cout << " -> (" << getIntervals() << ")" 
@@ -503,15 +677,72 @@ public:
         return *this;
     }
 
+    size_t size() const 
+    {
+        return mChordType.size();
+    }
+
 private:
-    ChordType mChordType;
-    Note mRootNote;
-    Note mBassNote;
+    ChordType mChordType; // Object representing the chord type, i.e. the basic structure of the chord
+    Note mRootNote;       // The root note of the chord
+    Note mBassNote;       // The bass note of the chord, this is only different from the root note if the chord is a slash chord
+    ChordVoicing mVoicing; // TODO: Make a ChordVoicing class that contains the voicing of the chord
+};
+
+class RomanChord : public Chord {
+public:
+    RomanChord(const std::string& aRomanSymbol, const Note& aTonic = Note("C"))
+    {
+        setRoman(aRomanSymbol,aTonic);
+    }
+
+    RomanChord& setRoman(const std::string& aRomanSymbol, const Note& aTonic = Note("C"))
+    {
+        mTonic = aTonic;
+        mRomanSymbol = aRomanSymbol;
+        Chord::setRoman(aRomanSymbol,aTonic);
+        return *this;
+    }
+
+    // Get the Roman
+    const std::string& getRoman()
+    {
+        if(mRomanSymbol.empty()) 
+            mRomanSymbol = Chord::getRoman(mTonic);
+        
+        return mRomanSymbol;
+    }
+
+    // Set Tonic
+    RomanChord& setTonic(Note aTonic)
+    {
+        mTonic = aTonic;
+        Chord::setRoman(mRomanSymbol,mTonic);
+        return *this;
+    }
+
+    // Get Tonic
+    const Note& getTonic() const
+    {
+        return mTonic;
+    }
+
+    RomanChord& print()
+    {
+        std::cout << "RomanChord(" << getRoman() << ", "  << mTonic.toString(false) << "): ";
+        Chord::print();
+        return *this;
+    }
+
+private:
+    std::string mRomanSymbol = "";
+    Note mTonic = Note();
+
 };
 
 
 
-
+/*
 // ----------------------------------------------------------------------- //
 // ----------------------------- Chord Class ----------------------------- //
 // ----------------------------------------------------------------------- //
@@ -1005,7 +1236,7 @@ private:
 
 
 
-
+*/
 
 
 

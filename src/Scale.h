@@ -80,7 +80,7 @@ namespace cmtk
             mName.clear();
             mNotes.clear();
             mIntervals.clear();
-            mProgressions.clear();
+            //mProgressions.clear();
             mStyle.clear();
         }
 
@@ -96,19 +96,19 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Happy,Light,Bright,Positive,Pop,Rock,Jazz,Classical,Happy";
-                mProgressions.add("Axis"        ,"I|V|vi|IV"  );
-                mProgressions.add("Axis2"       ,"vi|IV|I|V"  );
-                mProgressions.add("DooWop"      ,"I|vi|IV|V"  );
-                mProgressions.add("RedHot2"     ,"I|V|ii|IV"  );
-                mProgressions.add("RedHot3"     ,"IV|I|V|vi"  );
-                mProgressions.add("RedHot4"     ,"I|V|vi|IV"  );
-                mProgressions.add("RoyalRoad"   ,"I|IV|iii|vi");
-                mProgressions.add("Ghibli"      ,"IV|V|iii|vi");
-                mProgressions.add("Emotional"   ,"vi|IV|V|iii");
-                mProgressions.add("MysteryClimb","IV|V|vi"    );
-                mProgressions.add("Evanescence" ,"I|iii|I|iii");
-                mProgressions.add("Christiania" ,"I|iii|vi|V|IV|I|ii|V");
-                mProgressions.add("Love"        ,"I|V|vi|iii|IV|I|ii|V"); // "I|V/7|vi|iii/5|IV|I/3|ii|V"
+                // mProgressions.add("Axis"        ,"I|V|vi|IV"  );
+                // mProgressions.add("Axis2"       ,"vi|IV|I|V"  );
+                // mProgressions.add("DooWop"      ,"I|vi|IV|V"  );
+                // mProgressions.add("RedHot2"     ,"I|V|ii|IV"  );
+                // mProgressions.add("RedHot3"     ,"IV|I|V|vi"  );
+                // mProgressions.add("RedHot4"     ,"I|V|vi|IV"  );
+                // mProgressions.add("RoyalRoad"   ,"I|IV|iii|vi");
+                // mProgressions.add("Ghibli"      ,"IV|V|iii|vi");
+                // mProgressions.add("Emotional"   ,"vi|IV|V|iii");
+                // mProgressions.add("MysteryClimb","IV|V|vi"    );
+                // mProgressions.add("Evanescence" ,"I|iii|I|iii");
+                // mProgressions.add("Christiania" ,"I|iii|vi|V|IV|I|ii|V");
+                // mProgressions.add("Love"        ,"I|V|vi|iii|IV|I|ii|V"); // "I|V/7|vi|iii/5|IV|I/3|ii|V"
             }
             // Dorian Mode - Major Scale 2nd Mode {1 2 ♭3 4 5 6 ♭7} - Def:Nat6
             // Riders On The Storm by The Doors, Mad World by Tears for Fears, Scarborough Fair, Woodstock by Joni Mitchell, Blue Jeans by Lana Del Rey, Drive by R.E.M., The "Dorian vamp", Pink Floyd and Dorian
@@ -116,10 +116,10 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Jazzy,Bluesy,Rocky,Sophisticated,Adventurous";
-                mProgressions.add("PlagelCascade","i|bIII|bVII|IV");
-                mProgressions.add("DorianVamp"   ,"i|IV|i|IV");
-                mProgressions.add("Dorian12"     ,"i|ii|i|ii");
-                mProgressions.add("Dorian"       ,"i|bVII|bIII|IV"); // What name?
+                // mProgressions.add("PlagelCascade","i|bIII|bVII|IV");
+                // mProgressions.add("DorianVamp"   ,"i|IV|i|IV");
+                // mProgressions.add("Dorian12"     ,"i|ii|i|ii");
+                // mProgressions.add("Dorian"       ,"i|bVII|bIII|IV"); // What name?
             }
             // Phrygian Mode - Major Scale 3rd Mode {1 ♭2 ♭3 4 5 ♭6 ♭7} - Def:b2
             else if (mName == "Phrygian")
@@ -132,24 +132,24 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4, 1), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Dreamy,Spacey,Modern,Jazz,Hopeful,Positive,Magical";
-                mProgressions.add("Evanescence" ,"I|iii|I|iii");
+                // mProgressions.add("Evanescence" ,"I|iii|I|iii");
             }
             // Mixolydian Mode - Major Scale 5th Mode {1 2 3 4 5 6 ♭7} - Def:b7
             else if (mName == "Mixolydian") 
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Blues,Rock,Jazz,Folk,Country,Pop";
-                mProgressions.add("MixolydianVamp","I|bVII|IV|I");
+                // mProgressions.add("MixolydianVamp","I|bVII|IV|I");
             }
             // Aeolian Mode (Natural Minor) - Major Scale 6th Mode {1 2 ♭3 4 5 ♭6 ♭7} 
             else if (mName == "Aeolian" || mName == "Minor")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Sad,Dark,Blues,Jazz,Rock,Metal,Emotional,Sentimental,Serious";
-                mProgressions.add("Aeolian Vamp"       ,"i|bVII|bVI|bVII");
-                mProgressions.add("RedHot1"            ,"i|bVII|v|bVI"   );
-                mProgressions.add("Aeolian Closed Loop","i|bVII|iv|i"    );
-                mProgressions.add("Aeolian"            ,"i|bVII|bIII|iv" ); // TODO: Try this progression and give a name
+                // mProgressions.add("Aeolian Vamp"       ,"i|bVII|bVI|bVII");
+                // mProgressions.add("RedHot1"            ,"i|bVII|v|bVI"   );
+                // mProgressions.add("Aeolian Closed Loop","i|bVII|iv|i"    );
+                // mProgressions.add("Aeolian"            ,"i|bVII|bIII|iv" ); // TODO: Try this progression and give a name
 
             }
             // Locrian Mode - Major Scale 7th Mode {1 ♭2 ♭3 4 ♭5 ♭6 ♭7}
@@ -165,7 +165,7 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
                 mStyle = "Majestic,Heroic,Powerful,Exotic,Eastern,Classical";
-                mProgressions.add("PrincessLeia","I|iv6");
+                // mProgressions.add("PrincessLeia","I|iv6");
             }
             // Dorian b5 - Harmonic Major 2nd Mode {1 2 ♭3 4 ♭5 6 ♭7}
             else if (mName == "Dorian b5")
@@ -210,8 +210,8 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7)};
                 mStyle = "Sad,Epic,Tragic,Classical,Emotional,Dark,Exotic,Eastern,Spanish,Flamenco,Latin";
-                mProgressions.add("HarmonicVamp"  ,"i|i|bVI|V");
-                mProgressions.add("ChocolateJesus","i|iv|i|V7");
+                // mProgressions.add("HarmonicVamp"  ,"i|i|bVI|V");
+                // mProgressions.add("ChocolateJesus","i|iv|i|V7");
             }
             // Locrian n6 - Harmonic Minor 2nd Mode
             else if (mName == "Locrian n6")
@@ -282,8 +282,8 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Sad,Sentimental";
-                mProgressions.add("Vamp","I|iv");
-                mProgressions.add("PrincessLeia","I|iv6");
+                // mProgressions.add("Vamp","I|iv");
+                // mProgressions.add("PrincessLeia","I|iv6");
             }
             // Locrian #2 - Melodic Minor 6th Mode
             else if (mName == "Half Diminished" || mName == "Locrian #2")
@@ -366,7 +366,7 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4, 1), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "World,Flamenco,Gypsy,Eastern European,Middle Eastern";
-                mProgressions.add("ClapHands","i|bVI7");
+                // mProgressions.add("ClapHands","i|bVI7");
             }
             // Locrian n3 - Neopolitan Minor 5th Mode
             else if (mName == "Locrian n3")
@@ -379,7 +379,7 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2, 1), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Unstable,Complex";
-                mProgressions.add("RoyalRoad","I|IV|iii|vi");
+                // mProgressions.add("RoyalRoad","I|IV|iii|vi");
             }
             // Super-Locrian Diminished - Neopolitan Minor 7th Mode
             else if (mName == "Super-Locrian Diminished")
@@ -408,8 +408,8 @@ namespace cmtk
             else if (mName == "Hungarian Minor")
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4, 1), Interval(5), Interval(6, -1), Interval(7)};
-                mProgressions.add("HarmonicVamp","i|i|bVI|V");
-                mProgressions.add("ClapHands"   ,"i|bVI7");
+                // mProgressions.add("HarmonicVamp","i|i|bVI|V");
+                // mProgressions.add("ClapHands"   ,"i|bVI7");
             }
             // Oriental - Double Harmonic Major 5th Mode
             else if (mName == "Oriental")
@@ -715,21 +715,16 @@ namespace cmtk
             }
 
             // Insert the roman numeral at beginning of the chord symbol
-            if(roman) chordSymbol.insert(0, chordIntervals.front().getRomanName(uppercase));
+            if(roman) chordSymbol.insert(0, chordIntervals.front().getRoman(uppercase));
             else      chordSymbol.insert(0, mRootNote.getNoteFromInterval(chordIntervals.front()).toString(false,simplify));
 
             // Append
             if (!toAppend.empty())
             {
-                // toAppend.insert(0, "^");
                 chordSymbol.append(toAppend);
             }
 
             // Print the chord symbol
-            // std::cout << "Chord Symbol: " << chordSymbol << std::endl;
-            // Replace part of string at the end with another string
-            // chordSymbol.replace(chordSymbol.end()-1, chordSymbol.end(), "b5");
-
             return std::move(chordSymbol);
         }
 
@@ -754,6 +749,7 @@ namespace cmtk
             return std::move(chordSymbols);
         }
 
+        /*
         // Get ChordProgression from a vector of indexes
         ChordProgression getChordProgression(const std::vector<int> &indexes, int size = 3, bool roman=false)
         {
@@ -779,6 +775,7 @@ namespace cmtk
 
             return std::move(chordProgression);
         }
+        */
 
 
 
@@ -905,6 +902,7 @@ namespace cmtk
             return true;
         }
 
+        /*
         bool isDiatonic(const ChordProgression& chordProgression, bool useRoot=true)
         {
             for(const auto& chord : chordProgression)
@@ -914,6 +912,7 @@ namespace cmtk
 
             return true;
         }
+        */
 
         // Function to calculate the diatonicity of a chord to the scale
         float diatonicity(const Chord &chord)
@@ -933,6 +932,7 @@ namespace cmtk
             return static_cast<float>(diatonicNotes) / chord.size();
         }
 
+        /*
         // Function to calculate the diatonicity of a chordProgression to the scale
         float diatonicity(const ChordProgression& chordProgression)
         {
@@ -944,6 +944,7 @@ namespace cmtk
 
             return diatonicitySum / chordProgression.size();
         }
+        */
 
         static std::vector<Scale> getAllScales()
         {
@@ -1077,6 +1078,7 @@ namespace cmtk
             return std::move(diatonicScales);
         }
 
+        /*
         static std::vector<Scale> getDiatonicScales(const ChordProgression& chordProgression)
         {
             std::vector<Scale> diatonicScales;
@@ -1090,6 +1092,7 @@ namespace cmtk
 
             return std::move(diatonicScales);
         }
+        */
 
         static void printDiatonicScales(const Chord& chord, int size = 3)
         {
@@ -1099,6 +1102,7 @@ namespace cmtk
             }
         }
 
+        /*
         static void printDiatonicScales(const ChordProgression& chordProgression, int size = 3)
         {
             for(const auto& scale : getDiatonicScales(chordProgression))
@@ -1106,6 +1110,7 @@ namespace cmtk
                 scale.print(size);
             }
         }
+        */
 
     private:
         // The scale name
@@ -1119,7 +1124,7 @@ namespace cmtk
         // The styles of music the mode is usually used for
         std::string mStyle = "";
         // Some useful progressions for the scale
-        ChordProgressions mProgressions;
+        // ChordProgressions mProgressions;
 
         // Function to test is a vector contains the values given in the arguments
         const bool inVec(const std::vector<int> &vec, const std::vector<int> &values) const 

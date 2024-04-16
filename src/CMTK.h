@@ -105,6 +105,23 @@ inline bool removeSubstring(std::string& s, const std::string& sub, bool caseSen
     return false;
 }
 
+// Test is a string contains another string
+inline bool contains(std::string& s, const std::string& sub)
+{
+    return s.find(sub) != std::string::npos;
+}
+
+// Same as containsSubstring but case insensitive option
+inline bool contains(std::string& s, const std::string& sub, bool caseSensitive)
+{
+    if(caseSensitive) return contains(s, sub);
+    std::string s1 = s;
+    std::string s2 = sub;
+    std::transform(s1.begin(), s1.end(), s1.begin(), ::tolower);
+    std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
+    return s1.find(s2) != std::string::npos;
+}
+
 inline bool isNumber(const std::string& s)
 {
     return !s.empty() && std::all_of(s.begin(), s.end(), ::isdigit);
@@ -114,6 +131,11 @@ inline bool isNumber(const std::string& s)
 inline bool startsWithNumber(const std::string& s)
 {
     return !s.empty() && std::isdigit(s[0]);
+}
+
+inline bool startsWith(const std::string& s, const std::string& prefix)
+{
+    return s.size() >= prefix.size() && s.compare(0, prefix.size(), prefix) == 0;
 }
 
 // Remove all instances of the characters from a string
@@ -250,16 +272,22 @@ int romanPitchToSemitone(std::string romanPitch, int root=0)
     return semitone;
 };
 
+
 // Is the string a chord symbol in roman numerals
 inline bool isRomanChordSymbol(const std::string& chordSymbol)
 {
-    return chordSymbol.find_first_of("ivIVXL") != std::string::npos;
+    return chordSymbol.find_first_of("iIvV") != std::string::npos;
+}
+
+// Is the string a major chord symbol in roman numerals
+inline bool isRomanMajorSymbol(const std::string& chordSymbol)
+{
+    return chordSymbol.find_first_of("IV") != std::string::npos;
 }
 
 // -------------------------------------------------------------------------------------------- //
 // ---------------------------------- Arabic Numerals ----------------------------------------- //
 // -------------------------------------------------------------------------------------------- //
-
 // Is the string a chord symbol in arabic numerals
 inline bool isArabicChordSymbol(std::string chordSymbol)
 {
@@ -311,7 +339,6 @@ int arabicPitchToSemitone(std::string arabicPitch, int root=0)
     return semitone;
 };
 
-
 // Create a static std::map<std::vector<Notes>> with all the above notes:
 static std::map<std::string, std::vector<std::string>> MajorNoteMap = {
     {"C" , { "C"  , "D"  , "E"  , "F"  , "G"  , "A"  , "B"   }},
@@ -341,12 +368,34 @@ inline static std::string MajorNoteMapAt(std::string key, int index)
     return MajorNoteMap[key][index];
 }
 
+inline std::string keyFromPitch(int pitch)
+{
+    switch(pitch % 12)
+    {
+        case 0: return "C";
+        case 1: return "Db";
+        case 2: return "D";
+        case 3: return "Eb";
+        case 4: return "E";
+        case 5: return "F";
+        case 6: return "F#";
+        case 7: return "G";
+        case 8: return "Ab";
+        case 9: return "A";
+        case 10: return "Bb";
+        case 11: return "B";
+    }
+
+    return "NA";
+}
+
 inline void simplifyNoteName(std::string& note)
 {
     // Flats that can be replaced with note
     bool found = true;
     while(found){
         found = false;
+        // Flats that can be replaced with note
         if(replacePrefix(note, "Cb" , "B")) found = true;
         if(replacePrefix(note, "Dbb", "C")) found = true;
         if(replacePrefix(note, "Ebb", "D")) found = true;
@@ -364,9 +413,9 @@ inline void simplifyNoteName(std::string& note)
         if(replacePrefix(note, "A##", "B")) found = true;
         if(replacePrefix(note, "B#" , "C")) found = true;
 
-        if(removeSubstring(note, "b#")) found = true;
-        if(removeSubstring(note, "#b")) found = true;
-    
+        // Flats that can be replaced with sharp
+        if(removeSubstring(note, "b#"))     found = true;
+        if(removeSubstring(note, "#b"))     found = true;
     }
 }
 

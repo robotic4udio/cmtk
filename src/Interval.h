@@ -36,6 +36,14 @@ public:
         return std::move(res);
     }
 
+    Interval& clear()
+    {
+        degree    = 0;
+        quality   = 0;
+        semitones = 0;
+        return *this;
+    }
+
     // Function to set the interval
     void set(std::string aName)
     {
@@ -277,32 +285,6 @@ public:
         semitones += 12*n;
     }
 
-    // Get Name as Roman Numeral
-    std::string getRomanName(bool upperCase) 
-    {
-        std::string res = "";
-        
-        // Add the quality
-        auto quality = this->quality;
-        while(quality < 0)
-        {
-            res += "b";
-            quality++;
-        }
-        while(quality > 0)
-        {
-            res += "#";
-            quality--;
-        }
-
-        // Add the degree
-        res += getRomanDegree(upperCase);
-        
-        // Return the result
-        return std::move(res);
-
-    }
-
     // Interval to Note Name
     std::string getNoteName(int rootNote, bool isRoman = false)
     {
@@ -373,6 +355,82 @@ public:
         setFromSemi(getSemitones() + semitones);
     }
 
+    // ----------------------------- Support for Roman Numerals ----------------------------- //
+    // Create a new Interval from a Roman Numeral
+    static Interval newFromRoman(std::string roman)
+    {
+        Interval res;
+        res.setRoman(roman);
+        return std::move(res);
+    }
+
+    // Set the interval from a Roman Numeral
+    Interval& setRoman(std::string aRoman)
+    {
+        clear();
+        // Handle flat and sharp symbols
+        while(aRoman.front() == 'b' || aRoman.front() == '#')
+        {
+            if     (aRoman.front() == 'b') flatten();
+            else if(aRoman.front() == '#') sharpen();
+            aRoman.erase(0,1);
+        }
+
+        // Set Degree
+        setDegree(romanToInt(aRoman));
+        
+        return *this;
+    }
+
+    // Get Name as Roman Numeral
+    std::string getRoman(bool upperCase) const
+    {
+        std::string res = "";
+        
+        // Add the quality
+        auto quality = this->quality;
+        while(quality < 0)
+        {
+            res += "b";
+            quality++;
+        }
+        while(quality > 0)
+        {
+            res += "#";
+            quality--;
+        }
+
+        // Add the degree
+        res += getDegreeRoman(upperCase);
+        
+        // Return the result
+        return std::move(res);
+    }
+
+    // Get Degree as Roman Numeral
+    std::string getDegreeRoman(bool upperCase) const
+    {
+        auto degree = this->getDegree();
+        while(degree > 7)
+        {
+            degree -= 7;
+        }
+        while(degree < 1)
+        {
+            degree += 7;
+        }
+        switch(degree)
+        {
+            case 1: return upperCase ? "I"   : "i"  ;
+            case 2: return upperCase ? "II"  : "ii" ;
+            case 3: return upperCase ? "III" : "iii";
+            case 4: return upperCase ? "IV"  : "iv" ;
+            case 5: return upperCase ? "V"   : "v"  ;
+            case 6: return upperCase ? "VI"  : "vi" ;
+            case 7: return upperCase ? "VII" : "vii";
+            default: return "";
+        }
+    }
 
 private:
     // Function to set the interval
@@ -409,30 +467,7 @@ private:
         }
     }
 
-    // Get Degree as Roman Numeral
-    std::string getRomanDegree(bool upperCase)
-    {
-        auto degree = this->getDegree();
-        while(degree > 7)
-        {
-            degree -= 7;
-        }
-        while(degree < 1)
-        {
-            degree += 7;
-        }
-        switch(degree)
-        {
-            case 1: return upperCase ? "I"   : "i"  ;
-            case 2: return upperCase ? "II"  : "ii" ;
-            case 3: return upperCase ? "III" : "iii";
-            case 4: return upperCase ? "IV"  : "iv" ;
-            case 5: return upperCase ? "V"   : "v"  ;
-            case 6: return upperCase ? "VI"  : "vi" ;
-            case 7: return upperCase ? "VII" : "vii";
-            default: return "";
-        }
-    }
+
  
 };
 

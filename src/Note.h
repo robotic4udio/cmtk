@@ -44,6 +44,11 @@ public:
         return mNote;
     }
 
+    int getPitchWrap() const
+    {
+        return mNote%12;
+    }
+
     int getOctave() const
     {
         return (mNote - C0) / 12;
@@ -62,7 +67,7 @@ public:
     }
 
     // Function to set the note from a string
-    void set(std::string noteSymbol)
+    Note& set(std::string noteSymbol)
     {
         clear();
 
@@ -80,7 +85,7 @@ public:
         else if(removePrefix(noteSymbol,"G")){ mNoteString = "G"; mNote =  7; } 
         else if(removePrefix(noteSymbol,"A")){ mNoteString = "A"; mNote =  9; } 
         else if(removePrefix(noteSymbol,"B")){ mNoteString = "B"; mNote = 11; } 
-        else return;
+        else return *this;
 
         // Take care of flats and sharps
         while(noteSymbol.front() == 'B' || noteSymbol.front() == '#'){
@@ -91,6 +96,22 @@ public:
 
         // Add the octave
         mNote += noteSymbol.empty() ? C1 : C0 +std::stoi(noteSymbol) * 12;
+
+        return *this;
+    }
+
+    // Set from Interval with respedt to its RootNote
+    Note& set(const Interval& interval, const Note& aRootNote)
+    {
+        *this = aRootNote.getNoteFromInterval(interval);
+        return *this;
+    }
+
+    // Set from a Roman Chord Symbol with respect to its RootNote
+    Note& setRoman(std::string aRomanChordString, const Note& aRootNote)
+    {
+        set(Interval::newFromRoman(aRomanChordString),aRootNote);
+        return *this;
     }
 
     std::string toString(bool includeOctave=true, bool simplify=false) const
@@ -294,7 +315,7 @@ public:
             deg -= 7;
         }
 
-        const auto& s   = MajorNoteMapAt(key, deg-1);
+        const auto& s = MajorNoteMapAt(key, deg-1);
 
         Note note(s);
         note.setOctave(octave);
@@ -313,6 +334,39 @@ public:
         return std::move(note);
     }
 
+
+    Interval getIntervalTo(Note otherNote) const
+    {
+        auto thisNote = *this;
+        
+        std::cout << "This: " << thisNote.toString(false) 
+                  << ", Other: " << otherNote.toString(false) 
+                    << std::endl;
+
+
+        return getIntervalToSimp(otherNote);
+    }
+
+    Interval getIntervalToSimp(Note otherNote) const
+    {
+        auto thisNote = *this;
+        thisNote .setOctave(0);
+        otherNote.setOctave(0);
+
+        auto diff = otherNote-thisNote;
+
+        std::cout << "Diff: " << diff << std::endl;
+
+        while(diff < 0)
+        {
+            diff += 12;
+        }
+
+        auto res = Interval::newFromSemi(diff);
+
+        return std::move(res);
+    } 
+
     std::vector<Note> getNoteFromInterval(const Intervals& interval) const
     {
         std::vector<Note> notes;
@@ -320,11 +374,9 @@ public:
         return std::move(notes);
     }
 
-
 private:
     int mNote = C1;
     std::string mNoteString = "";
-    
     int mSharp = 0;
 
     // Display sharp or flat
@@ -333,6 +385,7 @@ private:
         if(mSharp == 0) return mPreferSharp;
         return mSharp  > 0; 
     }
+
 };
 
 
