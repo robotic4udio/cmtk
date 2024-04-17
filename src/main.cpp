@@ -30,5 +30,20 @@ int main() {
     Scale::printDiatonicScales(prog);
 
 
+    Chord c = Chord("Cm9/Eb");
+    c.setOctave(3).print().forceBassInRange(24, 48).print();
+
+    ChordType ct = ChordType("Maj7");
+    ct.print();
+
+
+    ct.setSemi({0,4,7 }).print(); // major root position
+    ct.setSemi({0,3,8 }).print(); // major 1st inversion
+    ct.setSemi({0,5,9 }).print(); // major 2nd inversion
+    ct.setSemi({0,3,7 }).print(); // minor root position
+    ct.setSemi({0,4,9 }).print(); // minor 1st inversion
+    ct.setSemi({0,5,8 }).print(); // minor 2nd inversion
+
+ 
     return 0;
 }

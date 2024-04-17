@@ -432,6 +432,25 @@ public:
         }
     }
 
+    Interval& simplify()
+    {
+        // Simplify the interval
+        while(degree > 7)
+        {
+            degree -= 7;
+        }
+        while(degree < 1)
+        {
+            degree += 7;
+        }
+
+        // Update the semitones
+        updateSemitones(degree, quality);
+
+        return *this;
+    
+    }
+
 private:
     // Function to set the interval
     int semitones = 0; // The number of semitones required to reach the interval
@@ -719,11 +738,12 @@ public:
     }
 
     // Print the chord intervals
-    void print(){
+    Intervals& print(){
         for(auto& interval : *this){
             std::cout << "(" << interval.toString() << "~" << interval.getSemitones() << ") ";
         }
         std::cout << std::endl;
+        return *this;
     }
 
     // Sort function
@@ -997,6 +1017,26 @@ public:
     void normalize()
     {
         setFromSemi(getSemitonesNormalized());
+    }
+
+    // Simplify
+    Intervals& simplify()
+    {
+        for(auto& interval : *this)
+        {
+            interval.simplify();
+        }
+
+        removeDuplicates();
+
+        return *this;
+    }
+
+    // Remove Duplicate Intervals
+    void removeDuplicates()
+    {
+        std::sort(IntervalVector::begin(), IntervalVector::end());
+        IntervalVector::erase(std::unique(IntervalVector::begin(), IntervalVector::end()), IntervalVector::end());
     }
     
     // Get negative harmonic 

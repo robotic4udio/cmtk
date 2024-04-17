@@ -122,6 +122,19 @@ inline bool contains(std::string& s, const std::string& sub, bool caseSensitive)
     return s1.find(s2) != std::string::npos;
 }
 
+template<typename T>
+inline bool contains(const std::vector<T>& v, const T& x)
+{
+    return std::find(v.begin(), v.end(), x) != v.end();
+}
+
+template<typename T>
+inline bool contains(const std::vector<T>& v, const std::vector<T>& X)
+{
+    for(auto& x : X) if(!contains(v, x)) return false;
+    return true;
+}
+
 inline bool isNumber(const std::string& s)
 {
     return !s.empty() && std::all_of(s.begin(), s.end(), ::isdigit);
@@ -406,7 +419,11 @@ inline void simplifyNoteName(std::string& note)
     }
 }
 
-
+inline void normalizeVector(std::vector<int>& v)
+{
+    const int min = *std::min_element(v.begin(), v.end());
+    for(auto& x : v) x -= min;
+}
 
 // Base Class for all CMTK Objects
 class CMTK

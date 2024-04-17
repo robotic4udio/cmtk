@@ -86,7 +86,7 @@ public:
     };
 
     // Set the ChordType from a set string representing the ChordType
-    void set(const std::string& aChordType){
+    ChordType& set(const std::string& aChordType){
         auto chordType = aChordType;
         mChordType = chordType;
 
@@ -208,6 +208,30 @@ public:
         if(chordType.size() > 0){
             std::cerr << "setChord(): Warning: Error parsing chord symbol: " << aChordType << " - Remaining: " << chordType << std::endl;
         }
+
+        return *this;
+    }
+
+    // Set from semi
+    ChordType& setSemi(const std::vector<int>& aX)
+    {
+        // Notmalize the intervals
+        auto X = aX;
+        const int min = *std::min_element(X.begin(), X.end());
+        for(auto& x : X) x -= min;
+
+        // Set the intervals
+        mIntervals.setFromSemi(X);
+        mIntervals.print().simplify().print();
+        
+        if     (contains(X,{0,3,7})) mChordType = "m";
+        else if(contains(X,{0,4,7})) mChordType = "M";
+
+        mChordType = mIntervals.getChordSymbol();
+
+        
+
+        return *this;
     }
 
     // Is the Chord a Minor Chord
@@ -251,9 +275,10 @@ public:
     }
 
     // Print the chordType
-    void print()
+    ChordType print()
     {
         std::cout << "ChordType: " << mChordType << " ---> (" << mIntervals << ")" << std::endl;
+        return *this;
     }
 
     // Size of ChordType
@@ -601,9 +626,20 @@ public:
     }
 
     // Set Octave
-    Chord& setOctave(int octave)
-    {
+    Chord& setOctave(int octave, bool keepBass=false)
+    {   
+        // Set the octave of the root note
+        int prev_octave = mRootNote.getOctave();
         mRootNote.setOctave(octave);
+
+        if(keepBass) return *this;
+
+        int diff = octave - prev_octave;
+
+        if(diff == 0) return *this;
+
+        // Set the octave of the bass note
+        mBassNote.shiftOctave(diff);
         return *this;
     }
 
@@ -611,6 +647,19 @@ public:
     int getOctave() const
     {
         return mRootNote.getOctave();
+    }
+
+    // Set Bass Octave
+    Chord& setBassOctave(int octave)
+    {
+        mBassNote.setOctave(octave);
+        return *this;
+    }
+
+    // Get Bass Octave
+    int getBassOctave() const
+    {
+        return mBassNote.getOctave();
     }
 
     // Get Intervals
