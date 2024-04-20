@@ -1,10 +1,11 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <map>
 #include <algorithm>
-#include <set>
 
 namespace cmtk {
 
@@ -122,6 +123,8 @@ inline bool contains(std::string& s, const std::string& sub, bool caseSensitive)
     return s1.find(s2) != std::string::npos;
 }
 
+
+
 template<typename T>
 inline bool contains(const std::vector<T>& v, const T& x)
 {
@@ -132,6 +135,33 @@ template<typename T>
 inline bool contains(const std::vector<T>& v, const std::vector<T>& X)
 {
     for(auto& x : X) if(!contains(v, x)) return false;
+    return true;
+}
+
+template<typename T>
+inline bool remove(std::vector<T>& v, const T& x)
+{
+    // Remove all instances of x from the vector
+    auto it = std::remove(v.begin(), v.end(), x);
+    v.erase(it, v.end());
+    return it != v.end();
+}
+
+template<typename T>
+inline bool remove(std::vector<T>& V, const std::vector<T>& X)
+{
+    // Remove all instances of X from the vector
+    if(!contains(V, X)) return false;
+    for(auto& x : X) remove(V, x);
+    return true;
+}
+
+// Test if two vectors are equel 
+template<typename T>
+inline bool equals(const std::vector<T>& v, const std::vector<T>& V)
+{
+    if(v.size() != V.size()) return false;
+    for(int i=0; i<v.size(); i++) if(v[i] != V[i]) return false;
     return true;
 }
 

@@ -5,10 +5,17 @@
 ## Description
 
 Various classes to perform music composition tasks. 
+## About
+CMTK is a pure header library for working with music composition in cpp. It features classes that are working with Notes, Intervals, Chord Structures, Scales, Voicing, etc. 
+It provides easy access Scales and Chord both for construction and analysis.
 
 ## Features
-- Chord: A class representing a chord
-- Scale: A class representing a scale
+
+```cpp
+
+
+```
+
 
 ## Installation
 
@@ -37,6 +44,5 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 ## Contact
 
 Hjalte Bested Hjorth 
-
 hjalte.moller@gmail.com
 

@@ -1,14 +1,8 @@
 #pragma once
 // Classes to handle the creation of the music
 
-#include <string>
-#include <vector>
-#include <iostream>
-#include <map>
-#include <algorithm>
-#include <cctype>
-#include "Chords.h"
 #include "CMTK.h"
+#include "Chords.h"
 
 namespace cmtk {
 
@@ -38,9 +32,9 @@ public:
 
     Interval& clear()
     {
-        degree    = 0;
-        quality   = 0;
-        semitones = 0;
+        mDegree    = 0;
+        mQuality   = 0;
+        mSemitones = 0;
         return *this;
     }
 
@@ -62,7 +56,7 @@ public:
         }
 
         // Initialize the quality of the interval
-        quality = 0;
+        mQuality = 0;
 
         // While the interval is not empty and starts with a 'b' or '#' character 
         while(!aName.empty() && (aName[0] == 'b' || aName[0] == '#'))
@@ -70,12 +64,12 @@ public:
             // If the interval starts with a 'b' character
             if(aName[0] == 'b')
             {
-                quality--;
+                mQuality--;
             }
             // If the interval starts with a '#' character
             else if(aName[0] == '#')
             {
-                quality++;
+                mQuality++;
             }
             // Remove the first character from the interval
             aName.erase(0, 1);
@@ -85,10 +79,10 @@ public:
         if(!aName.empty() && std::isdigit(aName[0]))
         {
             // Get the degree of the interval
-            degree = std::stoi(aName);
+            mDegree = std::stoi(aName);
 
             // Calculate the number of semitones
-            updateSemitones(degree, quality);
+            updateSemitones(mDegree, mQuality);
 
             // Return
             return *this;
@@ -104,9 +98,9 @@ public:
         while(aDegree < 1) aDegree += 7;
 
         // Set the degree, quality and semitones
-        degree = aDegree;
-        quality = aQuality;
-        updateSemitones(degree, quality);
+        mDegree = aDegree;
+        mQuality = aQuality;
+        updateSemitones(mDegree, mQuality);
         return *this;
     }
 
@@ -146,7 +140,7 @@ public:
     // Function to return inverted interval
     Interval getInverted()
     {
-        auto inverted = Interval::newFromSemi(12-semitones);
+        auto inverted = Interval::newFromSemi(12-mSemitones);
         while(inverted.getDegree() < 1) inverted.shiftOctave(1);
         return std::move(inverted);
     }
@@ -154,7 +148,7 @@ public:
     // Function to get the interval as a string
     std::string toString() const
     {
-        auto quality = this->quality;
+        auto quality = this->mQuality;
         std::string res = "";
         while(quality < 0)
         {
@@ -166,7 +160,7 @@ public:
             res += "#";
             quality--;
         }
-        res += std::to_string(degree);
+        res += std::to_string(mDegree);
         return std::move(res);
     }
 
@@ -177,15 +171,15 @@ public:
     }
 
     // Function to get the number of semitones
-    const int getSemitones() const
+    const int getSemi() const
     {
-        return semitones;
+        return mSemitones;
     }
 
     // Print the interval
     Interval& print()
     {
-        std::cout << "(" << toString() << "~" << getSemitones() << ")" << std::endl;  
+        std::cout << "(" << toString() << "~" << getSemi() << ")" << std::endl;  
         return *this; 
     }
 
@@ -199,25 +193,25 @@ public:
     // Sharpen the interval
     Interval& sharpen()
     {
-        quality++;
-        semitones++;
+        mQuality++;
+        mSemitones++;
         return *this;
     }
 
     // Flatten the interval
     Interval& flatten()
     {
-        quality--;
-        semitones--;
+        mQuality--;
+        mSemitones--;
         return *this;
     }
 
     // Set quality
     Interval& setQuality(int aQuality)
     {
-        int diff = aQuality - quality;
-        quality = aQuality;
-        semitones += diff;
+        int diff = aQuality - mQuality;
+        mQuality = aQuality;
+        mSemitones += diff;
         return *this;
     }
 
@@ -245,27 +239,46 @@ public:
     // Get Quality
     const int getQuality() const
     {
-        return quality;
+        return mQuality;
     }
 
     // Get Degree
     const int getDegree() const
     {
-        return degree;
+        return mDegree;
     }
 
     // Set Degree
-    Interval& setDegree(int aDegree)
+    Interval& setDegree(int aDegree, bool keepSemi=false)
     {
-        degree = aDegree;
-        updateSemitones(degree, quality);
+        if(keepSemi) return setDegreeKeepSemi(aDegree);
+        mDegree = aDegree;
+        updateSemitones(mDegree, mQuality);
         return *this;
     }
-    
+
+    // Set Degree
+    Interval& setDegreeKeepSemi(int aDegree)
+    {
+        mDegree = aDegree;
+        auto semiFromMajorDegree = getSemiFromMajorDegree(mDegree);
+        mQuality = mSemitones - semiFromMajorDegree;
+        return *this;
+    }
+
+    // Set Degree and Semi - Quality will be adjusted
+    Interval& setDegreeSemi(int aDegree, int aSemi)
+    {
+        mDegree = aDegree;
+        mSemitones = aSemi;
+        mQuality = mSemitones - getSemiFromMajorDegree(mDegree);
+        return *this;
+    }
+
     // Equality operator
     bool operator==(const Interval& other) const
     {
-        return degree == other.degree && quality == other.quality;
+        return mDegree == other.mDegree && mQuality == other.mQuality;
     }
 
     // Equality operator for string
@@ -283,7 +296,33 @@ public:
     // Add a function to be used in std::sort
     bool operator<(const Interval& other) const
     {
-        return semitones < other.semitones;
+        return mSemitones < other.mSemitones;
+    }
+
+    // operator+ for Interval
+    Interval operator+(const Interval& other) const
+    {
+        return Interval::newFromSemi(mSemitones + other.mSemitones);
+    }
+
+    // operator+ for Semitones
+    Interval operator+(int n) const
+    {
+        return Interval::newFromSemi(mSemitones + n);
+    }
+
+    // operator+= for Interval
+    Interval& operator+=(const Interval& other)
+    {
+        setFromSemi(mSemitones + other.mSemitones);
+        return *this;
+    }
+
+    // operator+= for Semitones
+    Interval& operator+=(int n)
+    {
+        setFromSemi(mSemitones + n);
+        return *this;
     }
 
     // Stream operator
@@ -298,9 +337,9 @@ public:
     Interval& shiftOctave(int n)
     {   
         // Shift the degree up by 7
-        degree += 7*n;
+        mDegree += 7*n;
         // Shift the quality up by 12
-        semitones += 12*n;
+        mSemitones += 12*n;
         return *this;
     }
 
@@ -308,7 +347,7 @@ public:
     std::string getNoteName(int rootNote, bool isRoman = false) const
     {
         // Get the note number
-        int note = (rootNote + getSemitones()) % 12;
+        int note = (rootNote + getSemi()) % 12;
 
         // Get the quality of the interval
         auto sharpFlat = getQuality();
@@ -358,21 +397,21 @@ public:
     Interval getNegativeHarmonic() const
     {
         // This will mirror on the Major <--> Minor axis
-        return std::move(Interval::newFromSemi(7-semitones));
+        return std::move(Interval::newFromSemi(7-mSemitones));
     }
 
     // Function to convert the interval to the negative harmonic by mirroring on the Major <--> Minor axis
-    Interval& negHarmonic()
+    Interval& harmonicNeg()
     {
         // This will mirror on the Major <--> Minor axis
-        setFromSemi(7-semitones);
+        setFromSemi(7-mSemitones);
         return *this;
     }
 
     // Transpose
-    Interval& transpose(int semitones)
+    Interval& transpose(int n)
     {
-        setFromSemi(getSemitones() + semitones);
+        setFromSemi(getSemi() + n);
         return *this;
     }
 
@@ -409,7 +448,7 @@ public:
         std::string res = "";
         
         // Add the quality
-        auto quality = this->quality;
+        auto quality = this->mQuality;
         while(quality < 0)
         {
             res += "b";
@@ -456,29 +495,34 @@ public:
     Interval& simplify()
     {
         // Simplify the interval
-        while(degree > 7)
+        while(mDegree > 7)
         {
-            degree -= 7;
+            mDegree -= 7;
         }
-        while(degree < 1)
+        while(mDegree < 1)
         {
-            degree += 7;
+            mDegree += 7;
         }
         // Update the semitones
-        updateSemitones(degree, quality);
+        updateSemitones(mDegree, mQuality);
         return *this;
     }
 
 private:
     // Function to set the interval
-    int semitones = 0; // The number of semitones required to reach the interval
-    int degree = 0;    // The degree is relative to the major scale
-    int quality = 0;   // -1 for flat, 0 for natural, 1 for sharp, etc.
+    int mSemitones = 0; // The number of semitones required to reach the interval
+    int mDegree = 0;    // The degree is relative to the major scale
+    int mQuality = 0;   // -1 for flat, 0 for natural, 1 for sharp, etc.
 
     // Function to get the number of semitones from the degree and quality
     void updateSemitones(int aDegree, int aQuality)
     {
-        semitones = aQuality;
+        mSemitones = aQuality + getSemiFromMajorDegree(aDegree);
+    }
+
+    int getSemiFromMajorDegree(int aDegree)
+    {
+        auto semitones = 0;
         while(aDegree > 7)
         {
             aDegree -= 7;
@@ -502,6 +546,9 @@ private:
             case 7: semitones += 11; break;
             default: break;
         }
+
+        return semitones;
+
     }
 
 
@@ -571,6 +618,18 @@ public:
         set(intervals);
         return *this;
     }
+    
+    Intervals& add(const Intervals& interval)
+    {
+        for(auto& i : interval) add(i);
+        return *this;
+    }
+
+    Intervals& add(const IntervalVector& interval)
+    {
+        for(auto& i : interval) add(i);
+        return *this;
+    }
 
     Intervals& add(int degree, int quality=0)
     {
@@ -602,7 +661,7 @@ public:
     Intervals& removeSemi(int semi)
     {
         // Remove the interval if semi is the same
-        auto it = std::remove_if(IntervalVector::begin(), IntervalVector::end(), [semi](Interval i){ return i.getSemitones() == semi; });
+        auto it = std::remove_if(IntervalVector::begin(), IntervalVector::end(), [semi](Interval i){ return i.getSemi() == semi; });
         IntervalVector::erase(it, IntervalVector::end());
         return *this;
     }
@@ -626,22 +685,6 @@ public:
 
         // Add the interval
         IntervalVector::push_back(interval);
-        return *this;
-    }
-
-    // Template function to add an interval to the chord
-    template<typename... Args>
-    Intervals& add(const Interval& interval, Args... args){
-        add(interval);
-        add(args...);
-        return *this;
-    }
-
-    // Template function to set the intervals
-    template<typename... Args>
-    Intervals& set(const Interval& interval, Args... args){
-        set(interval);
-        add(args...);
         return *this;
     }
 
@@ -696,6 +739,15 @@ public:
         return std::move(res);
     }
 
+    // Rotate the intervals
+    Intervals& rotate(int n)
+    {
+        // Rotate the intervals
+        if(n > 0) std::rotate(IntervalVector::begin() , IntervalVector::begin() + n, IntervalVector::end());
+        if(n < 0) std::rotate(IntervalVector::rbegin(), IntervalVector::rbegin() - n, IntervalVector::rend());
+        return *this;
+    }
+
     // Remove Interval by string, return true if changed
     bool remove(const std::string& str)
     {
@@ -745,7 +797,7 @@ public:
     }
 
 
-    // Set Quality
+    // Set Quality of the Interval by Degree
     Intervals& setQuality(int aDegree, int aQuality, bool allowAdd = false)
     {
         // Find the Degree and set the quality
@@ -768,7 +820,16 @@ public:
     // Print the chord intervals
     Intervals& print(){
         for(auto& interval : *this){
-            std::cout << "(" << interval.toString() << "~" << interval.getSemitones() << ") ";
+            std::cout << "(" << interval.toString() << "~" << interval.getSemi() << ") ";
+        }
+        std::cout << std::endl;
+        return *this;
+    }
+
+    // Print the semitones
+    Intervals& printSemi(){
+        for(auto& interval : *this){
+            std::cout << interval.getSemi() << " ";
         }
         std::cout << std::endl;
         return *this;
@@ -832,26 +893,23 @@ public:
         return true;
     }
 
-    const std::vector<int> getSemitones(int offset=0) const
+    const std::vector<int> getSemi(int offset=0) const
     {
         std::vector<int> res;
         for(auto& interval : *this)
         {
-            res.push_back(interval.getSemitones()+offset);
+            res.push_back(interval.getSemi()+offset);
         }
         return std::move(res);
     }
 
     // Get semitones, but ensure that the lowest is zero
-    std::vector<int> getSemitonesNormalized()
+    std::vector<int> getSemiNormalized()
     {
-        auto semitones = getSemitones();
-        const int min = *std::min_element(semitones.begin(), semitones.end());
-        for(auto& s : semitones)
-        {
-            s -= min;
-        }
-        return std::move(semitones);
+        auto semi = getSemi();
+        const int min = *std::min_element(semi.begin(), semi.end());
+        for(auto& s : semi) s -= min;
+        return std::move(semi);
     }
 
     // Get the minimum Interval
@@ -863,7 +921,8 @@ public:
     // Get the minimum semitone
     int getMinSemi() const
     {
-        return *std::min_element(getSemitones().begin(), getSemitones().end());
+        auto semi = getSemi();
+        return *std::min_element(semi.begin(), semi.end());
     }
 
     // Get the maximum Interval
@@ -875,7 +934,8 @@ public:
     // Get the maximum semitone
     int getMaxSemi() const
     {
-        return *std::max_element(getSemitones().begin(), getSemitones().end());
+        auto semi = getSemi();
+        return *std::max_element(semi.begin(), semi.end());
     }
 
     // Get the median Interval
@@ -889,18 +949,18 @@ public:
     // Get the median semitone
     int getMedianSemi() const
     {
-        auto semitones = getSemitones();
-        std::sort(semitones.begin(), semitones.end());
-        return semitones[semitones.size()/2];
+        auto semi = getSemi();
+        std::sort(semi.begin(), semi.end());
+        return semi[semi.size()/2];
     }
 
     // Get the mean semitone
     int getMeanSemi()
     {
-        auto semitones = getSemitones();
+        auto semi = getSemi();
         int sum = 0;
-        for(auto s : semitones) sum += s;
-        return sum / semitones.size();
+        for(auto s : semi) sum += s;
+        return sum / semi.size();
     }
 
     // Create a new Intervals object from the semitones 
@@ -932,7 +992,6 @@ public:
         {
             addSemi(s);
         }
-
     }
 
     std::string getChordSymbol()
@@ -1031,7 +1090,7 @@ public:
     Intervals getNormalized()
     {
         Intervals res;
-        for(auto s : getSemitonesNormalized())
+        for(auto s : getSemiNormalized())
         {
             res.add(Interval::newFromSemi(s));
         }
@@ -1041,7 +1100,7 @@ public:
     // Normalize the Intervals
     Intervals& normalize()
     {
-        setFromSemi(getSemitonesNormalized());
+        setFromSemi(getSemiNormalized());
         return *this;
     }
 
@@ -1081,9 +1140,9 @@ public:
     }
 
     // Convert to Negative Harmonic by mirroring on the Major <--> Minor axis
-    Intervals& negHarmonic()
+    Intervals& harmonicNeg()
     {
-        for(auto& interval : *this) interval.negHarmonic();
+        for(auto& interval : *this) interval.harmonicNeg();
         return *this;
     }
 
@@ -1098,10 +1157,10 @@ public:
     }
 
     // Return a new transposed Intervals object
-    Intervals getTransposed(int semitones)
+    Intervals getTransposed(int n)
     {
         auto res = *this;
-        res.transpose(semitones);
+        res.transpose(n);
         return std::move(res);
     }
 
@@ -1112,8 +1171,223 @@ public:
         {
             if(interval.getDegree() == degree) return interval;
         }
-        return Interval();
+        // Print error message
+        std::cerr << "Error: getIntervalFromDegree(): Degree not found" << std::endl;
+
+        // Return an empty interval
+        return Interval(degree);
     }
+
+    // Get a specific inversion
+    Intervals getInversion(int n, bool normalize=false) const
+    {
+        auto intervals = *this;
+        if(n > 0){ 
+            for(int i=0; i<n; i++){
+                intervals.rotate(1);
+                intervals.back().shiftOctave(1);
+                intervals.sort();
+            }
+        }
+        else if(n < 0){
+            for(int i=0; i<-n; i++){
+                intervals.rotate(-1);
+                intervals.front().shiftOctave(-1);
+                intervals.sort();
+            }
+        }
+        if(normalize) intervals.normalize();
+        return std::move(intervals);
+    }
+
+    // Create a vector with all inversions
+    std::vector<Intervals> getAllInversions(bool simplify=true, bool normalize=false) const
+    {
+        auto intervals = *this;
+        if(simplify) intervals.simplify();
+        std::vector<Intervals> inversions;
+        for(int i=0; i<intervals.size(); i++) {
+            intervals.sort();
+            inversions.push_back(intervals);
+            if(normalize) inversions.back().normalize();
+            intervals.front().shiftOctave(1);
+            intervals.rotate(1);
+            // If the first interval is above 12 then subtract 12 from all intervals
+            if(intervals.front().getSemi() >= 12) intervals.shiftOctave(-1);
+        }
+
+        // Remove duplicates
+        inversions.erase(std::unique(inversions.begin(), inversions.end()), inversions.end());
+
+        return std::move(inversions);
+    }
+
+    // Print all inversions
+    void printAllInversions(bool simplify=true, bool normalize=false) const
+    {
+        auto inversions = getAllInversions(simplify,normalize);
+        for(auto& inversion : inversions)
+        {
+            inversion.printSemi();
+        }
+    }
+
+    // Shift the intervals a number of octaves
+    Intervals& shiftOctave(int n)
+    {  
+        auto it = IntervalVector::begin();
+        while(it != IntervalVector::end())
+        {
+            it->shiftOctave(n);
+            it++;
+        }
+
+        return *this;
+    }
+
+    // Print the intervals as whole and half steps. 
+    // This is often used as scale signature. The method getSemiSteps is probably more interesting
+    const std::string getWH() const
+    {   
+        auto intervals = this->getSemi();
+        intervals.push_back(intervals[0] + 12);
+
+        // Get a vector with the diff between the intervals
+        std::string result = "";
+        for (int i = 1; i < intervals.size(); i++)
+        {
+            auto diff = intervals[i] - intervals[i-1];
+            if(diff % 2 == 0) // If the diff is even
+            {
+                int x = diff / 2;
+                result += x == 1 ? "W-" : std::to_string(x) + "W-";
+            }
+            else
+            {
+                int x = diff;
+                result += x==1 ? "H-" : std::to_string(x) + "H-";
+            }
+        }
+        // If the last char is a '-' remove it
+        if(result.back() == '-') result.pop_back();
+        
+        return std::move(result);
+    }
+
+    // Get the scale as semitone steps
+    std::vector<int> getSemiSteps()
+    {   
+        auto intervals = this->getSemi();
+        intervals.push_back(intervals[0] + 12);
+
+        // Get a vector with the diff between the intervals
+        std::vector<int> result = {};
+        for (int i = 1; i < intervals.size(); i++)
+        {
+            auto diff = intervals[i] - intervals[i-1];
+            result.push_back(diff);
+        }
+        
+        return std::move(result);
+    }
+
+    // Print the intervals as semitone steps
+    Intervals& printSemiSteps()
+    {
+        for(auto& step : getSemiSteps())
+        {
+            std::cout << step << " ";
+        }
+        std::cout << std::endl;
+        return *this;
+    }
+
+    // Set the Intervals from a Whole-Half step string
+    Intervals& setWH(const std::string& str)
+    {
+        this->clear();
+        this->add(1);
+        // For each W or H in the string, add the corresponding interval
+        int n=1;
+        for(auto& c : str)
+        {   
+            if(isdigit(c)) n = c - '0';
+            if(c == 'W'){ addW(n); n=1; }
+            if(c == 'H'){ addH(n); n=1; }
+        }
+        return *this;
+    }
+
+    // Print the Intervals as whole and half steps
+    Intervals& printWH()
+    {
+        std::cout << getWH() << std::endl;
+        return *this;
+    }
+
+    // Add a Whole Step
+    Intervals& addW(int n=1)
+    {
+        addStep(n*2);
+        return *this;
+    }
+
+    // Add a Whole Step
+    Intervals& addH(int n=1)
+    {
+        addStep(n);
+        return *this;
+    }
+
+    // Add a Whole Step
+    Intervals& addStep(int n)
+    {
+        std::sort(IntervalVector::begin(), IntervalVector::end());
+        auto interval = IntervalVector::back();
+        interval.transpose(n);
+        add(std::move(interval));
+        return *this;
+    }
+
+    // Add a step from another interval 
+    Intervals& addStep(const Interval& interval)
+    {
+        addStep(interval.getSemi());
+
+        return *this;
+    }
+
+    // Add step from sting
+    Intervals& addStep(const std::string& str)
+    {
+        return *this;
+    }
+
+    // If the Intervals represent a scale, then rotate to get the next mode
+    Intervals getMode(int n, bool keepDegree=false)
+    {
+        n -= 1;
+        auto semi = getSemiSteps();
+        std::rotate(semi.begin(), semi.begin() + n, semi.end());
+        auto size = this->size();
+
+        Intervals result;
+        int i = 0;
+        result.add(at(i++).getDegree());
+        for(auto& s : semi)
+        {
+            if(i == size) break;
+            result.addStep(s);
+            if(size == 7 || keepDegree) result.back().setDegreeKeepSemi(at(i).getDegree());
+            i++;
+        }
+
+        return std::move(result);
+    }
+
+
+
+
 
 private:
 

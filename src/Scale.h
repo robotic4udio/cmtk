@@ -1,58 +1,19 @@
 #pragma once
-// Classes to handle the creation of the music
-
-#include <string>
-#include <vector>
-#include <iostream>
-#include <iomanip>
-#include <map>
-#include <algorithm>
-#include <cctype>
-#include "Chords.h"
-#include "ChordProgression.h"
-#include "Interval.h"
 #include "CMTK.h"
+#include "Interval.h"
 #include "Note.h"
+#include "Chords.h"
 
 namespace cmtk
 {   
-
-    
-
-    // Major Scales overview: https://www.pianoscales.org/major.html
-    // C   :  C , D , E  , F , G , A  , B  , C 
-    // C#  :  C#, D#, E# , F#, G#, A# , B# , C#
-    // Db  :  Db, Eb, F  , Gb, Ab, Bb , C  , Db 
-    // D   :  D , E , F# , G , A , B  , C# , D  
-    // D#  :  D#, E#, F##, G#, A#, B# , C##, D# 
-    // Eb  :  Eb, F , G  , Ab, Bb, C  , D  , Eb 
-    // E   :  E , F#, G# , A , B , C# , D# , E  
-    // F   :  F , G , A  , Bb, C , D  , E  , F  
-    // F#  :  F#, G#, A# , B , C#, D# , E# , F# 
-    // Gb  :  Gb, Ab, Bb , Cb, Db, Eb , F  , Gb 
-    // G:     G , A , B  , C , D , E  , F# , G  
-    // G#  :  G#, A#, B# , C#, D#, E# , F##, G#  
-    // Ab  :  Ab, Bb, C  , Db, Eb, F  , G  , Ab 
-    // A   :  A , B , C# , D , E , F# , G# , A  
-    // A#  :  A#, B#, C##, D#, E#, F##, G##, A#
-    // Bb  :  Bb, C , D  , Eb, F , G  , A  , Bb
-    // B   :  B , C#, D# , E , F#, G# , A# , B 
-    // Cb  :  Cb, Db, Eb , Fb, Gb, Ab , Bb , Cb
-
-
-
-
-
-
-
-
-
     // ----------------------------------------------------------------------- //
     // ----------------------------- Scale Class ----------------------------- //
     // ----------------------------------------------------------------------- //
     class Scale : public CMTK
     {
     public:
+        Scale() = default;
+
         Scale(std::string aName, Note aRootNote = Note("C1"))
         {
             setRoot(aRootNote);
@@ -134,10 +95,10 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Jazzy,Bluesy,Rocky,Sophisticated,Adventurous";
-                // mProgressions.add("PlagelCascade","i|bIII|bVII|IV");
-                // mProgressions.add("DorianVamp"   ,"i|IV|i|IV");
-                // mProgressions.add("Dorian12"     ,"i|ii|i|ii");
-                // mProgressions.add("Dorian"       ,"i|bVII|bIII|IV"); // What name?
+                // mProgressions.add("PlagelCascade"   ,"i|bIII|bVII|IV");
+                // mProgressions.add("DorianVamp"      ,"i|IV|i|IV");
+                // mProgressions.add("DorianMinorVamp" ,"i|ii|i|ii");
+                // mProgressions.add("Dorian"          ,"i|bVII|bIII|IV"); // What name?
             }
             // Phrygian Mode - Major Scale 3rd Mode {1 ♭2 ♭3 4 5 ♭6 ♭7} - Def:b2
             else if (mName == "Phrygian")
@@ -445,6 +406,36 @@ namespace cmtk
                 mIntervals = {Interval(1), Interval(2, -1), Interval(3, -2), Interval(4), Interval(5, -1), Interval(6, -1), Interval(7, -2)};
             }
 
+            // ----------------------- Persian Modes ----------------- //
+            else if (mName == "Persian" || mName == "Persian 1st Mode")
+            {
+                mIntervals = {Interval(1), Interval(2, -1), Interval(3), Interval(4), Interval(5, -1), Interval(6,-1), Interval(7)};
+            }
+            else if (mName == "Persian 2nd Mode")
+            {
+                mIntervals = {Interval(1), Interval(2,1), Interval(3), Interval(4), Interval(5), Interval(6,1), Interval(7)};
+            }
+            else if (mName == "Persian 3rd Mode")
+            {
+                mIntervals = {Interval(1), Interval(2,-1), Interval(3,-2), Interval(4,-1), Interval(5), Interval(6,1), Interval(7,-2)};
+            } 
+            else if (mName == "Persian 4th Mode")
+            {
+                mIntervals = {Interval(1), Interval(2,-1), Interval(3,-1), Interval(4,1), Interval(5), Interval(6,-1), Interval(7)};
+            }
+            else if (mName == "Persian 5th Mode")
+            {
+                mIntervals = {Interval(1), Interval(2), Interval(3,1), Interval(4,1), Interval(5), Interval(6,1), Interval(7)};
+            }
+            else if (mName == "Persian 6th Mode")
+            {
+                mIntervals = {Interval(1), Interval(2,1), Interval(3), Interval(4), Interval(5,1), Interval(6), Interval(7,-1)};
+            }
+            else if (mName == "Persian 7th Mode")
+            {
+                mIntervals = {Interval(1), Interval(2,-1), Interval(3,-2), Interval(4), Interval(5,-1), Interval(6,-2), Interval(7,-2)};
+            }
+
             // ----------------------- Pentatonic Modes -------------- //
             // Major Pentatonic - Pentatonic 1st Mode
             else if (mName == "Major Pentatonic")
@@ -476,7 +467,7 @@ namespace cmtk
             // Major Blues - Blues 1st Mode
             else if (mName == "Major Blues" || mName == "Gospel" || mName == "Blues 1st Mode")
             {
-                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(3), Interval(5), Interval(6)};
+                mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4,-1), Interval(5), Interval(6)};
             }
             // Blues 2nd Mode
             else if (mName == "Blues 2nd Mode")
@@ -504,7 +495,20 @@ namespace cmtk
                 mIntervals = {Interval(1), Interval(3, -1), Interval(4), Interval(5, -1), Interval(5), Interval(7, -1)};
             }
 
+            // Enigma {1 b2 3 #4 #5 #6 7}
+            // Prometheus {1 2 3 ♯4 6 ♭7}
+            // Whole Tone {1 2 3 ♯4 ♯5 ♯6}
+            // ----------------------- Bebop Scales ----------------------- //
+
+
             // ----------------------- Other Scales ----------------------- //
+            // Whole Tone {1 2 3 ♯4 ♯5 ♯6}
+            // Octatonic
+            else if (mName == "Whole Tone")
+            {
+                mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4,1), Interval(5,1), Interval(6, 1)};
+            }
+
 
             // Octatonic
             else if (mName == "Octatonic")
@@ -537,7 +541,7 @@ namespace cmtk
             }
 
             // Set Notes
-            mNotes = mRootNote.getNoteFromInterval(mIntervals);
+            updateNotes();
 
             // Scale Unknown?
             if(mIntervals.empty())
@@ -570,7 +574,7 @@ namespace cmtk
                 res += 12;
             }
 
-            res += mIntervals[index].getSemitones();
+            res += mIntervals[index].getSemi();
             return res;
         }
 
@@ -649,7 +653,7 @@ namespace cmtk
             }
 
             // Get the normalized semitones
-            auto semitones = chordIntervals.getSemitonesNormalized();
+            auto semitones = chordIntervals.getSemiNormalized();
 
             // String for the chord symbol
             std::string chordSymbol = "";
@@ -675,9 +679,9 @@ namespace cmtk
 
             // 7th
             if (size > 3){
-                if      (inVec(semitones, Intervals("b7").getSemitones())){ if(chordSymbol == "°") chordSymbol = "ø7"; else chordSymbol.append("7"); }
-                else if (inVec(semitones, Intervals("7") .getSemitones())){ chordSymbol.append("Maj7"); }
-                else if (inVec(semitones, Intervals("6") .getSemitones())){ chordSymbol.append(chordSymbol == "°" ? "7" : "6"); }
+                if      (inVec(semitones, Intervals("b7").getSemi())){ if(chordSymbol == "°") chordSymbol = "ø7"; else chordSymbol.append("7"); }
+                else if (inVec(semitones, Intervals("7") .getSemi())){ chordSymbol.append("Maj7"); }
+                else if (inVec(semitones, Intervals("6") .getSemi())){ chordSymbol.append(chordSymbol == "°" ? "7" : "6"); }
                 else
                 {
                     // String with the semitones:
@@ -691,9 +695,9 @@ namespace cmtk
 
             // 9th Chords
             if (size > 4){
-                if      (inVec(semitones, Intervals( "9").getSemitones())){ chordSymbol.back() = '9'; }
-                else if (inVec(semitones, Intervals("b9").getSemitones())){ toAppend += "b9";         }
-                else if (inVec(semitones, Intervals("#9").getSemitones())){ toAppend += "#9";         }
+                if      (inVec(semitones, Intervals( "9").getSemi())){ chordSymbol.back() = '9'; }
+                else if (inVec(semitones, Intervals("b9").getSemi())){ toAppend += "b9";         }
+                else if (inVec(semitones, Intervals("#9").getSemi())){ toAppend += "#9";         }
                 else
                 {
                     // Throw exception for unknown chord
@@ -703,9 +707,9 @@ namespace cmtk
 
             // 11th Chords
             if(size > 5){
-                if      (inVec(semitones, Intervals("11") .getSemitones())){ chordSymbol.back() = '1'; chordSymbol.push_back('1'); }
-                else if (inVec(semitones, Intervals("b11").getSemitones())){ toAppend += "b11"; }
-                else if (inVec(semitones, Intervals("#11").getSemitones())){ toAppend += "#11"; }
+                if      (inVec(semitones, Intervals("11") .getSemi())){ chordSymbol.back() = '1'; chordSymbol.push_back('1'); }
+                else if (inVec(semitones, Intervals("b11").getSemi())){ toAppend += "b11"; }
+                else if (inVec(semitones, Intervals("#11").getSemi())){ toAppend += "#11"; }
                 else
                 {
                     // Throw exception for unknown chord
@@ -715,9 +719,9 @@ namespace cmtk
 
             // 13th Chords
             if (size > 6){
-                if      (inVec(semitones, Intervals("13" ).getSemitones())){ replaceBack(chordSymbol, "13", endsWith(chordSymbol, "11") ? 2 : 1); }
-                else if (inVec(semitones, Intervals("b13").getSemitones())){ toAppend += "b13"; }
-                else if (inVec(semitones, Intervals("#13").getSemitones())){ toAppend += "#13"; }
+                if      (inVec(semitones, Intervals("13" ).getSemi())){ replaceBack(chordSymbol, "13", endsWith(chordSymbol, "11") ? 2 : 1); }
+                else if (inVec(semitones, Intervals("b13").getSemi())){ toAppend += "b13"; }
+                else if (inVec(semitones, Intervals("#13").getSemi())){ toAppend += "#13"; }
                 else
                 {
                     throw std::runtime_error("Scale::getChordSymbol(): Unknown 13th chord with Semitones: " + toString(semitones));
@@ -726,7 +730,7 @@ namespace cmtk
 
             // Insert the roman numeral at beginning of the chord symbol
             if(roman) chordSymbol.insert(0, chordIntervals.front().getRoman(uppercase));
-            else      chordSymbol.insert(0, mRootNote.getNoteFromInterval(chordIntervals.front()).toString(false,simplify));
+            else      chordSymbol.insert(0, mRootNote.getNoteAt(chordIntervals.front()).toString(false,simplify));
 
             // Append
             if (!toAppend.empty())
@@ -784,12 +788,6 @@ namespace cmtk
 
             return std::move(chordProgression);
         }
-        
-
-
-
-
-
 
         // Print the chord symbols
         void printChordSymbols(int size = 3)
@@ -833,6 +831,12 @@ namespace cmtk
             return mIntervals;
         }
 
+        // Get Intervals
+        Intervals getIntervals()
+        {
+            return mIntervals;
+        }
+
         // Get Notes
         const Notes& getNotes() const
         {
@@ -853,7 +857,7 @@ namespace cmtk
             {
                 std::cout << std::left << std::setw(6) << i+1
                           << std::left << std::setw(6) << interval.toString()
-                          << std::left << std::setw(6) << interval.getSemitones()
+                          << std::left << std::setw(6) << interval.getSemi()
                           << std::left << std::setw(10) << getChordSymbol(i, size, true  ) << "\t"
                           << std::left << std::setw(10) << getChordSymbol(i, size, false, simplify ) << "\t" 
                           << mNotes.at(i).toString(true,simplify) << "\t" << mNotes.semiAt(i) 
@@ -866,7 +870,7 @@ namespace cmtk
         // Print the scale as whole and half steps
         const std::string getWholeHalfPattern() const
         {   
-            auto intervals = mIntervals.getSemitones();
+            auto intervals = mIntervals.getSemi();
             intervals.push_back(intervals[0] + 12);
 
             // Get a vector with the diff between the intervals
@@ -908,41 +912,41 @@ namespace cmtk
 
             return true;
         }
-        
+
+        // Function to calculate the diatonicity of a set of notes to the scale
+        float diatonicity(const Notes& aChordNotes)
+        {   
+            // ChordNotes
+            auto chordNotes = aChordNotes;
+            chordNotes.removeOctave();
+            chordNotes.removeDuplicates();
+            // ScaleNotes
+            auto scaleNotes = mNotes;
+            scaleNotes.removeOctave();
+            scaleNotes.removeDuplicates();
+            // Find Number of notes in the chord that are in the scale
+            int numNotesInScale = 0;
+            for (const auto& note : chordNotes)
+            {
+                if(scaleNotes.contains(note)) numNotesInScale++;
+            }
+
+            return numNotesInScale / (float) aChordNotes.size();
+        }        
 
         // Function to calculate the diatonicity of a chord to the scale
         float diatonicity(const Chord &chord)
-        {
-            int diatonicNotes = 0;
-            for (auto interval : chord.getIntervals())
-            {
-                auto semitones = interval.getSemitones() % 12;
-                // Check if the interval is in the scale
-                if (std::find_if(mIntervals.begin(), mIntervals.end(), [semitones, this](Interval i)
-                                 { return i.getSemitones() == semitones; }) != mIntervals.end())
-                {
-                    diatonicNotes++;
-                }
-            }
-
-            return static_cast<float>(diatonicNotes) / chord.size();
+        {   
+            return diatonicity(chord.getNotes());
         }
 
-        
         // Function to calculate the diatonicity of a chordProgression to the scale
         float diatonicity(const ChordProgression& chordProgression)
         {
-            float diatonicitySum = 0.0f;
-            for(const auto& chord : chordProgression)
-            {
-                diatonicitySum += diatonicity(chord);
-            }
-
-            return diatonicitySum / chordProgression.size();
+            return diatonicity(chordProgression.getNotes().removeOctave());
         }
         
-
-        static std::vector<Scale> getAllScales()
+        static std::vector<Scale> getAllScales(const Note& aRoot = Note("C"))
         {
             std::vector<Scale> scales;
             for (auto scaleName : {
@@ -960,13 +964,29 @@ namespace cmtk
                 // Neopolitan Major Modes:
                 "Neopolitan Minor", "Lydian #6", "Mixolydian Augmented", "Hungarian Gypsy", "Locrian n3", "Ionian #2", "Super-Locrian Diminished",
                 // Double Harmonic Major Modes:
-                "Double Harmonic Major", "Lydian #2 #6", "Ultra Phrygian", "Hungarian Minor", "Oriental", "Ionian Augmented #2", "Locrian Diminished bb3"
+                "Double Harmonic Major", "Lydian #2 #6", "Ultra Phrygian", "Hungarian Minor", "Oriental", "Ionian Augmented #2", "Locrian Diminished bb3",
+                // Persian Modes:
+                // "Persian", "Persian 2nd Mode", "Persian 3rd Mode", "Persian 4th Mode", "Persian 5th Mode", "Persian 6th Mode", "Persian 7th Mode",
                 // Other Scales - TODO: Fix this class so that scales with other number of notes than 7 is supported!
                 // "Major Pentatonic"     , "Minor Pentatonic", "Blues", "Octatonic", "Augmented", "Bebop Dominant", "Octatonic Whole-Half", "Octatonic Half-Whole", "Tritone"
             }){
-                scales.push_back(Scale(scaleName));
+                scales.push_back(Scale(scaleName,aRoot));
             }
 
+            return std::move(scales);
+        }
+
+        static std::vector<Scale> getAllScalesAllKeys()
+        {
+            std::vector<Scale> scales;
+            for(auto& scale : getAllScales())
+            {
+                for(auto& root : Notes::allKeys())
+                {
+                    scale.setRoot(root);
+                    scales.push_back(scale);
+                }
+            }
             return std::move(scales);
         }
 
@@ -980,6 +1000,7 @@ namespace cmtk
             if(s == "Neopolitan Major"     ) return {"Neopolitan Major"     , "Lydian Augmented #6", "Lydian Augmented Dominant", "Lydian b6 Dominant" , "Major Locrian"    , "Super Locrian n2"   , "Super Locrian bb3"       };
             if(s == "Neopolitan Minor"     ) return {"Neopolitan Minor"     , "Lydian #6"          , "Mixolydian Augmented"     , "Hungarian Gypsy"    , "Locrian n3"       , "Ionian #2"          , "Super-Locrian Diminished"};
             if(s == "Double Harmonic Major") return {"Double Harmonic Major", "Lydian #2 #6"       , "Ultra Phrygian"           , "Hungarian Minor"    , "Oriental"         , "Ionian Augmented #2", "Locrian Diminished bb3"  };
+            if(s == "Persian"              ) return {"Persian"              , "Persian 2nd Mode"   , "Persian 3rd Mode"         , "Persian 4th Mode"   , "Persian 5th Mode" , "Persian 6th Mode"   , "Persian 7th Mode"        };
             if(s == "Major Pentatonic"     ) return {"Major Pentatonic"     , "Egyptian Pentatonic", "Man Gong Pentatonic"      , "Ritsusen Pentatonic", "Minor Pentatonic" };
             if(s == "Blues"                ) return {"Major Blues"          , "Blues 2nd Mode"     , "Blues 3rd Mode"           , "Blues 4th Mode"     , "Blues 5th Mode"    , "Minor Blues"        };
 
@@ -1004,7 +1025,7 @@ namespace cmtk
         {
             if(s.empty()){
                 for(auto scaleName : {
-                    "Major", "Harmonic Major", "Harmonic Minor", "Melodic Minor", "Neopolitan Major", "Neopolitan Minor", "Double Harmonic Major", "Major Pentatonic", "Blues"
+                    "Major", "Harmonic Major", "Harmonic Minor", "Melodic Minor", "Neopolitan Major", "Neopolitan Minor", "Double Harmonic Major", "Persian", "Major Pentatonic", "Blues"
                 }){
                     printModeNames(scaleName, size);
                     std::cout << std::endl;
@@ -1058,6 +1079,55 @@ namespace cmtk
             return std::move(scales);
         }
 
+        static std::vector<Scale> getScalesByDiatonicity(const ChordProgression& chordProgression, const Note& aRoot)
+        {
+            auto scales = getAllScales(aRoot);
+            std::sort(scales.begin(), scales.end(), [&chordProgression](Scale a, Scale b){ 
+                return a.diatonicity(chordProgression) > b.diatonicity(chordProgression); 
+            });
+            return std::move(scales);
+        }
+
+        static std::vector<Scale> getScalesByDiatonicity(const ChordProgression& chordProgression)
+        {
+            if(chordProgression.getTonic().isOk()) return getScalesByDiatonicity(chordProgression, chordProgression.getTonic());
+
+            auto scales = getAllScalesAllKeys();
+            std::sort(scales.begin(), scales.end(), [&chordProgression](Scale a, Scale b){ 
+                float sad = a.diatonicity(chordProgression);
+                float sbd = b.diatonicity(chordProgression);
+                if(sad > sbd) return true;
+                if(sad < sbd) return false;
+
+                auto  sar = a.getRoot();
+                auto  sbr = b.getRoot();
+                auto  cr  = chordProgression[0].getRoot();
+                if(sar == cr && sbr != cr) return true;
+                if(sar != cr && sbr == cr) return false;
+
+                return sar == cr && sbr != cr;
+            });
+            return std::move(scales);
+        } 
+
+        std::string getName(bool withRoot=true) const
+        {
+            return mRootNote.toString(false,false) + "-" + mName;
+        }
+
+        static void printScalesByDiatonicity(const ChordProgression& chordProgression, int limit = 7)
+        {
+            // Collect all scales sorted by Diatonicity
+            auto scales = getScalesByDiatonicity(chordProgression);
+
+            int i=0;
+            for (auto scale : scales){
+
+                std::cout << scale.getName() << "\tdiatonicity : " << scale.diatonicity(chordProgression) * 100 << " %" << std::endl;
+                if(++i == limit) return;
+            }
+        }
+
         static std::vector<Scale> getDiatonicScales(const Chord& chord, const Note& aTonic)
         {
             std::vector<Scale> diatonicScales;
@@ -1105,7 +1175,6 @@ namespace cmtk
             }
         }        
 
-
         static void printDiatonicScales(const ChordProgression& chordProgression, const Note& aTonic, int size = 3)
         {
             for(const auto& scale : getDiatonicScales(chordProgression, aTonic))
@@ -1121,7 +1190,6 @@ namespace cmtk
                 printDiatonicScales(chordProgression, key, size);
             }
         }
-        
 
     private:
         // The scale name
@@ -1139,7 +1207,7 @@ namespace cmtk
 
         void updateNotes()
         {
-            mNotes = mRootNote.getNoteFromInterval(mIntervals);
+            mNotes = mRootNote.getNoteAt(mIntervals);
         }
 
         // Function to test is a vector contains the values given in the arguments

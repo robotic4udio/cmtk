@@ -4,12 +4,12 @@
 #include "CMTK.h"
 #include "Interval.h"
 
-#include <string>
-
 namespace cmtk {
 
 
+class Note;
 class Notes;
+using NoteVector = std::vector<Note>;
 
 // ----------------------------------------------------------------------- //
 // ----------------------- Note Class ------------------------------------ //
@@ -39,7 +39,7 @@ public:
         mNote = note;
     }
 
-    int getMidiPitch() const
+    int getPitch() const
     {
         return mNote;
     }
@@ -101,16 +101,23 @@ public:
     }
 
     // Set from Interval with respedt to its RootNote
-    Note& set(const Interval& interval, const Note& aRootNote)
+    Note& set(const Note& aNote, const Interval& interval)
     {
-        *this = aRootNote.getNoteFromInterval(interval);
+        *this = aNote.getNoteAt(interval);
+        return *this;
+    }
+
+    // Set from Note
+    Note& set(const Note& aNote)
+    {
+        *this = aNote;
         return *this;
     }
 
     // Set from a Roman Chord Symbol with respect to its RootNote
     Note& setRoman(std::string aRomanChordString, const Note& aRootNote)
     {
-        set(Interval::newFromRoman(aRomanChordString),aRootNote);
+        set(aRootNote, Interval::newFromRoman(aRomanChordString));
         return *this;
     }
 
@@ -148,12 +155,11 @@ public:
         if(includeOctave) res += std::to_string(octave);
 
         return std::move(res);
-
     }
 
     Note& print(bool includeOctave=true, bool simplify=false) const
     {
-        std::cout << toString(includeOctave,simplify) << ": " << getMidiPitch() << std::endl;
+        std::cout << toString(includeOctave,simplify) << ": " << getPitch() << std::endl;
         return *const_cast<Note*>(this);
     }
 
@@ -208,11 +214,10 @@ public:
     }
 
     // Transpose
-    Note& transpose(int semitones)
+    Note& transpose(int n)
     {
-        if(semitones == 0) return *this;
-        int n = mNote + semitones;
-        clear();
+        if(n == 0) return *this;
+        n += mNote;
         set(n);
         return *this;
     }
@@ -220,7 +225,7 @@ public:
     // Transpose Interval
     Note& transpose(const Interval& interval)
     {
-        *this = getNoteFromInterval(interval);
+        *this = getNoteAt(interval);
         return *this;
     }
 
@@ -233,6 +238,13 @@ public:
     {
         return Note{mNote - semitones};
     }
+
+    Note operator+(const Interval& interval) const
+    {
+        return getNoteAt(interval);
+    }
+
+    Notes operator+(const Intervals& intervals) const;
 
     // Increment operator
     Note& operator++()
@@ -305,7 +317,7 @@ public:
         return std::move(notes);
     }
 
-    Note getNoteFromInterval(const Interval& interval) const
+    Note getNoteAt(const Interval& interval) const
     {
         auto octave = getOctave();
         const auto& key = toString(false,true);
@@ -334,42 +346,31 @@ public:
         return std::move(note);
     }
 
-    // Get the interval to another note. Can I get the sharps and flats right?
-    // Interval getIntervalTo(Note otherNote) const
-    // {
-    //     auto thisNote = *this;
-    //     thisNote .setOctave(0);
-    //     otherNote.setOctave(0);
-
-    //     auto diff = otherNote-thisNote;
-
-    //     std::cout << "Diff: " << diff << std::endl;
-
-    //     while(diff < 0)
-    //     {
-    //         diff += 12;
-    //     }
-
-    //     auto res = Interval::newFromSemi(diff);
-
-    //     return std::move(res);
-    // } 
-
     Interval getIntervalTo(const Note& otherNote) const
     {
-        int semitones = otherNote.getMidiPitch() - getMidiPitch();
+        int semitones = otherNote.getPitch() - getPitch();
         return Interval::newFromSemi(semitones);
     }
 
-    std::vector<Note> getNoteFromInterval(const Intervals& interval) const
+    std::vector<Note> getNoteAt(const Intervals& interval) const
     {
         std::vector<Note> notes;
-        for(auto& i : interval) notes.push_back(getNoteFromInterval(i));
+        for(auto& i : interval) notes.push_back(getNoteAt(i));
         return std::move(notes);
     }
 
+    bool isOk() const
+    {
+        return mNote >= 0 && mNote <= 127;
+    }
+
+    operator bool() const
+    {
+        return isOk();
+    }
+
 private:
-    int mNote = C1;
+    int mNote = -1;
     std::string mNoteString = "";
     int mSharp = 0;
 
@@ -384,7 +385,6 @@ private:
 
 
 
-using NoteVector = std::vector<Note>;
 class Notes : public NoteVector
 {
 public:
@@ -452,9 +452,14 @@ public:
         clear();
         for(auto& interval : intervals)
         {
-            Note note = root + interval.getSemitones();
+            Note note = root + interval.getSemi();
             push_back(note);
         }
+    }
+
+    void add(const Notes& aNotes)
+    {
+        for(auto& note : aNotes) add(note);
     }
 
     void add(const Note& note)
@@ -472,11 +477,29 @@ public:
         push_back(note);
     }
 
+    Notes& removeDuplicates()
+    {
+        std::sort(begin(),end());
+        erase(std::unique(begin(),end()),end());
+        return *this;
+    }
+
+    Notes& removeOctave()
+    {
+        auto it = begin();
+        while(it != end())
+        {
+            it->setOctave(0);
+            it++;
+        }
+        return *this;
+    }
+
     // Get a string with the pitch vector
     std::string getPitchString() const
     {
         std::string res;
-        for(const auto& note : *this) res += std::to_string(note.getMidiPitch()) + " ";
+        for(const auto& note : *this) res += std::to_string(note.getPitch()) + " ";
         if(!res.empty()) res.pop_back();
         return std::move(res);
     }
@@ -565,14 +588,14 @@ public:
     // Semi at operator
     int semiAt(int i) const
     {
-        return at(i).getMidiPitch();
+        return at(i).getPitch();
     }
 
     // Get Vector of semitones
     std::vector<int> getMidiPitches() const
     {
         std::vector<int> semis;
-        for(auto& note : *this) semis.push_back(note.getMidiPitch());
+        for(auto& note : *this) semis.push_back(note.getPitch());
         return std::move(semis);
     }
 
@@ -624,10 +647,29 @@ public:
         return true;
     }
 
+    bool ok() const
+    {
+        for(auto& note : *this) if(!note.isOk()) return false;
+        return true;
+    }
+
+    // Cast to bool
+    operator bool() const
+    {
+        return ok();
+    }
+
     
 };
 
 
+
+inline Notes Note::operator+(const Intervals& intervals) const
+{
+    Notes notes;
+    for(auto& i : intervals) notes.push_back(getNoteAt(i));
+    return std::move(notes);
+}
 
 
 
