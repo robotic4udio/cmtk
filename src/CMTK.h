@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <vector>
 #include <iostream>
 #include <iomanip>
@@ -104,6 +105,18 @@ inline bool removeSubstring(std::string& s, const std::string& sub, bool caseSen
         return true;
     }
     return false;
+}
+
+// Split a string into a vector of strings
+inline std::vector<std::string> split(const std::string& s, char delimiter)
+{
+    std::stringstream ss(s);
+    std::string str;
+    std::vector<std::string> vec;
+    while(std::getline(ss, str, delimiter)) {
+        vec.push_back(str);
+    }
+    return vec;
 }
 
 // Test is a string contains another string
@@ -405,7 +418,7 @@ static std::map<std::string, std::vector<std::string>> MajorNoteMap = {
 };
 
 // An array with the 12 keys
-static const std::vector<std::string> sKeyNames = {"C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"};
+static const std::vector<std::string> KeyNames = {"C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"};
 
 inline static std::string MajorNoteMapAt(std::string key, int index) 
 {
@@ -416,7 +429,7 @@ inline static std::string MajorNoteMapAt(std::string key, int index)
 
 inline const std::string& KeyNameAt(int pitch)
 {
-    return sKeyNames[pitch % 12];
+    return KeyNames[pitch % 12];
 }
 
 inline void simplifyNoteName(std::string& note)

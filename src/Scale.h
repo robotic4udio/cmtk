@@ -14,7 +14,7 @@ namespace cmtk
     public:
         Scale() = default;
 
-        Scale(std::string aName, Note aRootNote = Note("C1"))
+        Scale(std::string aName, Note aRootNote)
         {
             setRoot(aRootNote);
             setScale(aName);
@@ -25,6 +25,12 @@ namespace cmtk
             setRoot(aRootNote);
             setScale(aName);
         }
+
+        Scale(const std::string& aName)
+        {
+            set(aName);
+        }
+
 
         Scale& setRoot(const Note& aRootNote)
         {
@@ -63,6 +69,28 @@ namespace cmtk
             return *this;
         }
 
+        Scale& set(const std::string& s)
+        {
+            // Split the string
+            auto vec = split(s, '-');
+
+            // If only one element - Set the scale and default the root to C
+            if(vec.size() == 1)
+            {
+                setScale(vec[0]);
+                setRoot("C");
+                return *this;
+            }
+            // If two elements - Set the root and scale
+            if(vec.size() >= 2)
+            {
+                setRoot(vec[0]);
+                setScale(vec[1]);
+            }
+
+            return *this;
+        }
+
         // Function to set the scale
         Scale& setScale(std::string aScaleName)
         {
@@ -75,19 +103,6 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3), Interval(4), Interval(5), Interval(6), Interval(7)};
                 mStyle = "Happy,Light,Bright,Positive,Pop,Rock,Jazz,Classical,Happy";
-                // mProgressions.add("Axis"        ,"I|V|vi|IV"  );
-                // mProgressions.add("Axis2"       ,"vi|IV|I|V"  );
-                // mProgressions.add("DooWop"      ,"I|vi|IV|V"  );
-                // mProgressions.add("RedHot2"     ,"I|V|ii|IV"  );
-                // mProgressions.add("RedHot3"     ,"IV|I|V|vi"  );
-                // mProgressions.add("RedHot4"     ,"I|V|vi|IV"  );
-                // mProgressions.add("RoyalRoad"   ,"I|IV|iii|vi");
-                // mProgressions.add("Ghibli"      ,"IV|V|iii|vi");
-                // mProgressions.add("Emotional"   ,"vi|IV|V|iii");
-                // mProgressions.add("MysteryClimb","IV|V|vi"    );
-                // mProgressions.add("Evanescence" ,"I|iii|I|iii");
-                // mProgressions.add("Christiania" ,"I|iii|vi|V|IV|I|ii|V");
-                // mProgressions.add("Love"        ,"I|V|vi|iii|IV|I|ii|V"); // "I|V/7|vi|iii/5|IV|I/3|ii|V"
             }
             // Dorian Mode - Major Scale 2nd Mode {1 2 ♭3 4 5 6 ♭7} - Def:Nat6
             // Riders On The Storm by The Doors, Mad World by Tears for Fears, Scarborough Fair, Woodstock by Joni Mitchell, Blue Jeans by Lana Del Rey, Drive by R.E.M., The "Dorian vamp", Pink Floyd and Dorian
@@ -95,10 +110,6 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6), Interval(7, -1)};
                 mStyle = "Jazzy,Bluesy,Rocky,Sophisticated,Adventurous";
-                // mProgressions.add("PlagelCascade"   ,"i|bIII|bVII|IV");
-                // mProgressions.add("DorianVamp"      ,"i|IV|i|IV");
-                // mProgressions.add("DorianMinorVamp" ,"i|ii|i|ii");
-                // mProgressions.add("Dorian"          ,"i|bVII|bIII|IV"); // What name?
             }
             // Phrygian Mode - Major Scale 3rd Mode {1 ♭2 ♭3 4 5 ♭6 ♭7} - Def:b2
             else if (mName == "Phrygian")
@@ -125,10 +136,6 @@ namespace cmtk
             {
                 mIntervals = {Interval(1), Interval(2), Interval(3, -1), Interval(4), Interval(5), Interval(6, -1), Interval(7, -1)};
                 mStyle = "Sad,Dark,Blues,Jazz,Rock,Metal,Emotional,Sentimental,Serious";
-                // mProgressions.add("Aeolian Vamp"       ,"i|bVII|bVI|bVII");
-                // mProgressions.add("RedHot1"            ,"i|bVII|v|bVI"   );
-                // mProgressions.add("Aeolian Closed Loop","i|bVII|iv|i"    );
-                // mProgressions.add("Aeolian"            ,"i|bVII|bIII|iv" ); // TODO: Try this progression and give a name
 
             }
             // Locrian Mode - Major Scale 7th Mode {1 ♭2 ♭3 4 ♭5 ♭6 ♭7}
@@ -578,9 +585,9 @@ namespace cmtk
             return res;
         }
 
-        static Scale getScale(const Intervals& intervals)
+        static Scale GetScale(const Intervals& intervals)
         {
-            for(auto& scale : getAllScales())
+            for(auto& scale : GetAllScales())
             {
                 if(scale.getIntervals() == intervals)
                 {
@@ -589,7 +596,7 @@ namespace cmtk
             }
 
             // Throw exception if scale not found
-            throw std::runtime_error("Scale::getScale(): Scale not found with intervals: " + intervals.toString());
+            throw std::runtime_error("Scale::GetScale(): Scale not found with intervals: " + intervals.toString());
         }
 
         // Function to get the semi-tones of the scale at given indexes
@@ -764,7 +771,7 @@ namespace cmtk
         }
 
         // Get ChordProgression from a vector of indexes
-        ChordProgression getChordProgression(const std::vector<int> &indexes, int size = 3, bool roman=false)
+        ChordProgression getChordProg(const std::vector<int>& indexes, int size = 3)
         {
             ChordProgression chordProgression;
             for (auto index : indexes)
@@ -776,7 +783,7 @@ namespace cmtk
         }
 
         // Get ChordProgression from a vector of indexes and sizes
-        ChordProgression getChordProgression(const std::vector<int>& indexes, const std::vector<int>& aSize)
+        ChordProgression getChordProg(const std::vector<int>& indexes, const std::vector<int>& aSize)
         {
             ChordProgression chordProgression;
             int i=0;
@@ -787,6 +794,32 @@ namespace cmtk
             }
 
             return std::move(chordProgression);
+        }
+        
+        // Get ChordProgression from a vector of indexes and sizes
+        ChordProgression getChordProg(const std::string& s, int size = 3)
+        {
+            std::vector<int> indexes;
+            for(char c : s)
+            {
+                if(isdigit(c))
+                {
+                    int index = c - '0';
+                    indexes.push_back(index);
+                }
+            }
+            return std::move(getChordProg(indexes,size).setTonic(mRootNote));
+        }
+
+        // Get ChordProgression from a vector of indexes and sizes
+        static ChordProgression GetChordProg(const std::string& s, int size = 3)
+        {
+            auto tokens = split(s, '-');
+            if(tokens.size() == 3)
+            {   
+                return std::move(Scale(tokens[1],tokens[0]).getChordProg(tokens[2],size));
+            }
+            return std::move(ChordProgression());
         }
 
         // Print the chord symbols
@@ -946,7 +979,7 @@ namespace cmtk
             return diatonicity(chordProgression.getNotes().removeOctave());
         }
         
-        static std::vector<Scale> getAllScales(const Note& aRoot = Note("C"))
+        static std::vector<Scale> GetAllScales(const Note& aRoot = Note("C"))
         {
             std::vector<Scale> scales;
             for (auto scaleName : {
@@ -976,12 +1009,12 @@ namespace cmtk
             return std::move(scales);
         }
 
-        static std::vector<Scale> getAllScalesAllKeys()
+        static std::vector<Scale> GetAllScalesAllKeys()
         {
             std::vector<Scale> scales;
-            for(auto& scale : getAllScales())
+            for(auto& scale : GetAllScales())
             {
-                for(auto& root : Notes::allKeys())
+                for(auto& root : Notes::AllKeys())
                 {
                     scale.setRoot(root);
                     scales.push_back(scale);
@@ -990,7 +1023,7 @@ namespace cmtk
             return std::move(scales);
         }
 
-        static std::vector<std::string> getModeNames(std::string s = "Major")
+        static std::vector<std::string> GetModeNames(std::string s = "Major")
         {
             //      Scale Name                       1st Mode                 2nd Mode               3rd Mode                     4th Mode               5th Mode             6th Mode               7th Mode
             if(s == "Major"                ) return {"Ionian"               , "Dorian"             , "Phrygian"                 , "Lydian"             , "Mixolydian"       , "Aeolian"            , "Locrian"                 };
@@ -1009,10 +1042,10 @@ namespace cmtk
         }
 
         // Get the Modes of a scale
-        static std::vector<Scale> getModes(std::string s = "Major", const Note& root = Note("C"))
+        static std::vector<Scale> GetModes(std::string s = "Major", const Note& root = Note("C"))
         {
             std::vector<Scale> modes;
-            for(auto modeName : getModeNames(s))
+            for(auto modeName : GetModeNames(s))
             {
                 modes.push_back(Scale(modeName,root));
             }
@@ -1021,13 +1054,13 @@ namespace cmtk
         }
 
         // Print the names of the modes
-        static void printModeNames(std::string s = "", int size = 3)
+        static void PrintModeNames(std::string s = "", int size = 3)
         {
             if(s.empty()){
                 for(auto scaleName : {
                     "Major", "Harmonic Major", "Harmonic Minor", "Melodic Minor", "Neopolitan Major", "Neopolitan Minor", "Double Harmonic Major", "Persian", "Major Pentatonic", "Blues"
                 }){
-                    printModeNames(scaleName, size);
+                    PrintModeNames(scaleName, size);
                     std::cout << std::endl;
                 }
                 return;
@@ -1036,19 +1069,19 @@ namespace cmtk
             // Print the ModeNames
             int i = 1;
             std::cout << s << " Modes: " << std::endl;
-            for(auto mode : getModeNames(s)){
+            for(auto mode : GetModeNames(s)){
                 std::cout << i++ << ": " << mode << std::endl;
             } 
         }
 
         // Print the modes
-        static void printModes(std::string s = "",  Note root = Note("C"), int size = 3)
+        static void PrintModes(std::string s = "",  Note root = Note("C"), int size = 3)
         {
             if(s.empty()){
                 for(auto scaleName : {
                     "Major", "Harmonic Major", "Harmonic Minor", "Melodic Minor", "Neopolitan Major", "Neopolitan Minor", "Double Harmonic Major", "Major Pentatonic", "Blues"
                 }){
-                    printModes(scaleName, root, size);
+                    PrintModes(scaleName, root, size);
                     std::cout << std::endl;
                 }
                 return;
@@ -1056,43 +1089,43 @@ namespace cmtk
 
             // Print the Modes
             int i = 1;
-            for(auto mode : getModes(s,root)){
+            for(auto mode : GetModes(s,root)){
                 std::cout << s << " Mode " << i++ << ": " << std::endl;
                 mode.print(size);
             } 
 
         }
 
-        static void printAllScales(int size = 3)
+        static void PrintAllScales(int size = 3)
         {
-            for (auto scale : getAllScales())
+            for (auto scale : GetAllScales())
             {
                 scale.print(size);
             }
         }
 
-        static std::vector<Scale> getScalesByBrightness()
+        static std::vector<Scale> GetScalesByBrightness()
         {
-            auto scales = getAllScales();
+            auto scales = GetAllScales();
             std::sort(scales.begin(), scales.end(), [](Scale a, Scale b)
                       { return a.getBrightness() < b.getBrightness(); });
             return std::move(scales);
         }
 
-        static std::vector<Scale> getScalesByDiatonicity(const ChordProgression& chordProgression, const Note& aRoot)
+        static std::vector<Scale> GetScalesByDiatonicity(const ChordProgression& chordProgression, const Note& aRoot)
         {
-            auto scales = getAllScales(aRoot);
+            auto scales = GetAllScales(aRoot);
             std::sort(scales.begin(), scales.end(), [&chordProgression](Scale a, Scale b){ 
                 return a.diatonicity(chordProgression) > b.diatonicity(chordProgression); 
             });
             return std::move(scales);
         }
 
-        static std::vector<Scale> getScalesByDiatonicity(const ChordProgression& chordProgression)
+        static std::vector<Scale> GetScalesByDiatonicity(const ChordProgression& chordProgression)
         {
-            if(chordProgression.getTonic().isOk()) return getScalesByDiatonicity(chordProgression, chordProgression.getTonic());
+            if(chordProgression.getTonic().isOk()) return GetScalesByDiatonicity(chordProgression, chordProgression.getTonic());
 
-            auto scales = getAllScalesAllKeys();
+            auto scales = GetAllScalesAllKeys();
             std::sort(scales.begin(), scales.end(), [&chordProgression](Scale a, Scale b){ 
                 float sad = a.diatonicity(chordProgression);
                 float sbd = b.diatonicity(chordProgression);
@@ -1115,10 +1148,10 @@ namespace cmtk
             return mRootNote.toString(false,false) + "-" + mName;
         }
 
-        static void printScalesByDiatonicity(const ChordProgression& chordProgression, int limit = 7)
+        static void PrintScalesByDiatonicity(const ChordProgression& chordProgression, int limit = 7)
         {
             // Collect all scales sorted by Diatonicity
-            auto scales = getScalesByDiatonicity(chordProgression);
+            auto scales = GetScalesByDiatonicity(chordProgression);
 
             int i=0;
             for (auto scale : scales){
@@ -1128,10 +1161,10 @@ namespace cmtk
             }
         }
 
-        static std::vector<Scale> getDiatonicScales(const Chord& chord, const Note& aTonic)
+        static std::vector<Scale> GetDiatonicScales(const Chord& chord, const Note& aTonic)
         {
             std::vector<Scale> diatonicScales;
-            for (auto scale : getAllScales())
+            for (auto scale : GetAllScales())
             {
                 scale.setRoot(aTonic);
                 if (scale.isDiatonic(chord))
@@ -1143,10 +1176,10 @@ namespace cmtk
             return std::move(diatonicScales);
         }
 
-        static std::vector<Scale> getDiatonicScales(const ChordProgression& chordProgression, const Note& aTonic)
+        static std::vector<Scale> GetDiatonicScales(const ChordProgression& chordProgression, const Note& aTonic)
         {
             std::vector<Scale> diatonicScales;
-            for (auto scale : getAllScales())
+            for (auto scale : GetAllScales())
             {   
                 scale.setRoot(aTonic);
                 if (scale.isDiatonic(chordProgression))
@@ -1159,35 +1192,35 @@ namespace cmtk
         }
         
 
-        static void printDiatonicScales(const Chord& chord, const Note& aTonic, int size = 3)
+        static void PrintDiatonicScales(const Chord& chord, const Note& aTonic, int size = 3)
         {
-            for(const auto& scale : getDiatonicScales(chord,aTonic))
+            for(const auto& scale : GetDiatonicScales(chord,aTonic))
             {
                 scale.print(size);
             }
         }
 
-        static void printDiatonicScales(const Chord& chord, int size = 3)
+        static void PrintDiatonicScales(const Chord& chord, int size = 3)
         {
-            for(const auto& key : Notes::allKeys())
+            for(const auto& key : Notes::AllKeys())
             {
-                printDiatonicScales(chord, key, size);
+                PrintDiatonicScales(chord, key, size);
             }
         }        
 
-        static void printDiatonicScales(const ChordProgression& chordProgression, const Note& aTonic, int size = 3)
+        static void PrintDiatonicScales(const ChordProgression& chordProgression, const Note& aTonic, int size = 3)
         {
-            for(const auto& scale : getDiatonicScales(chordProgression, aTonic))
+            for(const auto& scale : GetDiatonicScales(chordProgression, aTonic))
             {
                 scale.print(size);
             }   
         }
 
-        static void printDiatonicScales(const ChordProgression& chordProgression, int size = 3)
+        static void PrintDiatonicScales(const ChordProgression& chordProgression, int size = 3)
         {
-            for(const auto& key : Notes::allKeys())
+            for(const auto& key : Notes::AllKeys())
             {
-                printDiatonicScales(chordProgression, key, size);
+                PrintDiatonicScales(chordProgression, key, size);
             }
         }
 

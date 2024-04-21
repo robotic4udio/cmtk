@@ -175,7 +175,7 @@ public:
 
         // Print warning if there are still characters left
         if(chordType.size() > 0){
-            std::cerr << "setChord(): Warning: Error parsing chord symbol: " << aChordType << " - Remaining: " << chordType << std::endl;
+            std::cerr << "ChordType::setChord(): Warning: Error parsing chord symbol: " << aChordType << " - Remaining: " << chordType << std::endl;
         }
 
         return *this;
@@ -382,7 +382,7 @@ public:
 
         // Split the string into Note and ChordType
         std::string noteString  = chordSymbol.substr(0,pos);
-        std::string chordString = pos == chordSymbol.npos ? "" : chordSymbol.substr(pos,slashPos-1);
+        std::string chordString = pos == chordSymbol.npos ? "" : chordSymbol.substr(pos,slashPos-pos);
         std::string slashString = slashPos == chordSymbol.npos ? "" : chordSymbol.substr(slashPos+1);
 
         #ifdef CMTK_DEBUG
@@ -397,16 +397,16 @@ public:
         return setChord(noteString,chordString,slashString);
     }
 
-    static Chord newRoman(const std::string& chordSymbol, const Note& aTonic)
+    static Chord NewRoman(const std::string& chordSymbol, const Note& aTonic)
     {
         Chord chord;
         chord.setRoman(chordSymbol,aTonic);
         return std::move(chord);
     }
 
-    static Chord newRoman(const std::string& chordSymbol, const std::string& aTonic)
+    static Chord NewRoman(const std::string& chordSymbol, const std::string& aTonic)
     {
-        return newRoman(chordSymbol,Note(aTonic));
+        return NewRoman(chordSymbol,Note(aTonic));
     }
 
     // Set the Chord from a Roman Chord String 
@@ -423,7 +423,7 @@ public:
         std::string slashString = (spos == romanChordSymbol.npos) ? "" : romanChordSymbol.substr(spos+1);
 
         // Get the root note from the tonic using the roman string
-        const Note& rootNote = aTonic.getNoteAt(Interval::newFromRoman(romanString));
+        const Note& rootNote = aTonic.getNoteAt(Interval::NewFromRoman(romanString));
 
         // Find out if the chordString is minor or major, it is minor is the iv symbols are lowercase
         if(!isRomanMajorSymbol(romanString))
@@ -462,7 +462,7 @@ public:
         // Set Chord if Symbol after slash is Roman
         if(isRomanChordSymbol(slashString))
         {
-            const Note& bassNote = aTonic.getNoteAt(Interval::newFromRoman(slashString));
+            const Note& bassNote = aTonic.getNoteAt(Interval::NewFromRoman(slashString));
             setChord(rootNote,chordType,bassNote);
             return *this;
         }
@@ -784,6 +784,18 @@ public:
         }
     }
 
+    // Constructor to create a chord progression from a string of chord symbols
+    ChordProgression(const std::string& chordSymbols, const std::string& aTonic)
+    {
+        mTonic = Note(aTonic);
+        if(isRomanChordSymbol(chordSymbols)){
+            this->setRoman(chordSymbols,mTonic);
+        }
+        else {
+            this->set(chordSymbols);
+        }
+    }
+
     // Function to set the chord progression from a vector of chords
     ChordProgression& set(const ChordVector& chords)
     {
@@ -807,7 +819,7 @@ public:
         this->clear();
         mTonic = aTonic ? aTonic : Note("C");
         for (int i = 0; i < chordSymbols.size(); i++) {
-            this->push_back(Chord::newRoman(chordSymbols[i], mTonic));
+            this->push_back(Chord::NewRoman(chordSymbols[i], mTonic));
         }
         return *this;
     }
@@ -845,7 +857,7 @@ public:
     // Function to add a Roman chord to the progression
     ChordProgression& addRoman(const std::string& romanChordSymbol, const Note& tonic)
     {
-        ChordVector::push_back(Chord::newRoman(romanChordSymbol, tonic));
+        ChordVector::push_back(Chord::NewRoman(romanChordSymbol, tonic));
         return *this;
     }
 
@@ -1004,41 +1016,80 @@ private:
 
 // Initialize the static member variable sProgressions
 std::map<std::string, ChordProgression> ChordProgression::Map = {
-    {"Time"               , ChordProgression("Am|Em|G|D|CM7|Em|G|D"                         , Note("A"))}, // by Hans Zimmer (Inception)    - Root A, Scale Dorian
-    {"Interstellar"       , ChordProgression("F|G|Am|G|F"                                   , Note("A"))}, // by Hans Zimmer (Interstellar) - Root A, Scale Minor
-    {"Hes A Pirate A"     , ChordProgression("Dm|Bb|Am|Dm|Bb|F|C|Dm|Dm|Gm|Bb|Dm|Bb|Dm|A|A7" , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D, Scale Minor
-    {"Hes A Pirate Bridge", ChordProgression("A|Dm|C|Dm|A|Dm|Gm|A"                          , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D, Scale Minor
-    {"Hes A Pirate B"     , ChordProgression("Dm|Dm|C|Dm|Dm|Dm|C|Dm"                        , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D, Scale Minor
-    {"Hes A Pirate C"     , ChordProgression("Dm|C|F|Bb|F|Am|Dm|Dm|Dm|C|F|Bb|Gm|Bb|Am|A"    , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D, Scale Minor
-    {"Hes A Pirate Chorus", ChordProgression("Dm|Bb|F|C|Gm|Dm|A7|Dm"                        , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D, Scale Minor
-    {"SuperMarioCadence"  , ChordProgression("I|bVI|bVII|I"                                            )},
+//   // Major Progressions
+    {"DooWop"         ,ChordProgression("I|vi|IV|V"                 )},
+    {"Axis"           ,ChordProgression("I|V|vi|IV"                 )},
+    {"Axis2"          ,ChordProgression("vi|IV|I|V"                 )},
+    {"M3425"          ,ChordProgression("iii|IV|ii|V"               )},
+    {"RedHot2"        ,ChordProgression("I|V|ii|IV"                 )},
+    {"RedHot3"        ,ChordProgression("IV|I|V|vi"                 )},
+    {"RedHot4"        ,ChordProgression("I|V|vi|IV"                 )},
+    {"RoyalRoad"      ,ChordProgression("I|IV|iii|vi"               )},
+    {"Japan"          ,ChordProgression("IV|V|iii|vi"               )},
+    {"Emotional"      ,ChordProgression("vi|IV|V|iii"               )},
+    {"MysteryClimb"   ,ChordProgression("IV|V|vi"                   )},
+    {"Evanescence"    ,ChordProgression("I|iii|I|iii"               )},
+    {"Christiania"    ,ChordProgression("I|iii|vi|V|IV|I|ii|V"      )},
+    {"Love"           ,ChordProgression("I|V/7|vi|iii/5|IV|I/3|ii|V")},
+    {"Canon"          ,ChordProgression("D|A|Bm|F#m|G|D|G|A7","D")},
+    {"Major 5ths"     ,ChordProgression("Am7|Dm7|G7|CM7|FM7|Bm7b5|Em7|Am", Note("C"))},
+
+
+    {"KissFromARose"     ,ChordProgression("bVI|bVII|I"                )}, // Aeolian (Major 1 Chord)
+    {"SuperMarioCadence" ,ChordProgression("I|bVI|bVII|I"              )}, // Aeolian (Major 1 Chord)
+
+    // Minor Progressions
+    {"JonnyMinor1"    ,ChordProgression("Am|Dm|B°|E"  ,Note("A"))}, // Harmonic Minor
+    {"JonnyMinor2"    ,ChordProgression("Am|F|C|G"    ,Note("A"))}, // Natural Minor
+    {"JonnyMinor3"    ,ChordProgression("Am|C|D|E"    ,Note("A"))}, 
+    {"JonnyMinor3"    ,ChordProgression("Am|Em|G|D"   ,Note("A"))}, 
+    {"Andalusian"     ,ChordProgression("i|bVII|bVI|V"          )}, // Aeolian (Major 5th Chord)
+    {"Interstellar"   ,ChordProgression("F|G|Am|G|F"  ,Note("A"))}, // by Hans Zimmer (Interstellar) - Root A, Scale Minor
+
+    // Aeolian Progressions
+    {"AeolianCascade" ,ChordProgression("i|bIII|bVII|iv"        )},
+    {"AeolianVamp"    ,ChordProgression("i|bVII|bVI|bVII"       )},
+
+    // Dorian Progressions
+    {"PlagelCascade"  ,ChordProgression("i|bIII|bVII|IV")},
+    {"DorianVamp"     ,ChordProgression("i|IV|i|IV")},
+    {"DorianVamp2"    ,ChordProgression("i|ii|i|ii")},
+    {"Dorian1374"     ,ChordProgression("i|bVII|bIII|IV")},
+    {"Time"           ,ChordProgression("Am|Em|G|D|CM7|Em|G|D", Note("A"))}, // by Hans Zimmer (Inception) - Root A, Scale Dorian
+    {"UptownFunk"     ,ChordProgression("Dm7|G7"              , Note("D"))}, // Bruno Mars: Uptown Funk (DorianVamp) - https://tabs.ultimate-guitar.com/tab/bruno-mars/uptown-funk-chords-1710737 
+
+    // Mixolydian
+    {"MixolydianVamp"     ,ChordProgression("I|bVII|IV|I"               )},
+
+    // Mixolydian b6
+    {"PrincessLeia"       ,ChordProgression("I|iv6")}, // Mixolydian b6, Harmonic Major
+
+    // Progressions Named by the Song they are taken from
+    {"Hes A Pirate A"     , ChordProgression("Dm|Bb|Am|Dm|Bb|F|C|Dm|Dm|Gm|Bb|Dm|Bb|Dm|A|A7" , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
+    {"Hes A Pirate Bridge", ChordProgression("A|Dm|C|Dm|A|Dm|Gm|A"                          , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
+    {"Hes A Pirate B"     , ChordProgression("Dm|Dm|C|Dm|Dm|Dm|C|Dm"                        , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
+    {"Hes A Pirate C"     , ChordProgression("Dm|C|F|Bb|F|Am|Dm|Dm|Dm|C|F|Bb|Gm|Bb|Am|A"    , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
+    {"Hes A Pirate Chorus", ChordProgression("Dm|Bb|F|C|Gm|Dm|A7|Dm"                        , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
     // https://www.youtube.com/watch?v=WbRtz5Trnbo
-    {"Ghibli2"            , ChordProgression("Cm|D7|Gm|Fm6/D,Bb7|EbM7|F/Eb|Dm|Gm|Em7b5|A7|Dm7|C|Bb|A|D7")}, // Joe Hisaishi - Studio Ghibli
-    {"Spirited Away"      , ChordProgression("Gb|Ab|Db|Bbm")}, // Joe Hisaishi - Studio Ghibli Db Major
-    {"Circle5th"          , ChordProgression("Am7|Dm7|G7|CM7|FM7|Bm7b5|E7|Am", Note("C") )},
-    {"Ghibli2"            , ChordProgression("AbM7|Eb/G",Note("C"))}, // Use C-Minor Pentatonic Scale over this
-    {"Canon"              , ChordProgression("D|A|Bm|F#m|G|D|G|A7",Note("D"))},
-//     {"2-5-1"              , ChordProgression("ii7|V7|I7"                 )},
-//     {"Axis"               , ChordProgression("I|V|vi|iv"                 )},
-//     {"Axis2"              , ChordProgression("vi|IV|I|V"                 )},
-//     {"Andalusian"         , ChordProgression("i|bVII|bVI|V"              )},
-     {"AeolianVamp"        , ChordProgression("i|bVII|bVI|bVII"           )},
-//     {"DooWop"             , ChordProgression("I|vi|IV|V"                 )},
-//     {"MixolydianVamp"     , ChordProgression("I|bVII|IV|I"               )},
-//     {"PlagelCascade"      , ChordProgression("i|bIII|bVII|IV"            )},
-//     {"RedHot1"            , ChordProgression("i|bVII|v|bVI"              )},
-//     {"RedHot2"            , ChordProgression("I|V|ii|IV"                 )},
-//     {"RedHot3"            , ChordProgression("IV|I|V|vi"                 )},
-//     {"RedHot4"            , ChordProgression("I|V|vi|IV"                 )},
-//     {"RoyalRoad"          , ChordProgression("I|IV|iii|vi"               )},
-//     {"KissFromARose"      , ChordProgression("bVI|bVII|I"                )},
-     {"AugmentedClimb"     , ChordProgression("I|I+|I6no5|I7no5|IV"       )},
-//     {"LastNightOnEarth"   , ChordProgression("I|I+|I6no5|I7no5|IV|iv|I|I")},
-//     {"Ghibli"             , ChordProgression("IV|V|iii|vi"               )},
-//     {"ClapHands"          , ChordProgression("Bm|G7"),Note("B")} // Tom Waits: ClapHands - https://tabs.ultimate-guitar.com/tab/tom-waits/clap-hands-chords-876967
-       {"LayLadyLayA1"       , ChordProgression("A|C#m|G|Bm", Note("A"))}, // Johnny Cash: Hurt - https://tabs.ultimate-guitar.com/tab/johnny-cash/hurt-chords-108013
-       {"LayLadyLayA2"       , ChordProgression("E|F#m|A|A" , Note("A"))}, // Johnny Cash: Hurt - https://tabs.ultimate-guitar.com/tab/johnny-cash/hurt-chords-108013
+    {"Ghibli Marry"       , ChordProgression("Cm|D7|Gm|Fm6/D,Bb7|EbM7|F/Eb|Dm|Gm|Em7b5|A7|Dm7|C|Bb|A|D7")}, // Joe Hisaishi - Studio Ghibli
+    {"Ghibli Spirited"    , ChordProgression("Gb|Ab|Db|Bbm", Note("Db"))}, // Joe Hisaishi - Studio Ghibli Db Major
+    {"Ghibli3"            , ChordProgression("AbM7|Eb/G",Note("C"))}, // Use C-Minor Pentatonic Scale over this 
+    {"2-5-1"              , ChordProgression("ii7|V7|I7"                 )},
+    {"AugmentedClimb"     , ChordProgression("I|I+|I6no5|I7no5|IV"       )},
+    {"LastNightOnEarth"   , ChordProgression("I|I+|I6no5|I7no5|IV|iv|I|I")},
+    {"ClapHands"          , ChordProgression("Bm|G7","B")}, // Tom Waits: ClapHands - https://tabs.ultimate-guitar.com/tab/tom-waits/clap-hands-chords-876967
+    {"LayLadyLayA1"       , ChordProgression("A|C#m|G|Bm", Note("A"))}, // Johnny Cash: Hurt - https://tabs.ultimate-guitar.com/tab/johnny-cash/hurt-chords-108013
+    {"LayLadyLayA2"       , ChordProgression("E|F#m|A|A" , Note("A"))}, // Johnny Cash: Hurt - https://tabs.ultimate-guitar.com/tab/johnny-cash/hurt-chords-108013
+    {"Creep"              , ChordProgression("I|III|IV|iv","G")}, // Radiohead: Creep - Original Key G
+    {"LayLadyLayA2"       , ChordProgression("E|F#m|A|A"                , "A")}, // Hello by Adele https://www.youtube.com/watch?v=rQXendWErCA
+    {"Hello Verse"        , ChordProgression("Fm|Ab|Eb|Db"              , "F")},
+    {"Hello PreChorus"    , ChordProgression("Fm|Eb|Cm|Db|Fm|Eb|Db|Db"  , "F")},
+    {"Hello Chorus"       , ChordProgression("Fm|Db|Ab|Eb"              , "F")},
+    {"Hello Bridge"       , ChordProgression("Fm|Db|Eb|Ab"              , "F")},
+
+
 };
+
 
 
 
@@ -1117,24 +1168,6 @@ public:
     // Function to create the chord progressions
     void createChordProgressions()
     {
-        // Major Chord Progressions
-        chordProgressions["2-5-1"]               = ChordProgression("ii7|V7|I7");   
-        chordProgressions["Axis"]                = ChordProgression("I|V|vi|iv");    // Added to Scale
-        chordProgressions["Axis2"]               = ChordProgression("vi|IV|I|V");    // Added to Scale
-        chordProgressions["Andalusian"]          = ChordProgression("i|bVII|bVI|V");
-        chordProgressions["AeolianVamp"]         = ChordProgression("i|bVII|bVI|bVII"); // Added to Scale
-        chordProgressions["DooWop"]              = ChordProgression("I|vi|IV|V");    // Added to Scale
-        chordProgressions["MixolydianVamp"]      = ChordProgression("I|bVII|IV|I");  // Added to Scale
-        chordProgressions["PlagelCascade"]       = ChordProgression("i|bIII|bVII|IV"); // Added to Dorian
-        chordProgressions["RedHot1"]             = ChordProgression("i|bVII|v|bVI");   // Added to Aeolian
-        chordProgressions["RedHot2"]             = ChordProgression("I|V|ii|IV");      // Added to Major
-        chordProgressions["RedHot3"]             = ChordProgression("IV|I|V|vi");      // Added to Major
-        chordProgressions["RedHot4"]             = ChordProgression("I|V|vi|IV");      // Added to Major
-        chordProgressions["RoyalRoad"]           = ChordProgression("I|IV|iii|vi");    // Added to Major & Ionian #2
-        chordProgressions["KissFromARose"]       = ChordProgression("bVI|bVII|I");     
-        chordProgressions["AugmentedClimb"]      = ChordProgression("I|I+|I6no5|I7no5|IV");
-        chordProgressions["LastNightOnEarth"]    = ChordProgression("I|I+|I6no5|I7no5|IV|iv|I|I");
-        chordProgressions["Ghibli"]              = ChordProgression("IV|V|iii|vi");  // Added to Major
         // Sad Chord Progressions from https://www.pianote.com/blog/sad-chord-progressions/
         chordProgressions["PopProgression"]      = ChordProgression("vi|IV|I|V");
         chordProgressions["HarmonicMinorAxis"]   = ChordProgression("vi|IV|I|bIII");  // Check this progression - Not Harmonic minor

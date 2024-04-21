@@ -23,7 +23,7 @@ public:
         set(degree, quality);
     }
 
-    static Interval newFromSemi(int semitones, bool sharp=false)
+    static Interval NewFromSemi(int semitones, bool sharp=false)
     {
         Interval res;
         res.setFromSemi(semitones,sharp);
@@ -140,7 +140,7 @@ public:
     // Function to return inverted interval
     Interval getInverted()
     {
-        auto inverted = Interval::newFromSemi(12-mSemitones);
+        auto inverted = Interval::NewFromSemi(12-mSemitones);
         while(inverted.getDegree() < 1) inverted.shiftOctave(1);
         return std::move(inverted);
     }
@@ -302,13 +302,13 @@ public:
     // operator+ for Interval
     Interval operator+(const Interval& other) const
     {
-        return Interval::newFromSemi(mSemitones + other.mSemitones);
+        return Interval::NewFromSemi(mSemitones + other.mSemitones);
     }
 
     // operator+ for Semitones
     Interval operator+(int n) const
     {
-        return Interval::newFromSemi(mSemitones + n);
+        return Interval::NewFromSemi(mSemitones + n);
     }
 
     // operator+= for Interval
@@ -397,7 +397,7 @@ public:
     Interval getNegativeHarmonic() const
     {
         // This will mirror on the Major <--> Minor axis
-        return std::move(Interval::newFromSemi(7-mSemitones));
+        return std::move(Interval::NewFromSemi(7-mSemitones));
     }
 
     // Function to convert the interval to the negative harmonic by mirroring on the Major <--> Minor axis
@@ -417,7 +417,7 @@ public:
 
     // ----------------------------- Support for Roman Numerals ----------------------------- //
     // Create a new Interval from a Roman Numeral
-    static Interval newFromRoman(std::string roman)
+    static Interval NewFromRoman(std::string roman)
     {
         Interval res;
         res.setRoman(roman);
@@ -639,21 +639,21 @@ public:
 
     Intervals& add(std::string str)
     {
-        for(auto& interval : fromString(str)){ add(interval); }
+        for(auto& interval : FromString(str)){ add(interval); }
         return *this;
     }
 
     // Add semitone
     Intervals& addSemi(int semi, bool sharp=false)
     {
-        add(Interval::newFromSemi(semi,sharp));
+        add(Interval::NewFromSemi(semi,sharp));
         return *this;
     }
 
     // Add semitones
     Intervals& addSemi(std::vector<int> semi, bool sharp=false)
     {
-        for(auto s : semi) add(Interval::newFromSemi(s,sharp));
+        for(auto s : semi) add(Interval::NewFromSemi(s,sharp));
         return *this;
     }
 
@@ -753,7 +753,7 @@ public:
     {
         bool changed = false;
 
-        for(auto& interval : fromString(str))
+        for(auto& interval : FromString(str))
         {
             if(remove(interval)) changed = true;
         }
@@ -774,7 +774,7 @@ public:
     }
 
     // Convert a string to a Intervals object
-    static Intervals fromString(std::string str)
+    static Intervals FromString(std::string str)
     {
         // Replace double spaces with single spaces
         str.erase(std::unique(str.begin(), str.end(), [](char a, char b){ return a == ' ' && b == ' '; }), str.end());
@@ -852,7 +852,7 @@ public:
     // Test if an interval is present
     const bool contains(const std::string& yes) const
     {
-        for(const auto& interval : fromString(yes))
+        for(const auto& interval : FromString(yes))
         {
             if(!contains(interval)) return false;
         }
@@ -862,7 +862,7 @@ public:
     // Test if an interval is not present
     const bool containsNot(const std::string& no) const
     {
-        for(const auto& interval : fromString(no))
+        for(const auto& interval : FromString(no))
         {
             if(contains(interval)) return false;
         }
@@ -964,7 +964,7 @@ public:
     }
 
     // Create a new Intervals object from the semitones 
-    static Intervals newFromSemi(std::vector<int> semitones, bool normalize=false)
+    static Intervals NewFromSemi(std::vector<int> semitones, bool normalize=false)
     {
         Intervals res;
         res.setFromSemi(semitones, normalize);
@@ -1092,7 +1092,7 @@ public:
         Intervals res;
         for(auto s : getSemiNormalized())
         {
-            res.add(Interval::newFromSemi(s));
+            res.add(Interval::NewFromSemi(s));
         }
         return std::move(res);
     }

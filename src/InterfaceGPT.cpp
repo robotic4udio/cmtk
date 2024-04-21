@@ -44,7 +44,7 @@ std::string InterfaceGPT::sendPrompt(std::string prompt, std::string API_KEY, st
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
         // Set the write function
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteFunction);
 
         // Set the response
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
@@ -68,7 +68,7 @@ std::string InterfaceGPT::sendPrompt(std::string prompt, std::string API_KEY, st
 }
 
 // Write function
-size_t InterfaceGPT::writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data)
+size_t InterfaceGPT::WriteFunction(void *ptr, size_t size, size_t nmemb, std::string *data)
 {
     // Append the data to the string
     data->append((char *)ptr, size * nmemb);
@@ -107,7 +107,7 @@ std::string InterfaceGPT::generateMusic(std::string prompt, std::string API_KEY,
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
 
         // Set the write function
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteFunction);
 
         // Set the response
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);

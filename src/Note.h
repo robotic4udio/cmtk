@@ -117,7 +117,7 @@ public:
     // Set from a Roman Chord Symbol with respect to its RootNote
     Note& setRoman(std::string aRomanChordString, const Note& aRootNote)
     {
-        set(aRootNote, Interval::newFromRoman(aRomanChordString));
+        set(aRootNote, Interval::NewFromRoman(aRomanChordString));
         return *this;
     }
 
@@ -349,7 +349,7 @@ public:
     Interval getIntervalTo(const Note& otherNote) const
     {
         int semitones = otherNote.getPitch() - getPitch();
-        return Interval::newFromSemi(semitones);
+        return Interval::NewFromSemi(semitones);
     }
 
     std::vector<Note> getNoteAt(const Intervals& interval) const
@@ -600,10 +600,10 @@ public:
     }
 
     // Get Vector of N
-    static Notes allKeys()
+    static Notes AllKeys()
     {
         Notes notes;
-        for(auto& s : sKeyNames) notes.push_back(Note(s));
+        for(auto& s : KeyNames) notes.push_back(Note(s));
         return std::move(notes);
     }
 

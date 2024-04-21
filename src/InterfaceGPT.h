@@ -25,7 +25,7 @@ public:
     std::string generateMusic(std::string prompt, std::string API_KEY, std::string model = "gpt-3.5-turbo");
 
     // Write function
-    static size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string *data);
+    static size_t WriteFunction(void *ptr, size_t size, size_t nmemb, std::string *data);
 
 private:
 
