@@ -977,396 +977,396 @@ void Intervals::setFromSemi(std::vector<int> semitones, bool normalize)
     }
 }
 
-    std::string Intervals::getChordSymbol()
-    {   
-        auto intervals = this->getNormalized();
-        std::string chordSymbol = "";
-        bool maj = false;
-        std::string toAppend = "";
+std::string Intervals::getChordSymbol()
+{   
+    auto intervals = this->getNormalized();
+    std::string chordSymbol = "";
+    bool maj = false;
+    std::string toAppend = "";
 
-        if     (intervals.contains("3 b7", "#5 b6")){ chordSymbol = "dom"  ; intervals.remove("3")           ; }
-        else if(intervals.contains("3 #5", "b3 5" )){ chordSymbol = "aug"  ; intervals.remove("3")           ; }
-        else if(intervals.contains("b3 b5","3 5"  )){ chordSymbol = "dim"  ; intervals.remove("b3")          ; }
-        else if(intervals.contains("3"            )){ chordSymbol = "maj"  ; intervals.remove("3"); maj=true ; }
-        else if(intervals.contains("b3"           )){ chordSymbol = "min"  ; intervals.remove("b3")          ; }
-        else if(intervals.contains("2 5"          )){ chordSymbol = "sus2" ; intervals.remove("2")           ; }
-        else if(intervals.contains("4 5"          )){ chordSymbol = "sus4" ; intervals.remove("4")           ; }
-        else if(intervals.contains("5"            )){ chordSymbol = "5"    ;                                 ; }
+    if     (intervals.contains("3 b7", "#5 b6")){ chordSymbol = "dom"  ; intervals.remove("3")           ; }
+    else if(intervals.contains("3 #5", "b3 5" )){ chordSymbol = "aug"  ; intervals.remove("3")           ; }
+    else if(intervals.contains("b3 b5","3 5"  )){ chordSymbol = "dim"  ; intervals.remove("b3")          ; }
+    else if(intervals.contains("3"            )){ chordSymbol = "maj"  ; intervals.remove("3"); maj=true ; }
+    else if(intervals.contains("b3"           )){ chordSymbol = "min"  ; intervals.remove("b3")          ; }
+    else if(intervals.contains("2 5"          )){ chordSymbol = "sus2" ; intervals.remove("2")           ; }
+    else if(intervals.contains("4 5"          )){ chordSymbol = "sus4" ; intervals.remove("4")           ; }
+    else if(intervals.contains("5"            )){ chordSymbol = "5"    ;                                 ; }
 
-        // Add Extension
-        if     (intervals.contains("b7 9 11 13"  )){ chordSymbol += "13"      ; intervals.remove("b7 9 11 13"   );  }
-        else if(intervals.contains("b7 b9 11 13" )){ chordSymbol += "13 b9"   ; intervals.remove("b7 b9 11 13"  );  }
-        else if(intervals.contains("b7 9 b11 13" )){ chordSymbol += "13 b11"  ; intervals.remove("b7 9 b11 13"  );  }
-        else if(intervals.contains("b7 b9 b11 13")){ chordSymbol += "13 b9b11"; intervals.remove("b7 b9 b11 13" );  }
-        else if(intervals.contains("b7 9 11"     )){ chordSymbol += "11"      ; intervals.remove("b7 9 11" );  }
-        else if(intervals.contains("b7 b9 11"    )){ chordSymbol += "11 b9"   ; intervals.remove("b7 b9 11");  }
-        else if(intervals.contains("b7 9"        )){ chordSymbol += "9"       ; intervals.remove("b7 9" );  }
-        else if(intervals.contains("b7"          )){ chordSymbol += "7"       ; intervals.remove("b7" );  }
-        else if(intervals.contains("7 9 11 13"   )){ chordSymbol += maj ? "13" : "Maj13" ; intervals.remove("7 9 11 13" );  }
-        else if(intervals.contains("7 b9 11 13"  )){ chordSymbol += maj ? "13 b9" : "Maj13 b9" ; intervals.remove("7 b9 11 13" );  }
-        else if(intervals.contains("7 9 b11 13"  )){ chordSymbol += maj ? "13 b11" : "Maj13 b11" ; intervals.remove("7 9 b11 13" );  }
-        else if(intervals.contains("7 b9 b11 13" )){ chordSymbol += maj ? "13 b9b11" : "Maj13 b9b11" ; intervals.remove("7 b9 b11 13" );  }
-        else if(intervals.contains("7 9 11"      )){ chordSymbol += maj ? "11" : "Maj11" ; intervals.remove("7 9 11" );  }
-        else if(intervals.contains("7 b9 11"     )){ chordSymbol += maj ? "11 b9" : "Maj11 b9" ; intervals.remove("7 9 11" );  }
-        else if(intervals.contains("7 9"         )){ chordSymbol += maj ? "9"  : "Maj9"  ; intervals.remove("7 9" );  }
-        else if(intervals.contains("7"           )){ chordSymbol += maj ? "7"  : "Maj7"  ; intervals.remove("7" );  }
+    // Add Extension
+    if     (intervals.contains("b7 9 11 13"  )){ chordSymbol += "13"      ; intervals.remove("b7 9 11 13"   );  }
+    else if(intervals.contains("b7 b9 11 13" )){ chordSymbol += "13 b9"   ; intervals.remove("b7 b9 11 13"  );  }
+    else if(intervals.contains("b7 9 b11 13" )){ chordSymbol += "13 b11"  ; intervals.remove("b7 9 b11 13"  );  }
+    else if(intervals.contains("b7 b9 b11 13")){ chordSymbol += "13 b9b11"; intervals.remove("b7 b9 b11 13" );  }
+    else if(intervals.contains("b7 9 11"     )){ chordSymbol += "11"      ; intervals.remove("b7 9 11" );  }
+    else if(intervals.contains("b7 b9 11"    )){ chordSymbol += "11 b9"   ; intervals.remove("b7 b9 11");  }
+    else if(intervals.contains("b7 9"        )){ chordSymbol += "9"       ; intervals.remove("b7 9" );  }
+    else if(intervals.contains("b7"          )){ chordSymbol += "7"       ; intervals.remove("b7" );  }
+    else if(intervals.contains("7 9 11 13"   )){ chordSymbol += maj ? "13" : "Maj13" ; intervals.remove("7 9 11 13" );  }
+    else if(intervals.contains("7 b9 11 13"  )){ chordSymbol += maj ? "13 b9" : "Maj13 b9" ; intervals.remove("7 b9 11 13" );  }
+    else if(intervals.contains("7 9 b11 13"  )){ chordSymbol += maj ? "13 b11" : "Maj13 b11" ; intervals.remove("7 9 b11 13" );  }
+    else if(intervals.contains("7 b9 b11 13" )){ chordSymbol += maj ? "13 b9b11" : "Maj13 b9b11" ; intervals.remove("7 b9 b11 13" );  }
+    else if(intervals.contains("7 9 11"      )){ chordSymbol += maj ? "11" : "Maj11" ; intervals.remove("7 9 11" );  }
+    else if(intervals.contains("7 b9 11"     )){ chordSymbol += maj ? "11 b9" : "Maj11 b9" ; intervals.remove("7 9 11" );  }
+    else if(intervals.contains("7 9"         )){ chordSymbol += maj ? "9"  : "Maj9"  ; intervals.remove("7 9" );  }
+    else if(intervals.contains("7"           )){ chordSymbol += maj ? "7"  : "Maj7"  ; intervals.remove("7" );  }
 
-        // Check if the 5 is present
-        if     (intervals.contains("b3" )){ chordSymbol += " b3"    ; intervals.remove("b3"  );  }
-        else if(intervals.contains("#3" )){ chordSymbol += " #3"    ; intervals.remove("#3"  );  }
+    // Check if the 5 is present
+    if     (intervals.contains("b3" )){ chordSymbol += " b3"    ; intervals.remove("b3"  );  }
+    else if(intervals.contains("#3" )){ chordSymbol += " #3"    ; intervals.remove("#3"  );  }
 
-        if     (intervals.contains("b5" )){ chordSymbol += " b5"    ;                            }
-        else if(intervals.contains("#5" )){ chordSymbol += " #5"    ;                            }
+    if     (intervals.contains("b5" )){ chordSymbol += " b5"    ;                            }
+    else if(intervals.contains("#5" )){ chordSymbol += " #5"    ;                            }
 
-        if     (intervals.contains("b7" )){ chordSymbol += " b7"    ; intervals.remove("b7"  );  }
-        else if(intervals.contains("#7" )){ chordSymbol += " #7"    ; intervals.remove("#7"  );  }
+    if     (intervals.contains("b7" )){ chordSymbol += " b7"    ; intervals.remove("b7"  );  }
+    else if(intervals.contains("#7" )){ chordSymbol += " #7"    ; intervals.remove("#7"  );  }
 
-        if     (intervals.contains("b9" )){ chordSymbol += " b9"    ; intervals.remove("b9"  );  }
-        else if(intervals.contains("#9" )){ chordSymbol += " #9"    ; intervals.remove("#9"  );  }
+    if     (intervals.contains("b9" )){ chordSymbol += " b9"    ; intervals.remove("b9"  );  }
+    else if(intervals.contains("#9" )){ chordSymbol += " #9"    ; intervals.remove("#9"  );  }
 
-        if     (intervals.contains("b11")){ chordSymbol += " b11"   ; intervals.remove("b11" );  }
-        else if(intervals.contains("#11")){ chordSymbol += " #11"   ; intervals.remove("#11" );  }
+    if     (intervals.contains("b11")){ chordSymbol += " b11"   ; intervals.remove("b11" );  }
+    else if(intervals.contains("#11")){ chordSymbol += " #11"   ; intervals.remove("#11" );  }
 
-        if     (intervals.contains("b13")){ chordSymbol += " b13"   ; intervals.remove("b13" );  }
-        else if(intervals.contains("#13")){ chordSymbol += " #13"   ; intervals.remove("#13" );  }
-
-
-        // Check for no 3rd or 5th
-        if(!intervals.containsDegree(1)) chordSymbol += " no1";
-        else intervals.removeDegree(1);
-
-        //if(!intervals.containsDegree(5)) chordSymbol += " no5";
-        //else intervals.removeDegree(5);
+    if     (intervals.contains("b13")){ chordSymbol += " b13"   ; intervals.remove("b13" );  }
+    else if(intervals.contains("#13")){ chordSymbol += " #13"   ; intervals.remove("#13" );  }
 
 
-        // Check added notes - Naturals
-        std::vector<std::string> addedNotes = {
-            "b2" , "2" , "#2" , 
-            "b3" , "3" , "#3" ,
-            "b4" , "4" , "#4" ,
-            "b5" , "5" , "#5" ,
-            "b6" , "6" , "#6" ,
-            "b7" , "7" , "#7" ,
-            "b9" , "9" , "#9" ,
-            "b11", "11", "#11",
-            "b13", "13", "#13",
-        };
-            
-        for(const auto& note : addedNotes){
-            if(intervals.contains(note)){
-                chordSymbol += " add" + note;
-                intervals.remove(note);
-            }
+    // Check for no 3rd or 5th
+    if(!intervals.containsDegree(1)) chordSymbol += " no1";
+    else intervals.removeDegree(1);
+
+    //if(!intervals.containsDegree(5)) chordSymbol += " no5";
+    //else intervals.removeDegree(5);
+
+
+    // Check added notes - Naturals
+    std::vector<std::string> addedNotes = {
+        "b2" , "2" , "#2" , 
+        "b3" , "3" , "#3" ,
+        "b4" , "4" , "#4" ,
+        "b5" , "5" , "#5" ,
+        "b6" , "6" , "#6" ,
+        "b7" , "7" , "#7" ,
+        "b9" , "9" , "#9" ,
+        "b11", "11", "#11",
+        "b13", "13", "#13",
+    };
+        
+    for(const auto& note : addedNotes){
+        if(intervals.contains(note)){
+            chordSymbol += " add" + note;
+            intervals.remove(note);
         }
-
-        return chordSymbol;
     }
 
-    // Print the ChordSymbol
-    Intervals& Intervals::printChordSymbol()
+    return chordSymbol;
+}
+
+// Print the ChordSymbol
+Intervals& Intervals::printChordSymbol()
+{
+    std::cout << "Chord Symbol: " << getChordSymbol() << std::endl;
+    return *this;
+}
+
+// Function to get the Intervals normalized
+Intervals Intervals::getNormalized()
+{
+    Intervals res;
+    for(auto s : getSemiNormalized())
     {
-        std::cout << "Chord Symbol: " << getChordSymbol() << std::endl;
-        return *this;
+        res.add(Interval::NewFromSemi(s));
+    }
+    return std::move(res);
+}
+
+// Normalize the Intervals
+Intervals& Intervals::normalize()
+{
+    setFromSemi(getSemiNormalized());
+    return *this;
+}
+
+// Simplify
+Intervals& Intervals::simplify()
+{
+    for(auto& interval : *this)
+    {
+        interval.simplify();
     }
 
-    // Function to get the Intervals normalized
-    Intervals Intervals::getNormalized()
+    removeDuplicates();
+
+    return *this;
+}
+
+// Remove Duplicate Intervals
+Intervals& Intervals::removeDuplicates()
+{
+    std::sort(IntervalVector::begin(), IntervalVector::end());
+    IntervalVector::erase(std::unique(IntervalVector::begin(), IntervalVector::end()), IntervalVector::end());
+    return *this;
+}
+
+// Get negative harmonic 
+Intervals Intervals::getNegativeHarmonic()
+{
+    Intervals res;
+    for(auto& interval : *this)
     {
-        Intervals res;
-        for(auto s : getSemiNormalized())
+        res.add(interval.getNegativeHarmonic());
+    }
+    // Sort the intervals
+    res.sort();
+
+    return std::move(res);
+}
+
+// Convert to Negative Harmonic by mirroring on the Major <--> Minor axis
+Intervals& Intervals::harmonicNeg()
+{
+    for(auto& interval : *this) interval.harmonicNeg();
+    return *this;
+}
+
+// Transpose this
+Intervals& Intervals::transpose(int semitones)
+{
+    for(auto& interval : *this)
+    {
+        interval.transpose(semitones);
+    }
+    return *this;
+}
+
+// Return a new transposed Intervals object
+Intervals Intervals::getTransposed(int n)
+{
+    auto res = *this;
+    res.transpose(n);
+    return std::move(res);
+}
+
+// Get Interval from Degree
+Interval Intervals::getIntervalFromDegree(int degree)
+{
+    for(auto& interval : *this)
+    {
+        if(interval.getDegree() == degree) return interval;
+    }
+    // Print error message
+    std::cerr << "Error: getIntervalFromDegree(): Degree not found" << std::endl;
+
+    // Return an empty interval
+    return Interval(degree);
+}
+
+// Get a specific inversion
+Intervals Intervals::getInversion(int n, bool normalize) const
+{
+    auto intervals = *this;
+    if(n > 0){ 
+        for(int i=0; i<n; i++){
+            intervals.rotate(1);
+            intervals.back().shiftOctave(1);
+            intervals.sort();
+        }
+    }
+    else if(n < 0){
+        for(int i=0; i<-n; i++){
+            intervals.rotate(-1);
+            intervals.front().shiftOctave(-1);
+            intervals.sort();
+        }
+    }
+    if(normalize) intervals.normalize();
+    return std::move(intervals);
+}
+
+// Create a vector with all inversions
+std::vector<Intervals> Intervals::getAllInversions(bool simplify, bool normalize) const
+{
+    auto intervals = *this;
+    if(simplify) intervals.simplify();
+    std::vector<Intervals> inversions;
+    for(int i=0; i<intervals.size(); i++) {
+        intervals.sort();
+        inversions.push_back(intervals);
+        if(normalize) inversions.back().normalize();
+        intervals.front().shiftOctave(1);
+        intervals.rotate(1);
+        // If the first interval is above 12 then subtract 12 from all intervals
+        if(intervals.front().getSemi() >= 12) intervals.shiftOctave(-1);
+    }
+
+    // Remove duplicates
+    inversions.erase(std::unique(inversions.begin(), inversions.end()), inversions.end());
+
+    return std::move(inversions);
+}
+
+// Print all inversions
+void Intervals::printAllInversions(bool simplify, bool normalize) const
+{
+    auto inversions = getAllInversions(simplify,normalize);
+    for(auto& inversion : inversions)
+    {
+        inversion.printSemi();
+    }
+}
+
+// Shift the intervals a number of octaves
+Intervals& Intervals::shiftOctave(int n)
+{  
+    auto it = IntervalVector::begin();
+    while(it != IntervalVector::end())
+    {
+        it->shiftOctave(n);
+        it++;
+    }
+
+    return *this;
+}
+
+// Print the intervals as whole and half steps. 
+// This is often used as scale signature. The method getSemiSteps is probably more interesting
+const std::string Intervals::getWH() const
+{   
+    auto intervals = this->getSemi();
+    intervals.push_back(intervals[0] + 12);
+
+    // Get a vector with the diff between the intervals
+    std::string result = "";
+    for (int i = 1; i < intervals.size(); i++)
+    {
+        auto diff = intervals[i] - intervals[i-1];
+        if(diff % 2 == 0) // If the diff is even
         {
-            res.add(Interval::NewFromSemi(s));
+            int x = diff / 2;
+            result += x == 1 ? "W-" : std::to_string(x) + "W-";
         }
-        return std::move(res);
-    }
-
-    // Normalize the Intervals
-    Intervals& Intervals::normalize()
-    {
-        setFromSemi(getSemiNormalized());
-        return *this;
-    }
-
-    // Simplify
-    Intervals& Intervals::simplify()
-    {
-        for(auto& interval : *this)
+        else
         {
-            interval.simplify();
+            int x = diff;
+            result += x==1 ? "H-" : std::to_string(x) + "H-";
         }
-
-        removeDuplicates();
-
-        return *this;
     }
+    // If the last char is a '-' remove it
+    if(result.back() == '-') result.pop_back();
+    
+    return std::move(result);
+}
 
-    // Remove Duplicate Intervals
-    Intervals& Intervals::removeDuplicates()
+// Get the scale as semitone steps
+std::vector<int> Intervals::getSemiSteps()
+{   
+    auto intervals = this->getSemi();
+    intervals.push_back(intervals[0] + 12);
+
+    // Get a vector with the diff between the intervals
+    std::vector<int> result = {};
+    for (int i = 1; i < intervals.size(); i++)
     {
-        std::sort(IntervalVector::begin(), IntervalVector::end());
-        IntervalVector::erase(std::unique(IntervalVector::begin(), IntervalVector::end()), IntervalVector::end());
-        return *this;
+        auto diff = intervals[i] - intervals[i-1];
+        result.push_back(diff);
     }
     
-    // Get negative harmonic 
-    Intervals Intervals::getNegativeHarmonic()
+    return std::move(result);
+}
+
+// Print the intervals as semitone steps
+Intervals& Intervals::printSemiSteps()
+{
+    for(auto& step : getSemiSteps())
     {
-        Intervals res;
-        for(auto& interval : *this)
-        {
-            res.add(interval.getNegativeHarmonic());
-        }
-        // Sort the intervals
-        res.sort();
-
-        return std::move(res);
+        std::cout << step << " ";
     }
+    std::cout << std::endl;
+    return *this;
+}
 
-    // Convert to Negative Harmonic by mirroring on the Major <--> Minor axis
-    Intervals& Intervals::harmonicNeg()
-    {
-        for(auto& interval : *this) interval.harmonicNeg();
-        return *this;
-    }
-
-    // Transpose this
-    Intervals& Intervals::transpose(int semitones)
-    {
-        for(auto& interval : *this)
-        {
-            interval.transpose(semitones);
-        }
-        return *this;
-    }
-
-    // Return a new transposed Intervals object
-    Intervals Intervals::getTransposed(int n)
-    {
-        auto res = *this;
-        res.transpose(n);
-        return std::move(res);
-    }
-
-    // Get Interval from Degree
-    Interval Intervals::getIntervalFromDegree(int degree)
-    {
-        for(auto& interval : *this)
-        {
-            if(interval.getDegree() == degree) return interval;
-        }
-        // Print error message
-        std::cerr << "Error: getIntervalFromDegree(): Degree not found" << std::endl;
-
-        // Return an empty interval
-        return Interval(degree);
-    }
-
-    // Get a specific inversion
-    Intervals Intervals::getInversion(int n, bool normalize) const
-    {
-        auto intervals = *this;
-        if(n > 0){ 
-            for(int i=0; i<n; i++){
-                intervals.rotate(1);
-                intervals.back().shiftOctave(1);
-                intervals.sort();
-            }
-        }
-        else if(n < 0){
-            for(int i=0; i<-n; i++){
-                intervals.rotate(-1);
-                intervals.front().shiftOctave(-1);
-                intervals.sort();
-            }
-        }
-        if(normalize) intervals.normalize();
-        return std::move(intervals);
-    }
-
-    // Create a vector with all inversions
-    std::vector<Intervals> Intervals::getAllInversions(bool simplify, bool normalize) const
-    {
-        auto intervals = *this;
-        if(simplify) intervals.simplify();
-        std::vector<Intervals> inversions;
-        for(int i=0; i<intervals.size(); i++) {
-            intervals.sort();
-            inversions.push_back(intervals);
-            if(normalize) inversions.back().normalize();
-            intervals.front().shiftOctave(1);
-            intervals.rotate(1);
-            // If the first interval is above 12 then subtract 12 from all intervals
-            if(intervals.front().getSemi() >= 12) intervals.shiftOctave(-1);
-        }
-
-        // Remove duplicates
-        inversions.erase(std::unique(inversions.begin(), inversions.end()), inversions.end());
-
-        return std::move(inversions);
-    }
-
-    // Print all inversions
-    void Intervals::printAllInversions(bool simplify, bool normalize) const
-    {
-        auto inversions = getAllInversions(simplify,normalize);
-        for(auto& inversion : inversions)
-        {
-            inversion.printSemi();
-        }
-    }
-
-    // Shift the intervals a number of octaves
-    Intervals& Intervals::shiftOctave(int n)
-    {  
-        auto it = IntervalVector::begin();
-        while(it != IntervalVector::end())
-        {
-            it->shiftOctave(n);
-            it++;
-        }
-
-        return *this;
-    }
-
-    // Print the intervals as whole and half steps. 
-    // This is often used as scale signature. The method getSemiSteps is probably more interesting
-    const std::string Intervals::getWH() const
+// Set the Intervals from a Whole-Half step string
+Intervals& Intervals::setWH(const std::string& str)
+{
+    this->clear();
+    this->add(1);
+    // For each W or H in the string, add the corresponding interval
+    int n=1;
+    for(auto& c : str)
     {   
-        auto intervals = this->getSemi();
-        intervals.push_back(intervals[0] + 12);
-
-        // Get a vector with the diff between the intervals
-        std::string result = "";
-        for (int i = 1; i < intervals.size(); i++)
-        {
-            auto diff = intervals[i] - intervals[i-1];
-            if(diff % 2 == 0) // If the diff is even
-            {
-                int x = diff / 2;
-                result += x == 1 ? "W-" : std::to_string(x) + "W-";
-            }
-            else
-            {
-                int x = diff;
-                result += x==1 ? "H-" : std::to_string(x) + "H-";
-            }
-        }
-        // If the last char is a '-' remove it
-        if(result.back() == '-') result.pop_back();
-        
-        return std::move(result);
+        if(isdigit(c)) n = c - '0';
+        if(c == 'W'){ addW(n); n=1; }
+        if(c == 'H'){ addH(n); n=1; }
     }
+    return *this;
+}
 
-    // Get the scale as semitone steps
-    std::vector<int> Intervals::getSemiSteps()
-    {   
-        auto intervals = this->getSemi();
-        intervals.push_back(intervals[0] + 12);
+// Print the Intervals as whole and half steps
+Intervals& Intervals::printWH()
+{
+    std::cout << getWH() << std::endl;
+    return *this;
+}
 
-        // Get a vector with the diff between the intervals
-        std::vector<int> result = {};
-        for (int i = 1; i < intervals.size(); i++)
-        {
-            auto diff = intervals[i] - intervals[i-1];
-            result.push_back(diff);
-        }
-        
-        return std::move(result);
-    }
+// Add a Whole Step
+Intervals& Intervals::addW(int n)
+{
+    addStep(n*2);
+    return *this;
+}
 
-    // Print the intervals as semitone steps
-    Intervals& Intervals::printSemiSteps()
+// Add a Whole Step
+Intervals& Intervals::addH(int n)
+{
+    addStep(n);
+    return *this;
+}
+
+// Add a Whole Step
+Intervals& Intervals::addStep(int n)
+{
+    std::sort(IntervalVector::begin(), IntervalVector::end());
+    auto interval = IntervalVector::back();
+    interval.transpose(n);
+    add(std::move(interval));
+    return *this;
+}
+
+// Add a step from another interval 
+Intervals& Intervals::addStep(const Interval& interval)
+{
+    addStep(interval.getSemi());
+
+    return *this;
+}
+
+// Add step from sting
+Intervals& Intervals::addStep(const std::string& str)
+{
+    return *this;
+}
+
+// If the Intervals represent a scale, then rotate to get the next mode
+Intervals Intervals::getMode(int n, bool keepDegree)
+{
+    n -= 1;
+    auto semi = getSemiSteps();
+    std::rotate(semi.begin(), semi.begin() + n, semi.end());
+    auto size = this->size();
+
+    Intervals result;
+    int i = 0;
+    result.add(at(i++).getDegree());
+    for(auto& s : semi)
     {
-        for(auto& step : getSemiSteps())
-        {
-            std::cout << step << " ";
-        }
-        std::cout << std::endl;
-        return *this;
+        if(i == size) break;
+        result.addStep(s);
+        if(size == 7 || keepDegree) result.back().setDegreeKeepSemi(at(i).getDegree());
+        i++;
     }
 
-    // Set the Intervals from a Whole-Half step string
-    Intervals& Intervals::setWH(const std::string& str)
-    {
-        this->clear();
-        this->add(1);
-        // For each W or H in the string, add the corresponding interval
-        int n=1;
-        for(auto& c : str)
-        {   
-            if(isdigit(c)) n = c - '0';
-            if(c == 'W'){ addW(n); n=1; }
-            if(c == 'H'){ addH(n); n=1; }
-        }
-        return *this;
-    }
-
-    // Print the Intervals as whole and half steps
-    Intervals& Intervals::printWH()
-    {
-        std::cout << getWH() << std::endl;
-        return *this;
-    }
-
-    // Add a Whole Step
-    Intervals& Intervals::addW(int n)
-    {
-        addStep(n*2);
-        return *this;
-    }
-
-    // Add a Whole Step
-    Intervals& Intervals::addH(int n)
-    {
-        addStep(n);
-        return *this;
-    }
-
-    // Add a Whole Step
-    Intervals& Intervals::addStep(int n)
-    {
-        std::sort(IntervalVector::begin(), IntervalVector::end());
-        auto interval = IntervalVector::back();
-        interval.transpose(n);
-        add(std::move(interval));
-        return *this;
-    }
-
-    // Add a step from another interval 
-    Intervals& Intervals::addStep(const Interval& interval)
-    {
-        addStep(interval.getSemi());
-
-        return *this;
-    }
-
-    // Add step from sting
-    Intervals& Intervals::addStep(const std::string& str)
-    {
-        return *this;
-    }
-
-    // If the Intervals represent a scale, then rotate to get the next mode
-    Intervals Intervals::getMode(int n, bool keepDegree)
-    {
-        n -= 1;
-        auto semi = getSemiSteps();
-        std::rotate(semi.begin(), semi.begin() + n, semi.end());
-        auto size = this->size();
-
-        Intervals result;
-        int i = 0;
-        result.add(at(i++).getDegree());
-        for(auto& s : semi)
-        {
-            if(i == size) break;
-            result.addStep(s);
-            if(size == 7 || keepDegree) result.back().setDegreeKeepSemi(at(i).getDegree());
-            i++;
-        }
-
-        return std::move(result);
-    }
+    return std::move(result);
+}
 
 
 

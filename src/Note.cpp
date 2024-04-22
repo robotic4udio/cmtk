@@ -1,98 +1,241 @@
-#pragma once
-// Classes to handle the creation of the music
-
-#include "CMTK.h"
-#include "Interval.h"
+#include "Note.h"
 
 namespace cmtk {
 
 
-class Note;
-class Notes;
-using NoteVector = std::vector<Note>;
-
-// ----------------------------------------------------------------------- //
-// ----------------------- Note Class ------------------------------------ //
-// ----------------------------------------------------------------------- //
-class Note : public CMTK
+// Constructor to create a note from a string
+Note::Note(const std::string& note)
 {
-public:
-    // Constructor
-    Note() = default;
+    set(note);
+}
 
-    // Constructor to create a note from a string
-    Note(const std::string& note);
+// Constructor to create a note from a midinote
+Note::Note(int note)
+{
+    set(note);
+}
 
-    // Constructor to create a note from a midinote
-    Note(int note);
 
-    // Function to set the note from a midinote
-    void set(int note);
+// Function to set the note from a midinote
+void Note::set(int note)
+{
+    clear();
+    mNote = note;
+}
 
-    int getPitch() const;
+int Note::getPitch() const
+{
+    return mNote;
+}
 
-    int getPitchWrap() const;
+int Note::getPitchWrap() const
+{
+    return mNote%12;
+}
 
-    int getOctave() const;
+int Note::getOctave() const
+{
+    return (mNote - C0) / 12;
+}
 
-    Note& setOctave(int octave);
+Note& Note::setOctave(int octave)
+{
+    mNote = mNote % 12 + C0 + octave * 12;
+    return *this;
+}
 
-    Note& shiftOctave(int octaves);
+Note& Note::shiftOctave(int octaves)
+{
+    mNote += octaves * 12;
+    return *this;
+}
 
-    // Function to set the note from a string
-    Note& set(std::string noteSymbol);
+// Function to set the note from a string
+Note& Note::set(std::string noteSymbol)
+{
+    clear();
 
-    // Set from Interval with respedt to its RootNote
-    Note& set(const Note& aNote, const Interval& interval);
+    // Convert the note to uppercase
+    std::transform(noteSymbol.begin(), noteSymbol.end(), noteSymbol.begin(), ::toupper);
 
-    // Set from Note
-    Note& set(const Note& aNote);
+    // Remove all spaces from the note symbol
+    noteSymbol.erase(std::remove(noteSymbol.begin(), noteSymbol.end(), ' '), noteSymbol.end());
 
-    // Set from a Roman Chord Symbol with respect to its RootNote
-    Note& setRoman(std::string aRomanChordString, const Note& aRootNote);
+    // Use the note to set the note value
+    if     (removePrefix(noteSymbol,"C")){ mNoteString = "C"; mNote =  0; } 
+    else if(removePrefix(noteSymbol,"D")){ mNoteString = "D"; mNote =  2; } 
+    else if(removePrefix(noteSymbol,"E")){ mNoteString = "E"; mNote =  4; } 
+    else if(removePrefix(noteSymbol,"F")){ mNoteString = "F"; mNote =  5; } 
+    else if(removePrefix(noteSymbol,"G")){ mNoteString = "G"; mNote =  7; } 
+    else if(removePrefix(noteSymbol,"A")){ mNoteString = "A"; mNote =  9; } 
+    else if(removePrefix(noteSymbol,"B")){ mNoteString = "B"; mNote = 11; } 
+    else return *this;
 
-    // Represent the note as a string - allow to in or exclude the octave, and simplify the note
-    std::string toString(bool includeOctave=true, bool simplify=false) const;
+    // Take care of flats and sharps
+    while(noteSymbol.front() == 'B' || noteSymbol.front() == '#'){
+        if      (noteSymbol[0] == 'B') { mNoteString += 'b'; mNote -= 1; mSharp--; }
+        else if (noteSymbol[0] == '#') { mNoteString += '#'; mNote += 1; mSharp++; }
+        noteSymbol.erase(0,1);
+    }
 
-    // Get the note as a string
-    Note& print(bool includeOctave=true, bool simplify=false) const;
+    // Add the octave
+    mNote += noteSymbol.empty() ? C1 : C0 + std::stoi(noteSymbol) * 12;
 
-    // Clear the note
-    Note& clear();
+    return *this;
+}
 
-    // Equality operator
-    bool operator==(const Note& other) const;
+// Set from Interval with respedt to its RootNote
+Note& Note::set(const Note& aNote, const Interval& interval)
+{
+    *this = aNote.getNoteAt(interval);
+    return *this;
+}
 
-    bool operator!=(const Note& other) const;
+// Set from Note
+Note& Note::set(const Note& aNote)
+{
+    *this = aNote;
+    return *this;
+}
 
-    bool operator<(const Note& other) const;
+// Set from a Roman Chord Symbol with respect to its RootNote
+Note& Note::setRoman(std::string aRomanChordString, const Note& aRootNote)
+{
+    set(aRootNote, Interval::NewFromRoman(aRomanChordString));
+    return *this;
+}
 
-    // Assignment operator
-    Note& operator=(const int& note);
+std::string Note::toString(bool includeOctave, bool simplify) const
+{        
+    int octave = -OCTAVES_BELOW_ZERO;
+    int note = mNote;
+    while(note >= 12)
+    {
+        note -= 12;
+        octave++;
+    }            
 
-    // Assignment operator
-    Note& operator=(const std::string& note);
-    
-    // Cast to int
-    operator int() const;
+    std::string res = mNoteString;
+    if(res.empty())
+    {
+        switch(note){
+            case 0:  res = "C";                   break;
+            case 1:  res = sharp() ? "C#" : "Db"; break;
+            case 2:  res = "D";                   break;
+            case 3:  res = sharp() ? "D#" : "Eb"; break;
+            case 4:  res = "E";                   break;
+            case 5:  res = "F";                   break;
+            case 6:  res = sharp() ? "F#" : "Gb"; break;
+            case 7:  res = "G";                   break;
+            case 8:  res = sharp() ? "G#" : "Ab"; break;
+            case 9:  res = "A";                   break;
+            case 10: res = sharp() ? "A#" : "Bb"; break;
+            case 11: res = "B";                   break;
+        }
+    }
 
-    // Cast to string
-    operator std::string() const;
+    if(simplify) simplifyNoteName(res);
 
-    // Transpose
-    Note& transpose(int n);
+    if(includeOctave) res += std::to_string(octave);
 
-    // Transpose Interval
-    Note& transpose(const Interval& interval);
+    return std::move(res);
+}
 
-    Note operator+(const int& semitones) const;
+Note& Note::print(bool includeOctave, bool simplify) const
+{
+    std::cout << toString(includeOctave,simplify) << ": " << getPitch() << std::endl;
+    return *const_cast<Note*>(this);
+}
 
-    Note operator-(const int& semitones) const;
+Note& Note::clear()
+{
+    mNote = C1;
+    mNoteString.clear();
+    mSharp = 0;
+    return *this;
+}
 
-    Note operator+(const Interval& interval) const;
+// Equality operator
+bool Note::operator==(const Note& other) const
+{
+    return mNote == other.mNote;
+}
 
-    Notes operator+(const Intervals& intervals) const;
+bool Note::operator!=(const Note& other) const
+{
+    return mNote != other.mNote;
+}
 
+bool Note::operator<(const Note& other) const
+{
+    return mNote < other.mNote;
+}
+
+// Assignment operator
+Note& Note::operator=(const int& note)
+{
+    set(note);
+    return *this;
+}
+
+// Assignment operator
+Note& Note::operator=(const std::string& note)
+{
+    set(note);
+    return *this;
+}
+
+// Cast to int
+Note::operator int() const
+{
+    return mNote;
+}
+
+// Cast to string
+Note::operator std::string() const
+{
+    return toString();
+}
+
+// Transpose
+Note& Note::transpose(int n)
+{
+    if(n == 0) return *this;
+    n += mNote;
+    set(n);
+    return *this;
+}
+
+// Transpose Interval
+Note& Note::transpose(const Interval& interval)
+{
+    *this = getNoteAt(interval);
+    return *this;
+}
+
+Note Note::operator+(const int& semitones) const
+{
+    return Note{mNote + semitones};
+}
+
+Note Note::operator-(const int& semitones) const
+{
+    return Note{mNote - semitones};
+}
+
+Note Note::operator+(const Interval& interval) const
+{
+    return getNoteAt(interval);
+}
+
+Notes Note::operator+(const Intervals& intervals) const
+{
+    Notes notes;
+    for(auto& i : intervals) notes.push_back(getNoteAt(i));
+    return std::move(notes);
+}
+
+/*
     // Increment operator
     Note& operator++()
     {
@@ -510,6 +653,10 @@ public:
 };
 
 
+
+
+
+*/
 
 
 } // namespace cmtk
