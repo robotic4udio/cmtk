@@ -420,7 +420,7 @@ static std::map<std::string, std::vector<std::string>> MajorNoteMap = {
 // An array with the 12 keys
 static const std::vector<std::string> KeyNames = {"C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"};
 
-inline static std::string MajorNoteMapAt(std::string key, int index) 
+static std::string MajorNoteMapAt(std::string key, int index) 
 {
     while(index <  0) index += 6;
     while(index >  6) index -= 6;

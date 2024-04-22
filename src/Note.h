@@ -3,17 +3,14 @@
 
 #include "CMTK.h"
 #include "Interval.h"
-
 namespace cmtk {
 
-
-class Note;
+// Forward declarations
 class Notes;
-using NoteVector = std::vector<Note>;
 
-// ----------------------------------------------------------------------- //
-// ----------------------- Note Class ------------------------------------ //
-// ----------------------------------------------------------------------- //
+// -------------------------------------------------------------------------------------------- //
+// ---------------------------------- Note Class ---------------------------------------------- //
+// -------------------------------------------------------------------------------------------- //
 class Note : public CMTK
 {
 public:
@@ -94,127 +91,30 @@ public:
     Notes operator+(const Intervals& intervals) const;
 
     // Increment operator
-    Note& operator++()
-    {
-        mNote++;
-        return *this;
-    }
+    Note& operator++();
 
     // Decrement operator
-    Note& operator--()
-    {
-        mNote--;
-        return *this;
-    }
-
-    // - operator
-    int operator-(const Note& other) const
-    {
-        return mNote - other.mNote;
-    }
+    Note& operator--();
 
     // Stream operator
-    friend std::ostream& operator<<(std::ostream& os, const Note& note)
-    {
-        os << note.toString();
-        return os;
-    }
+    friend std::ostream& operator<<(std::ostream& os, const Note& note);
 
-    bool isKey(const std::string& key) const
-    {
-        return toString(false) == key;
-    }
+    bool isKey(const std::string& key) const;
 
-    Note& flatten()
-    {
-        if(mNoteString.back() == '#')
-        {
-            mNoteString.pop_back();
-        }
-        else 
-        {
-            mNoteString.push_back('b');
-        }
-        mNote-- ;
-        mSharp--;
-        return *this;
-    }
+    Note& flatten();
+    Note& sharpen();
 
-    Note& sharpen()
-    {
-        if(mNoteString.back() == 'b')
-        {
-            mNoteString.pop_back();
-        }
-        else 
-        {
-            mNoteString.push_back('#');
-        }
-        mNote++ ;
-        mSharp++;
-        return *this;
-    }
+    Notes getMajorNotes();
 
-    std::vector<Note> getMajorNotes()
-    {
-        std::vector<Note> notes;
-        auto sv = MajorNoteMap[toString(false)];
-        for(auto& s : sv) notes.push_back(s);
+    Note getNoteAt(const Interval& interval) const;
 
-        return std::move(notes);
-    }
+    Interval getIntervalTo(const Note& otherNote) const;
 
-    Note getNoteAt(const Interval& interval) const
-    {
-        auto octave = getOctave();
-        const auto& key = toString(false,true);
-        auto deg = interval.getDegree();
-        if(deg > 7){
-            octave++;
-            deg -= 7;
-        }
+    Notes getNoteAt(const Intervals& interval) const;
 
-        const auto& s = MajorNoteMapAt(key, deg-1);
+    bool isOk() const;
 
-        Note note(s);
-        note.setOctave(octave);
-        auto q = interval.getQuality();
-        while(q > 0)
-        {
-            note.sharpen();
-            q--;
-        }
-        while(q < 0)
-        {
-            note.flatten();
-            q++;
-        }
-
-        return std::move(note);
-    }
-
-    Interval getIntervalTo(const Note& otherNote) const
-    {
-        int semitones = otherNote.getPitch() - getPitch();
-        return Interval::NewFromSemi(semitones);
-    }
-
-    std::vector<Note> getNoteAt(const Intervals& interval) const
-    {
-        std::vector<Note> notes;
-        for(auto& i : interval) notes.push_back(getNoteAt(i));
-        return std::move(notes);
-    }
-
-    bool isOk() const
-    {
-        return mNote >= 0 && mNote <= 127;
-    }
-
-    operator bool() const
-    {
-        return isOk();
-    }
+    operator bool() const;
 
 private:
     int mNote = -1;
@@ -222,292 +122,133 @@ private:
     int mSharp = 0;
 
     // Display sharp or flat
-    bool sharp() const
-    {
-        if(mSharp == 0) return mPreferSharp;
-        return mSharp  > 0; 
-    }
+    bool sharp() const;
 
 };
 
 
-
+// -------------------------------------------------------------------------------------------- //
+// ---------------------------------- Notes Class --------------------------------------------- //
+// -------------------------------------------------------------------------------------------- //
+using NoteVector = std::vector<Note>;
 class Notes : public NoteVector
 {
 public:
     Notes() = default;
 
-    Notes(const NoteVector& notes)
-    {
-        set(notes);
-    }
+    // Constructor
+    Notes(const NoteVector& notes);
+    Notes(const std::string& notes);
+    Notes(const std::vector<int>& notes);
+    Notes(const std::vector<std::string>& notes);
+    Notes(const Intervals& intervals, const Note& root = C1);
 
-    Notes(const std::string& notes)
-    {
-        set(notes);
-    }
+    // Set Notes
+    void set(const NoteVector& notes);
+    void set(const std::vector<int>& notes);
+    void set(const std::vector<std::string>& notes);
+    void set(const std::string& notes);
+    void set(const Intervals& intervals, const Note& root = C1);
 
-    Notes(const std::vector<int>& notes)
-    {
-        set(notes);
-    }
+    // Add notes
+    void add(const Notes& aNotes);
+    void add(const Note& note);
+    void add(const std::string& note);
+    void add(const int& note);
 
-    Notes(const std::vector<std::string>& notes)
-    {
-        set(notes);
-    }
-
-    Notes(const Intervals& intervals, const Note& root = C1)
-    {
-        set(intervals,root);
-    }
-
-    void set(const NoteVector& notes)
-    {
-        clear();
-        for(auto& note : notes) push_back(note);
-    }
-
-    void set(const std::vector<int>& notes)
-    {
-        clear();
-        for(auto& note : notes) push_back(note);
-    }
-
-    void set(const std::vector<std::string>& notes)
-    {
-        clear();
-        for(auto& note : notes) push_back(note);
-    }
-
-    void set(const std::string& notes)
-    {
-        clear();
-        std::string s = notes;
-        while(!s.empty())
-        {
-            auto pos = s.find_first_of(" ,|");
-            if(pos == std::string::npos) pos = s.size();
-            std::string note = s.substr(0,pos);
-            if(!note.empty()) push_back(note);
-            s.erase(0,pos+1);
-        }
-    }
-
-    void set(const Intervals& intervals, const Note& root = C1)
-    {
-        clear();
-        for(auto& interval : intervals)
-        {
-            Note note = root + interval.getSemi();
-            push_back(note);
-        }
-    }
-
-    void add(const Notes& aNotes)
-    {
-        for(auto& note : aNotes) add(note);
-    }
-
-    void add(const Note& note)
-    {
-        push_back(note);
-    }
-
-    void add(const std::string& note)
-    {
-        push_back(note);
-    }
-
-    void add(const int& note)
-    {
-        push_back(note);
-    }
-
-    Notes& removeDuplicates()
-    {
-        std::sort(begin(),end());
-        erase(std::unique(begin(),end()),end());
-        return *this;
-    }
-
-    Notes& removeOctave()
-    {
-        auto it = begin();
-        while(it != end())
-        {
-            it->setOctave(0);
-            it++;
-        }
-        return *this;
-    }
+    Notes& removeDuplicates();
+    Notes& removeOctave();
 
     // Get a string with the pitch vector
-    std::string getPitchString() const
-    {
-        std::string res;
-        for(const auto& note : *this) res += std::to_string(note.getPitch()) + " ";
-        if(!res.empty()) res.pop_back();
-        return std::move(res);
-    }
+    std::string getPitchString() const;
 
     // To string
-    std::string toString(bool octave=false, bool simplify=false) const
-    {
-        std::string res;
-        auto it = begin();
-        while(it != end())
-        {
-            res += it->toString(octave,simplify);
-            if(++it != end()) res += " ";
-        }
-        return std::move(res);
-    }
+    std::string toString(bool octave=false, bool simplify=false) const;
 
     // Stream operator
-    friend std::ostream& operator<<(std::ostream& os, const Notes& notes)
-    {        
-        auto it = notes.begin();
-        while(it != notes.end())
-        {
-            os << it->toString(false,false);
-            if(++it != notes.end()) os << " ";
-        }
-        return os;
-    }
+    friend std::ostream& operator<<(std::ostream& os, const Notes& notes);
 
-    void print(bool octave=false, bool simplify=false) const
-    {
-        std::cout << "Notes(";
-        auto it = begin();
-        while(it != end())
-        {
-            std::cout << it->toString(octave,simplify);
-            if(++it != end()) std::cout << " ";
-        }
-        std::cout << ")" << std::endl;
-    }
+    void print(bool octave=false, bool simplify=false) const;
 
-    void transpose(int semitones)
-    {
-        for(auto& note : *this) note.transpose(semitones);
-    }
+    void transpose(int semitones);
 
-    void sort()
-    {
-        std::sort(begin(),end());
-    }
+    void sort();
 
     // Assignment operator
-    Notes& operator=(const std::string& notes)
-    {
-        set(notes);
-        return *this;
-    }
+    Notes& operator=(const std::string& notes);
 
     // Assignment operator
-    Notes& operator=(const Intervals& intervals)
-    {
-        set(intervals);
-        return *this;
-    }
+    Notes& operator=(const Intervals& intervals);
 
     // Assignment operator
-    Notes& operator=(const NoteVector& notes)
-    {
-        set(notes);
-        return *this;
-    }
+    Notes& operator=(const NoteVector& notes);
 
     // Assignment operator
-    Notes& operator=(const std::vector<int>& notes)
-    {
-        set(notes);
-        return *this;
-    }
+    Notes& operator=(const std::vector<int>& notes);
 
     // at operator
-    Note& operator[](int i)
-    {
-        return at(i);
-    }
+    Note& operator[](int i);
 
     // Semi at operator
-    int semiAt(int i) const
-    {
-        return at(i).getPitch();
-    }
+    int semiAt(int i) const;
 
     // Get Vector of semitones
-    std::vector<int> getMidiPitches() const
-    {
-        std::vector<int> semis;
-        for(auto& note : *this) semis.push_back(note.getPitch());
-        return std::move(semis);
-    }
+    std::vector<int> getMidiPitches() const;
 
     // Get Vector of N
-    static Notes AllKeys()
-    {
-        Notes notes;
-        for(auto& s : KeyNames) notes.push_back(Note(s));
-        return std::move(notes);
-    }
+    static Notes AllKeys();
 
     // Contains a specific note
-    bool contains(const Note& note) const
-    {
-        return std::find(begin(),end(),note) != end();
-    }
+    bool contains(const Note& note) const;
 
     // Contains a specific note ignoring octave
-    bool contains(const Note& note, bool ignoreOctave) const
-    {
-        auto it = std::find_if(begin(),end(),[&note,ignoreOctave](const Note& n){
-            return ignoreOctave ? n.getPitchWrap() == note.getPitchWrap() : n == note;
-        });
-
-        return it != end();
-    }
+    bool contains(const Note& note, bool ignoreOctave) const;
 
     // Contains all the notes in another vector
-    bool contains(const Notes& notes) const
-    {
-        auto it = notes.begin();
-        while(it != notes.end())
-        {
-            if(!contains(*it)) return false;
-            it++;
-        }
-        return true;
-    }
+    bool contains(const Notes& notes) const;
 
     // Contains all the notes in another vector ignoring octave
-    bool contains(const Notes& notes, bool ignoreOctave) const
-    {
-        auto it = notes.begin();
-        while(it != notes.end())
-        {
-            if(!contains(*it,ignoreOctave)) return false;
-            it++;
-        }
-        return true;
-    }
+    bool contains(const Notes& notes, bool ignoreOctave) const;
 
-    bool ok() const
-    {
-        for(auto& note : *this) if(!note.isOk()) return false;
-        return true;
-    }
+    // Return true if all the notes are ok
+    bool ok() const;
 
     // Cast to bool
-    operator bool() const
-    {
-        return ok();
-    }
+    operator bool() const;
 
     
 };
+
+
+// This results in a seqentation fault if placed in the cpp file? TODO: Find out why, fix and move to cpp file...
+inline Note Note::getNoteAt(const Interval& interval) const
+{
+    auto octave = getOctave();
+    const auto& key = toString(false,true);
+    auto deg = interval.getDegree();
+    if(deg > 7){
+        octave++;
+        deg -= 7;
+    }
+
+    const auto s = MajorNoteMapAt(key, deg-1);
+
+    Note note(s);
+    note.setOctave(octave);
+    auto q = interval.getQuality();
+    while(q > 0)
+    {
+        note.sharpen();
+        q--;
+    }
+    while(q < 0)
+    {
+        note.flatten();
+        q++;
+    }
+
+    return std::move(note);
+}
 
 
 
