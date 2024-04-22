@@ -770,10 +770,10 @@ namespace cmtk
             return std::move(chordSymbols);
         }
 
-        // Get ChordProgression from a vector of indexes
-        ChordProgression getChordProg(const std::vector<int>& indexes, int size = 3)
+        // Get ChordProg from a vector of indexes
+        ChordProg getChordProg(const std::vector<int>& indexes, int size = 3)
         {
-            ChordProgression chordProgression;
+            ChordProg chordProgression;
             for (auto index : indexes)
             {
                 chordProgression.addChord(getChord(index, size));
@@ -782,10 +782,10 @@ namespace cmtk
             return std::move(chordProgression);
         }
 
-        // Get ChordProgression from a vector of indexes and sizes
-        ChordProgression getChordProg(const std::vector<int>& indexes, const std::vector<int>& aSize)
+        // Get ChordProg from a vector of indexes and sizes
+        ChordProg getChordProg(const std::vector<int>& indexes, const std::vector<int>& aSize)
         {
-            ChordProgression chordProgression;
+            ChordProg chordProgression;
             int i=0;
             for (auto index : indexes)
             {
@@ -796,8 +796,8 @@ namespace cmtk
             return std::move(chordProgression);
         }
         
-        // Get ChordProgression from a vector of indexes and sizes
-        ChordProgression getChordProg(const std::string& s, int size = 3)
+        // Get ChordProg from a vector of indexes and sizes
+        ChordProg getChordProg(const std::string& s, int size = 3)
         {
             std::vector<int> indexes;
             for(char c : s)
@@ -811,15 +811,15 @@ namespace cmtk
             return std::move(getChordProg(indexes,size).setTonic(mRootNote));
         }
 
-        // Get ChordProgression from a vector of indexes and sizes
-        static ChordProgression GetChordProg(const std::string& s, int size = 3)
+        // Get ChordProg from a vector of indexes and sizes
+        static ChordProg GetChordProg(const std::string& s, int size = 3)
         {
             auto tokens = split(s, '-');
             if(tokens.size() == 3)
             {   
                 return std::move(Scale(tokens[1],tokens[0]).getChordProg(tokens[2],size));
             }
-            return std::move(ChordProgression());
+            return std::move(ChordProg());
         }
 
         // Print the chord symbols
@@ -936,7 +936,7 @@ namespace cmtk
         }
 
         
-        bool isDiatonic(const ChordProgression& chordProgression) const
+        bool isDiatonic(const ChordProg& chordProgression) const
         {
             for(const auto& chord : chordProgression)
             {
@@ -974,7 +974,7 @@ namespace cmtk
         }
 
         // Function to calculate the diatonicity of a chordProgression to the scale
-        float diatonicity(const ChordProgression& chordProgression)
+        float diatonicity(const ChordProg& chordProgression)
         {
             return diatonicity(chordProgression.getNotes().removeOctave());
         }
@@ -1112,7 +1112,7 @@ namespace cmtk
             return std::move(scales);
         }
 
-        static std::vector<Scale> GetScalesByDiatonicity(const ChordProgression& chordProgression, const Note& aRoot)
+        static std::vector<Scale> GetScalesByDiatonicity(const ChordProg& chordProgression, const Note& aRoot)
         {
             auto scales = GetAllScales(aRoot);
             std::sort(scales.begin(), scales.end(), [&chordProgression](Scale a, Scale b){ 
@@ -1121,7 +1121,7 @@ namespace cmtk
             return std::move(scales);
         }
 
-        static std::vector<Scale> GetScalesByDiatonicity(const ChordProgression& chordProgression)
+        static std::vector<Scale> GetScalesByDiatonicity(const ChordProg& chordProgression)
         {
             if(chordProgression.getTonic().isOk()) return GetScalesByDiatonicity(chordProgression, chordProgression.getTonic());
 
@@ -1148,7 +1148,7 @@ namespace cmtk
             return mRootNote.toString(false,false) + "-" + mName;
         }
 
-        static void PrintScalesByDiatonicity(const ChordProgression& chordProgression, int limit = 7)
+        static void PrintScalesByDiatonicity(const ChordProg& chordProgression, int limit = 7)
         {
             // Collect all scales sorted by Diatonicity
             auto scales = GetScalesByDiatonicity(chordProgression);
@@ -1176,7 +1176,7 @@ namespace cmtk
             return std::move(diatonicScales);
         }
 
-        static std::vector<Scale> GetDiatonicScales(const ChordProgression& chordProgression, const Note& aTonic)
+        static std::vector<Scale> GetDiatonicScales(const ChordProg& chordProgression, const Note& aTonic)
         {
             std::vector<Scale> diatonicScales;
             for (auto scale : GetAllScales())
@@ -1208,7 +1208,7 @@ namespace cmtk
             }
         }        
 
-        static void PrintDiatonicScales(const ChordProgression& chordProgression, const Note& aTonic, int size = 3)
+        static void PrintDiatonicScales(const ChordProg& chordProgression, const Note& aTonic, int size = 3)
         {
             for(const auto& scale : GetDiatonicScales(chordProgression, aTonic))
             {
@@ -1216,7 +1216,7 @@ namespace cmtk
             }   
         }
 
-        static void PrintDiatonicScales(const ChordProgression& chordProgression, int size = 3)
+        static void PrintDiatonicScales(const ChordProg& chordProgression, int size = 3)
         {
             for(const auto& key : Notes::AllKeys())
             {
@@ -1236,7 +1236,7 @@ namespace cmtk
         // The styles of music the mode is usually used for
         std::string mStyle = "";
         // Some useful progressions for the scale
-        // ChordProgressions mProgressions;
+        // ChordProgs mProgressions;
 
         void updateNotes()
         {

@@ -13,10 +13,7 @@ class ChordType : public CMTK {
 public:
     // Constructor
     ChordType() = default;
-    ChordType(const std::string& chordSymbol)
-    {
-        set(chordSymbol);
-    }
+    ChordType(const std::string& chordSymbol);
 
     // Enum class to represent the quality of the chord
     enum class Quality {
@@ -35,267 +32,34 @@ public:
     };
 
     // Set the ChordType from a set string representing the ChordType
-    ChordType& set(const std::string& aChordType){
-        auto chordType = aChordType;
-        mChordType = chordType;
-
-        // Initialize the quality of the chord
-        Quality quality = Quality::NA;
-
-        int n = 0;
-
-        // Check for the quality of the chord
-        if     (chordType.empty()                    ){ quality = Quality::Major;          }
-        else if(removePrefix(chordType, "maj" ,false)){ quality = Quality::Major;          }
-        else if(removePrefix(chordType, "min" ,false)){ quality = Quality::Minor;          }
-        else if(removePrefix(chordType, "M"         )){ quality = Quality::Major;          }
-        else if(removePrefix(chordType, "m"         )){ quality = Quality::Minor;          }
-        else if(removePrefix(chordType, "dom" ,false)){ quality = Quality::Dominant;       }
-        else if(removePrefix(chordType, "aug" ,false)){ quality = Quality::Augmented;      }
-        else if(removePrefix(chordType, "+"   ,false)){ quality = Quality::Augmented;      }
-        else if(removePrefix(chordType, "dim" ,false)){ quality = Quality::Diminished;     }
-        else if(removePrefix(chordType, "°"   ,false)){ quality = Quality::Diminished;     }
-        else if(removePrefix(chordType, "hdim",false)){ quality = Quality::HalfDiminished; }
-        else if(removePrefix(chordType, "ø"   ,false)){ quality = Quality::HalfDiminished; }
-        else if(removePrefix(chordType, "sus2",false)){ quality = Quality::Sus2;           }
-        else if(removePrefix(chordType, "sus4",false)){ quality = Quality::Sus4;           }
-        else if(removePrefix(chordType, "sus4",false)){ quality = Quality::Sus4;           }
-        else if(removePrefix(chordType, "4x1" ,false)){ quality = Quality::Quartal;  n=1;  }
-        else if(removePrefix(chordType, "4x2" ,false)){ quality = Quality::Quartal;  n=2;  }
-        else if(removePrefix(chordType, "4x3" ,false)){ quality = Quality::Quartal;  n=3;  }
-        else if(removePrefix(chordType, "4x4" ,false)){ quality = Quality::Quartal;  n=4;  }
-        else if(removePrefix(chordType, "4x5" ,false)){ quality = Quality::Quartal;  n=5;  }
-        else if(removePrefix(chordType, "4x6" ,false)){ quality = Quality::Quartal;  n=6;  }
-        else if(removePrefix(chordType, "4x7" ,false)){ quality = Quality::Quartal;  n=7;  }
-        else if(removePrefix(chordType, "5x1" ,false)){ quality = Quality::Quintal;  n=1;  }
-        else if(removePrefix(chordType, "5x2" ,false)){ quality = Quality::Quintal;  n=2;  }
-        else if(removePrefix(chordType, "5x3" ,false)){ quality = Quality::Quintal;  n=3;  }
-        else if(removePrefix(chordType, "5x4" ,false)){ quality = Quality::Quintal;  n=4;  }
-        else if(removePrefix(chordType, "5x5" ,false)){ quality = Quality::Quintal;  n=5;  }
-        else if(removePrefix(chordType, "5x6" ,false)){ quality = Quality::Quintal;  n=6;  }
-        else if(removePrefix(chordType, "5x7" ,false)){ quality = Quality::Quintal;  n=7;  }
-        else if(removePrefix(chordType, "5"   ,false)){ quality = Quality::PowerChord;     }
-        else if(startsWithNumber(chordType)          ){ quality = Quality::Dominant;       }
-
-
-        // Remove stuff from the chord symbol
-        removeChars(chordType, " ^()"); // Remove spaces
-
-        // Initialize the chord tones vector based on the chord type
-        switch (quality){
-            case Quality::Major:          mIntervals.set({Interval(1), Interval(3)   , Interval(5)                    }); break;
-            case Quality::Dominant:       mIntervals.set({Interval(1), Interval(3)   , Interval(5)                    }); break;
-            case Quality::Minor:          mIntervals.set({Interval(1), Interval(3,-1), Interval(5)                    }); break;
-            case Quality::Diminished:     mIntervals.set({Interval(1), Interval(3,-1), Interval(5,-1)                 }); break;
-            case Quality::HalfDiminished: mIntervals.set({Interval(1), Interval(3,-1), Interval(5,-1), Interval(7,-1) }); break;
-            case Quality::Augmented:      mIntervals.set({Interval(1), Interval(3)   , Interval(5, 1)                 }); break;
-            case Quality::Sus2:           mIntervals.set({Interval(1), Interval(2)   , Interval(5)                    }); break;
-            case Quality::Sus4:           mIntervals.set({Interval(1), Interval(4)   , Interval(5)                    }); break;
-            case Quality::PowerChord:     mIntervals.set({Interval(1),                 Interval(5)                    }); break;
-            case Quality::Quartal:        mIntervals.set({Interval(1)}); for(int i=0; i<n; i++) mIntervals.addStep(5);    break;
-            case Quality::Quintal:        mIntervals.set({Interval(1)}); for(int i=0; i<n; i++) mIntervals.addStep(7);    break;
-            case Quality::NA: break;      // TODO: Throw Error;
-        }
-
-        // Add Extension to the intervals
-        const bool maj = quality == Quality::Major;
-        const bool dim = quality == Quality::Diminished;
-        if(removePrefix(chordType, "6")){
-            mIntervals.add(Interval(6));
-        }
-        else if(removePrefix(chordType, "7")){
-            mIntervals.add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
-        }
-        else if(removePrefix(chordType, "9")){ 
-            mIntervals.add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
-            mIntervals.add(Interval(9));
-        }
-        else if(removePrefix(chordType, "11")){ 
-            mIntervals.add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
-            mIntervals.add({Interval(9),Interval(11)});
-        }
-        else if(removePrefix(chordType, "13")){ 
-            mIntervals.add(maj ? Interval(7) : dim ? Interval(7,-2) : Interval(7,-1));
-            mIntervals.add({Interval(9),Interval(11),Interval(13)});
-        }
-        else if(removePrefix(chordType,"Maj7",false) || removePrefix(chordType,"M7")){
-            mIntervals.add(Interval(7));
-        }
-        else if(removePrefix(chordType,"Maj9",false) || removePrefix(chordType,"M9")){
-            mIntervals.add({Interval(7),Interval(9)});
-        }
-        else if(removePrefix(chordType,"Maj11",false) || removePrefix(chordType,"M11")){
-            mIntervals.add({Interval(7),Interval(9),Interval(11)});
-        }
-        else if(removePrefix(chordType,"Maj13",false) || removePrefix(chordType,"M13")){
-            mIntervals.add({Interval(7),Interval(9),Interval(11),Interval(13)});
-        }
-
-        // Handle more complex chords
-        bool found = true;
-        while(found)
-        {   
-            found = false;
-            // Flatten
-            if(removePrefix(chordType, "b3"    )){ mIntervals.setQuality( 3, -1, true); found = true; }
-            if(removePrefix(chordType, "b5"    )){ mIntervals.setQuality( 5, -1, true); found = true; }
-            if(removePrefix(chordType, "b7"    )){ mIntervals.setQuality( 7, -1, true); found = true; }
-            if(removePrefix(chordType, "b9"    )){ mIntervals.setQuality( 9, -1, true); found = true; }
-            if(removePrefix(chordType, "b11"   )){ mIntervals.setQuality(11, -1, true); found = true; }
-            if(removePrefix(chordType, "b13"   )){ mIntervals.setQuality(13, -1, true); found = true; }
-            
-            // Sharpen
-            if(removePrefix(chordType, "#3"    )){ mIntervals.setQuality(3 ,  1, true); found = true; }
-            if(removePrefix(chordType, "#5"    )){ mIntervals.setQuality(5 ,  1, true); found = true; }
-            if(removePrefix(chordType, "#7"    )){ mIntervals.setQuality(7 ,  1, true); found = true; }
-            if(removePrefix(chordType, "#9"    )){ mIntervals.setQuality(9 ,  1, true); found = true; }
-            if(removePrefix(chordType, "#11"   )){ mIntervals.setQuality(11,  1, true); found = true; }
-            if(removePrefix(chordType, "#13"   )){ mIntervals.setQuality(13,  1, true); found = true; }
-
-            // Add notes if required
-            if(removePrefix(chordType, "add2"  )){ mIntervals.add(Interval( 2));        found = true; }
-            if(removePrefix(chordType, "add4"  )){ mIntervals.add(Interval( 4));        found = true; }
-            if(removePrefix(chordType, "add6"  )){ mIntervals.add(Interval( 6));        found = true; }
-            if(removePrefix(chordType, "add9"  )){ mIntervals.add(Interval( 9));        found = true; }
-            if(removePrefix(chordType, "add11" )){ mIntervals.add(Interval(11));        found = true; }
-            if(removePrefix(chordType, "add13" )){ mIntervals.add(Interval(13));        found = true; }
-
-            // Remove notes if required
-            if(removePrefix(chordType, "no1"   )){ mIntervals.removeDegree( 1);         found = true; }
-            if(removePrefix(chordType, "no3"   )){ mIntervals.removeDegree( 3);         found = true; }
-            if(removePrefix(chordType, "no5"   )){ mIntervals.removeDegree( 5);         found = true; }
-            if(removePrefix(chordType, "no7"   )){ mIntervals.removeDegree( 7);         found = true; }
-            if(removePrefix(chordType, "no9"   )){ mIntervals.removeDegree( 9);         found = true; }
-            if(removePrefix(chordType, "no11"  )){ mIntervals.removeDegree(11);         found = true; }
-            if(removePrefix(chordType, "no13"  )){ mIntervals.removeDegree(13);         found = true; }
-        }
-
-        // Sort the chordIntervals
-        mIntervals.sort();
-
-        // Print warning if there are still characters left
-        if(chordType.size() > 0){
-            std::cerr << "ChordType::setChord(): Warning: Error parsing chord symbol: " << aChordType << " - Remaining: " << chordType << std::endl;
-        }
-
-        return *this;
-    }
+    ChordType& set(const std::string& aChordType);
 
     // Get Normalized Semi from ChordType and Inversion
-    std::vector<int> getSemiSignature(const std::string& chordType, int inv)
-    {
-        auto c = ChordType(chordType);
-        auto i = c.getIntervals();
-        i.simplify();
-        auto semi = i.getInversion(inv,1).getSemi();
-        return std::move(semi);
-    }
+    std::vector<int> getSemiSignature(const std::string& chordType, int inv);
 
     // Set from semi
-    ChordType& setSemi(const std::vector<int>& aX)
-    {
-        // Notmalize the intervals
-        auto X = aX;
-        const int min = *std::min_element(X.begin(), X.end());
-        for(auto& x : X) x -= min;
-        std::sort(X.begin(), X.end());
-
-        // Set the intervals
-        mIntervals.setFromSemi(X);
-
-
-        std::vector<std::string> chordTypeVec;
-        int inv = 0;
-
-        // Major Triad
-        if     (equals(X,{0,7}  )){ chordTypeVec.push_back("5"); inv = 0; } // Major Triad Root Position 
-        else if(equals(X,{0,5}  )){ chordTypeVec.push_back("5"); inv = 1; } // Major Triad Root Position 
-
-        else if(equals(X,{0,4,7})){ chordTypeVec.push_back("M"); inv = 0; } // Major Triad Root Position 
-        else if(equals(X,{0,3,8})){ chordTypeVec.push_back("M"); inv = 2; } // Major Triad 1st Inversion
-        else if(equals(X,{0,5,9})){ chordTypeVec.push_back("M"); inv = 3; } // Major Triad 2nd Inversion
-        // Minor Triad
-        else if(remove(X,{0,3,7})){ chordTypeVec.push_back("m"); inv = 0; } // Minor Triad Root Position
-        else if(remove(X,{0,4,9})){ chordTypeVec.push_back("m"); inv = 2; } // Minor Triad 1st Inversion
-        else if(remove(X,{0,5,8})){ chordTypeVec.push_back("m"); inv = 3; } // Minor Triad 2nd Inversion
-        // Diminished Triad
-        else if(remove(X,{0,3,6})){ chordTypeVec.push_back("°"); inv = 0; } // Diminished Triad Root Position
-        else if(remove(X,{0,3,9})){ chordTypeVec.push_back("°"); inv = 2; } // Diminished Triad 1st Inversion
-        else if(remove(X,{0,6,9})){ chordTypeVec.push_back("°"); inv = 3; } // Diminished Triad 2nd Inversion
-        // Augmented Triad
-        else if(remove(X,{0,4,8})){ chordTypeVec.push_back("+"); } // Augmented Triad Root, 1st and 2nd Inversion
-        // Sus2
-        else if(remove(X,{0,2,7 })){ chordTypeVec.push_back("sus2"); inv = 0; } // Sus2 Root Position
-        else if(remove(X,{0,5,10})){ chordTypeVec.push_back("sus2"); inv = 2; } // Sus2 1st Inversion
-        else if(remove(X,{0,5,7 })){ chordTypeVec.push_back("sus2"); inv = 3; } // Sus2 2nd Inversion
-        // Sus4
-        else if(remove(X,{0,5,7 })){ chordTypeVec.push_back("sus4"); inv = 0; } // Sus4 Root Position
-        else if(remove(X,{0,2,7 })){ chordTypeVec.push_back("sus4"); inv = 2; } // Sus4 1st Inversion
-        else if(remove(X,{0,5,10})){ chordTypeVec.push_back("sus4"); inv = 3; } // Sus4 2nd Inversion
-
-        std::cout << "Possible Chord Types: ";
-        for(auto& c : chordTypeVec) std::cout << c << ", ";
-        std::cout << std::endl;
-
-        mChordType = mIntervals.getChordSymbol();
-
-        
-
-        return *this;
-    }
+    ChordType& setSemi(const std::vector<int>& aX);
 
     // Is the Chord a Minor Chord
-    bool isKindOfMinor() const
-    {   
-        if(mIntervals.contains(Interval(3,-1))) return true;
-        if(mIntervals.contains(Interval(3)))    return false;
-        if(startsWithNumber(mChordType))        return false;
-        if(startsWith      (mChordType,"min" )) return true;
-        if(startsWith      (mChordType,"m"   )) return true;
-        if(startsWith      (mChordType,"dim" )) return true;
-        if(startsWith      (mChordType,"°"   )) return true;
-        if(startsWith      (mChordType,"hdim")) return true;
-        if(startsWith      (mChordType,"ø"   )) return true;
-        return false;
-    }
+    bool isKindOfMinor() const;
 
     // Get the chord symbol
-    std::string getChordType()
-    {
-        return mChordType;
-    }
+    std::string getChordType();
 
     // Get the intervals
-    const Intervals& getIntervals() const
-    {
-        return mIntervals;
-    }
+    const Intervals& getIntervals() const;
 
     // ChordType to string
-    std::string toString() const
-    {
-        return mChordType;
-    }
+    std::string toString() const;
 
     // Stream operator
-    friend std::ostream& operator<<(std::ostream& os, const ChordType& ct)
-    {
-        os << ct.mChordType;
-        return os;
-    }
+    friend std::ostream& operator<<(std::ostream& os, const ChordType& ct);
 
     // Print the chordType
-    ChordType print()
-    {
-        std::cout << "ChordType: " << mChordType << " ---> (" << mIntervals << ")" << std::endl;
-        return *this;
-    }
+    ChordType print();
 
     // Size of ChordType
-    size_t size() const 
-    {
-        return mIntervals.size();
-    }
+    size_t size() const;
 
 
 private:
@@ -326,424 +90,129 @@ public:
     Chord() = default;
 
     // Constructor from RootNote, ChordType and BassNote
-    Chord(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote)
-    {
-        setChord(aRootNote,chordType,aBassNote);
-    }
+    Chord(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote);
 
     // Constructor from RootNote and ChordType - BassNote is set to the RootNote
-    Chord(const Note& aRootNote, const ChordType& chordType)
-    {
-        setChord(aRootNote,chordType);
-    }
+    Chord(const Note& aRootNote, const ChordType& chordType);
 
     // Constructor from note and chordType expressed as strings
-    Chord(const std::string& note, const std::string& chordType, const std::string& aBassNote = "")
-    {
-        if(aBassNote.empty()) setChord(note,chordType);
-        else                  setChord(note,chordType,aBassNote);
-    }
+    Chord(const std::string& note, const std::string& chordType, const std::string& aBassNote = "");
 
     // Constructor from a combined chord symbol
-    Chord(const std::string& chordSymbol)
-    {
-        setChord(chordSymbol);
-    }
+    Chord(const std::string& chordSymbol);
 
     // Set the chord from a Note and a ChordType
-    Chord& setChord(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote)
-    {
-        mRootNote = aRootNote;
-        mChordType = chordType;
-        mBassNote = aBassNote;
-        return *this;
-    }
+    Chord& setChord(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote);
 
     // Set the chord from a Note and a ChordType
-    Chord& setChord(const Note& aRootNote, const ChordType& chordType)
-    {
-        return setChord(aRootNote,chordType,aRootNote);
-    }
+    Chord& setChord(const Note& aRootNote, const ChordType& chordType);
 
     // Set from a note and a chordType expressed as strings
-    Chord& setChord(const std::string& aRootNote, const std::string& aChordType, const std::string& aBassNote = "")
-    {
-        const auto& rootNote  = Note(aRootNote);
-        const auto& chordType = ChordType(aChordType);
-        const auto& bassNote  = aBassNote.empty() ? rootNote : Note(aBassNote).setOctave(rootNote.getOctave()-1);
-        return setChord(rootNote,chordType,bassNote);
-    }
+    Chord& setChord(const std::string& aRootNote, const std::string& aChordType, const std::string& aBassNote = "");
 
-    Chord& setChord(const std::string& chordSymbol)
-    {
-        // Find the first non note character
-        auto pos = chordSymbol.find_first_not_of("ABCDEFGb#");
-        auto slashPos = chordSymbol.find_first_of('/');
+    // Set the Chord from a combined chord symbol, e.g. "Cm7/E"
+    Chord& setChord(const std::string& chordSymbol);
 
-        // Split the string into Note and ChordType
-        std::string noteString  = chordSymbol.substr(0,pos);
-        std::string chordString = pos == chordSymbol.npos ? "" : chordSymbol.substr(pos,slashPos-pos);
-        std::string slashString = slashPos == chordSymbol.npos ? "" : chordSymbol.substr(slashPos+1);
+    // Create a new Chord from a Roman Chord String and a Tonic
+    static Chord NewRoman(const std::string& chordSymbol, const Note& aTonic);
 
-        #ifdef CMTK_DEBUG
-        // Print Debug Info
-        std::cout << "NoteString: " << noteString 
-                  << ", ChordString: " << chordString
-                  << ", Slash: " << slashString 
-                  << std::endl;
-        #endif
+    // Create a new Chord from a Roman Chord String and a Tonic
+    static Chord NewRoman(const std::string& chordSymbol, const std::string& aTonic);
 
-        // Set the chord
-        return setChord(noteString,chordString,slashString);
-    }
+    // Set the Chord from a Roman Chord String and a Tonic
+    Chord& setRoman(const std::string& romanChordSymbol, const Note& aTonic);
 
-    static Chord NewRoman(const std::string& chordSymbol, const Note& aTonic)
-    {
-        Chord chord;
-        chord.setRoman(chordSymbol,aTonic);
-        return std::move(chord);
-    }
+    // Set the Chord from a Roman Chord String and a Tonic
+    Chord& setRoman(const std::string& aRomanChordSymbol, const std::string& aTonic);
 
-    static Chord NewRoman(const std::string& chordSymbol, const std::string& aTonic)
-    {
-        return NewRoman(chordSymbol,Note(aTonic));
-    }
-
-    // Set the Chord from a Roman Chord String 
-    Chord& setRoman(const std::string& romanChordSymbol, const Note& aTonic)
-    {
-         
-        // Find the first non note character
-        auto pos  = romanChordSymbol.find_first_not_of("iIvVxXb#");
-        auto spos = romanChordSymbol.find("/");
-
-        // Split the string into Note and ChordType
-        std::string romanString  = romanChordSymbol.substr(0,pos);
-        std::string chordString = (pos  == romanChordSymbol.npos) ? "" : romanChordSymbol.substr(pos,spos-pos);
-        std::string slashString = (spos == romanChordSymbol.npos) ? "" : romanChordSymbol.substr(spos+1);
-
-        // Get the root note from the tonic using the roman string
-        const Note& rootNote = aTonic.getNoteAt(Interval::NewFromRoman(romanString));
-
-        // Find out if the chordString is minor or major, it is minor is the iv symbols are lowercase
-        if(!isRomanMajorSymbol(romanString))
-        {   
-            // Find out if chordString starts with minor symbol, i.e. m,°,ø,min,dim,hdim using a std function
-            if(chordString.empty() || isdigit(chordString[0]) || chordString[0] == 'M') chordString.insert(0,"m");
-        }  
-
-        #ifdef CMTK_DEBUG
-        std::cout << "Roman: ("   << romanString << ")"
-                  << ", Chord: (" << chordString << ")"
-                  << ", Slash: (" << slashString << ")"
-                  << ", Tonic: (" << aTonic.toString(false) << ")"
-                  << ", Root: ("  << rootNote.toString(false) << ")"
-                  << std::endl;
-        #endif
-
-        // Create ChordType Object
-        const auto& chordType = ChordType(chordString);
-
-        // Set Chord if no Slash
-        if(slashString.empty())
-        {
-            setChord(rootNote,chordType);
-            return *this;
-        }
-
-        // Set Chord if Symbol after slash is Arabic
-        if(isArabicChordSymbol(slashString))
-        {
-            const Note& bassNote = aTonic.getNoteAt(Interval(slashString));
-            setChord(rootNote,chordType,bassNote);
-            return *this;
-        } 
-
-        // Set Chord if Symbol after slash is Roman
-        if(isRomanChordSymbol(slashString))
-        {
-            const Note& bassNote = aTonic.getNoteAt(Interval::NewFromRoman(slashString));
-            setChord(rootNote,chordType,bassNote);
-            return *this;
-        }
-
-        return *this;
-    }
+    // Set the Chord from a Roman Chord String and a Tonic given as an integer semitone
+    Chord& setRoman(const std::string& aRomanChordSymbol, int aTonic);
 
     // Set the Chord from a Roman Chord String
-    Chord& setRoman(const std::string& aRomanChordSymbol, const std::string& aTonic)
-    {
-        return setRoman(aRomanChordSymbol,Note(aTonic));
-    }
-
-    // Set the Chord from a Roman Chord String
-    Chord& setRoman(const std::string& aRomanChordSymbol, int aTonic)
-    {
-        return setRoman(aRomanChordSymbol,Note(aTonic));
-    }
-
-    // Set the Chord from a Roman Chord String
-    Chord& setRoman(const std::string& aRomanChordSymbol)
-    {
-        return setRoman(aRomanChordSymbol,mRootNote);
-    }
+    Chord& setRoman(const std::string& aRomanChordSymbol);
 
     // Get Roman Chord Symbol from Chord and Tonic
-    std::string getRoman(const Note& aTonic) const
-    {
-        // Get the interval from the tonic to the root note
-        const auto& interval = aTonic.getIntervalTo(mRootNote);
-
-        // Get the roman numeral from the interval
-        const auto& romanString = interval.getRoman(!mChordType.isKindOfMinor());
-
-        auto chordTypeString = mChordType.toString();
-        removePrefix(chordTypeString,"min");
-        removePrefix(chordTypeString,"m"  );
-
-        // The Result String
-        std::string res = romanString + chordTypeString;
-
-        // Handle the Slash Chord
-        if(isSlashChord())
-        {
-            // Get the BassInterval from the tonic to the root note
-            const auto& bassInterval = aTonic.getIntervalTo(mBassNote);
-            res += "/";
-            res += bassInterval.toString();
-        }
-
-        // Return the result
-        return std::move(res);
-    }
+    std::string getRoman(const Note& aTonic) const;
 
     // Print the Roman Chord
-    Chord& printRoman(const Note& aTonic)
-    {
-        std::cout << "Roman: " << getRoman(aTonic) << std::endl;
-        return *this;
-    }
+    Chord& printRoman(const Note& aTonic);
 
     // Set Chord Type
-    Chord& setType(const ChordType& chordType)
-    {
-        mChordType = chordType;
-        return *this;
-    }
+    Chord& setType(const ChordType& chordType);
 
     // Set Chord Type
-    Chord& setType(const std::string& chordType)
-    {
-        mChordType = ChordType(chordType);
-        return *this;
-    }
+    Chord& setType(const std::string& chordType);
     
     // Get the chord type
-    const ChordType& getType() const
-    {
-        return mChordType;
-    }
+    const ChordType& getType() const;
 
     // Set the RootNote
-    Chord& setRoot(const Note& note, bool keepOctave=false)
-    {
-        bool bassEqualRoot = mRootNote == mBassNote;
-        auto rootOctave    = mRootNote.getOctave();
-        auto bassOctave    = mBassNote.getOctave();
-
-        auto diff = note-mRootNote;
-
-        mBassNote.transpose(diff);
-        mRootNote = note;
-        if(keepOctave){
-            mRootNote.setOctave(rootOctave);
-            mBassNote.setOctave(bassOctave);
-        }
-
-        return *this;
-    }
+    Chord& setRoot(const Note& note, bool keepOctave=false);
 
     // Set the RootNote
-    Chord& setRoot(const std::string& note)
-    {
-        // Keep the octave if none is given in the string
-        return setRoot(Note(note),!isdigit(note.back()));
-    }
+    Chord& setRoot(const std::string& note);
 
-    Chord& setRoot(int note)
-    {
-        return setRoot(Note(note));
-    }
+    Chord& setRoot(int note);
 
     // Get the note
-    const Note& getRoot() const
-    {
-        return mRootNote;
-    }
+    const Note& getRoot() const;
 
     // Set the BassNote
-    Chord& setBass(const Note& note, bool keepOctave=false)
-    {
-        mBassNote = note;
-        if(keepOctave) mBassNote.setOctave(mRootNote.getOctave());
-        return *this;
-    }
+    Chord& setBass(const Note& note, bool keepOctave=false);
 
     // Set the BassNote
-    Chord& setBass(const std::string& note)
-    {
-        // Keep the octave if none is given in the string
-        return setBass(Note(note),!isdigit(note.back()));
-    }
+    Chord& setBass(const std::string& note);
 
     // Set Bass from Semitone
-    Chord& setBass(int note)
-    {
-        return setBass(Note(note));
-    }
+    Chord& setBass(int note);
 
     // Set Bass from Interval with respect to the root note
-    Chord& setBass(const Interval& interval, bool keepOctave=false)
-    {
-        mBassNote = mRootNote.getNoteAt(interval);
-        if(keepOctave) mBassNote.setOctave(mBassNote.getOctave()  );
-        else           mBassNote.setOctave(mRootNote.getOctave()-1);
-        return *this;
-    }
+    Chord& setBass(const Interval& interval, bool keepOctave=false);
 
     // Set Bass from Root
-    Chord& rootBass()
-    {
-        mBassNote = mRootNote;
-        return *this;
-    }
+    Chord& rootBass();
 
-    bool isSlashChord() const
-    {
-        return mBassNote.getPitchWrap() != mRootNote.getPitchWrap();
-    }
+    bool isSlashChord() const;
 
     // Force bass into range
-    Chord& forceBassInRange(int min=0, int max=127)
-    {
-        while(mBassNote.getPitch() < min) mBassNote.shiftOctave( 1);
-        while(mBassNote.getPitch() > max) mBassNote.shiftOctave(-1);
-        return *this;
-    }
+    Chord& forceBassInRange(int min=0, int max=127);
 
     // Get the Bass note
-    const Note& getBass() const
-    {
-        return mBassNote;
-    }
+    const Note& getBass() const;
 
     // Set Octave
-    Chord& setOctave(int octave, bool keepBass=false)
-    {   
-        // Set the octave of the root note
-        int prev_octave = mRootNote.getOctave();
-        mRootNote.setOctave(octave);
-
-        if(keepBass) return *this;
-
-        int diff = octave - prev_octave;
-
-        if(diff == 0) return *this;
-
-        // Set the octave of the bass note
-        mBassNote.shiftOctave(diff);
-        return *this;
-    }
+    Chord& setOctave(int octave, bool keepBass=false);
 
     // Get Octave
-    int getOctave() const
-    {
-        return mRootNote.getOctave();
-    }
+    int getOctave() const;
 
     // Set Bass Octave
-    Chord& setBassOctave(int octave)
-    {
-        mBassNote.setOctave(octave);
-        return *this;
-    }
+    Chord& setBassOctave(int octave);
 
     // Get Bass Octave
-    int getBassOctave() const
-    {
-        return mBassNote.getOctave();
-    }
+    int getBassOctave() const;
 
     // Get Intervals
-    const Intervals& getIntervals() const
-    {
-        return mChordType.getIntervals();
-    }
+    const Intervals& getIntervals() const;
 
     // Get the Notes of the chord
-    Notes getNotes() const
-    {
-        return mRootNote.getNoteAt(getIntervals());
-    }
+    Notes getNotes() const;
 
     // Transpose the Chord
-    Chord& transpose(int semitones)
-    {
-        mRootNote.transpose(semitones);
-        mBassNote.transpose(semitones);
-        return *this;
-    }
-
-    Chord& transpose(const Interval& interval)
-    {
-        mRootNote.transpose(interval);
-        mBassNote.transpose(interval);
-        return *this;
-    }
+    Chord& transpose(int semitones);
+    Chord& transpose(const Interval& interval);
 
     // Stream operator
-    friend std::ostream& operator<<(std::ostream& os, const Chord& Chord)
-    {
-        os << Chord.mRootNote << " " << Chord.mChordType;
-        return os;
-    }
+    friend std::ostream& operator<<(std::ostream& os, const Chord& Chord);
 
     // Get Chord as string
-    std::string toString() const
-    {
-        std::string res;
-        res += getRoot().toString(false);
-        res += mChordType.toString();
-        if(isSlashChord()){
-            res += "/";
-            res += mBassNote.toString(false);
-        }
-
-        return std::move(res);
-    }
+    std::string toString() const;
 
     // Print the chord
-    Chord& print(bool simplify=true)
-    {
-        bool slashBass = isSlashChord();
-        std::cout << getRoot().toString(false) << mChordType;        
-        if(slashBass) std::cout << "/" << mBassNote.toString(false);
-        std::cout << " -> (" << getIntervals() << ")" 
-                  << " -> (";
-        std::cout <<  getNotes().toString(false,simplify) << ")" 
-                  << " -> (" << getNotes().getPitchString() << ")";
+    Chord& print(bool simplify=true);
 
-        if(slashBass) std::cout << "\tBass: " << mBassNote.toString(true,simplify) << " -> " << mBassNote.getPitch();
-
-        std::cout << std::endl;
-
-        return *this;
-    }
-
-    size_t size() const 
-    {
-        return mChordType.size();
-    }
+    // Size of Chord
+    size_t size() const;
 
 private:
     ChordType mChordType;  // Object representing the chord type, i.e. the basic structure of the chord
@@ -752,342 +221,96 @@ private:
     ChordVoicing mVoicing; // TODO: Make a ChordVoicing class that contains the voicing of the chord
 };
 
+
+
+
+
 // -------------------------------------------------------------------------------------------- //
-// ---------------------------------- ChordProgression Class ---------------------------------- //
+// ---------------------------------- ChordProg Class ----------------------------------------- //
 // -------------------------------------------------------------------------------------------- //
 using ChordVector = std::vector<Chord>;
-class ChordProgression : public ChordVector {
+class ChordProg : public ChordVector {
 public:
-    ChordProgression() = default;
+    ChordProg() = default;
     // Constructor to create a chord progression from a vector of chords
-    ChordProgression(const ChordVector& chords, const Note& aTonic=Note())
-    {
-        mTonic = aTonic;
-        this->set(chords);
-    }
+    ChordProg(const ChordVector& chords, const Note& aTonic=Note());
+
     // Constructor to create a chord progression from a vector of chord symbols
-    ChordProgression(const std::vector<std::string>& chordSymbols, const Note& aTonic=Note())
-    {
-        mTonic = aTonic;
-        this->set(chordSymbols);
-    }
+    ChordProg(const std::vector<std::string>& chordSymbols, const Note& aTonic=Note());
 
     // Constructor to create a chord progression from a string of chord symbols
-    ChordProgression(const std::string& chordSymbols, const Note& aTonic=Note())
-    {
-        mTonic = aTonic;
-        if(isRomanChordSymbol(chordSymbols)){
-            this->setRoman(chordSymbols,aTonic);
-        }
-        else {
-            this->set(chordSymbols);
-        }
-    }
+    ChordProg(const std::string& chordSymbols, const Note& aTonic=Note());
 
     // Constructor to create a chord progression from a string of chord symbols
-    ChordProgression(const std::string& chordSymbols, const std::string& aTonic)
-    {
-        mTonic = Note(aTonic);
-        if(isRomanChordSymbol(chordSymbols)){
-            this->setRoman(chordSymbols,mTonic);
-        }
-        else {
-            this->set(chordSymbols);
-        }
-    }
+    ChordProg(const std::string& chordSymbols, const std::string& aTonic);
 
     // Function to set the chord progression from a vector of chords
-    ChordProgression& set(const ChordVector& chords)
-    {
-        *this = chords;
-        return *this;
-    }
+    ChordProg& set(const ChordVector& chords);
 
     // Function to set the chord progression from a vector of chord symbols
-    ChordProgression& set(const std::vector<std::string>& chordSymbols)
-    {
-        this->clear();
-        for (int i = 0; i < chordSymbols.size(); i++) {
-            this->push_back(Chord(chordSymbols[i]));
-        }
-        return *this;
-    }
+    ChordProg& set(const std::vector<std::string>& chordSymbols);
 
     // Function to set the chord progression from a vector of chord symbols
-    ChordProgression& setRoman(const std::vector<std::string>& chordSymbols, const Note& aTonic)
-    {
-        this->clear();
-        mTonic = aTonic ? aTonic : Note("C");
-        for (int i = 0; i < chordSymbols.size(); i++) {
-            this->push_back(Chord::NewRoman(chordSymbols[i], mTonic));
-        }
-        return *this;
-    }
+    ChordProg& setRoman(const std::vector<std::string>& chordSymbols, const Note& aTonic);
 
     // Function to set the chord progression from string of chord symbols
-    ChordProgression& set(const std::string& chordSymbols)
-    {
-        // Use the vector-based set function
-        set(chordStringToVector(chordSymbols));
-        return *this;
-    }
+    ChordProg& set(const std::string& chordSymbols);
 
     // Function to set the chord progression from string of chord symbols
-    ChordProgression& setRoman(const std::string& chordSymbols, const Note& aTonic = Note())
-    {
-        // Use the vector-based set function
-        setRoman(chordStringToVector(chordSymbols),aTonic);
-        return *this;
-    }
+    ChordProg& setRoman(const std::string& chordSymbols, const Note& aTonic = Note());
 
     // Function to add a chord to the progression
-    ChordProgression& addChord(const Chord& chord)
-    {
-        ChordVector::push_back(chord);
-        return *this;
-    }
+    ChordProg& addChord(const Chord& chord);
 
     // Function to add a chord to the progression
-    ChordProgression& addChord(const std::string& chordSymbol)
-    {
-        ChordVector::push_back(Chord(chordSymbol));
-        return *this;
-    }
+    ChordProg& addChord(const std::string& chordSymbol);
 
     // Function to add a Roman chord to the progression
-    ChordProgression& addRoman(const std::string& romanChordSymbol, const Note& tonic)
-    {
-        ChordVector::push_back(Chord::NewRoman(romanChordSymbol, tonic));
-        return *this;
-    }
+    ChordProg& addRoman(const std::string& romanChordSymbol, const Note& tonic);
 
     // Function to clear the progression
-    ChordProgression& clear()
-    {
-        ChordVector::clear();
-        return *this;
-    }
+    ChordProg& clear();
 
-    ChordProgression& transpose(int n)
-    {
-        auto it = ChordVector::begin();
-        while(it != ChordVector::end())
-        {   
-            it->transpose(n);
-            it++;
-        }
-        if(mTonic) mTonic.transpose(n); 
-        return *this; 
-    }
+    ChordProg& transpose(int n);
 
     // Print the chord progression
-    ChordProgression& printChords()
-    {
-        auto it = this->begin();
-        while (it != this->end()) {
-            it->print();
-            it++;
-        }
-        return *this;
-    }
+    ChordProg& printChords();
 
     // Print the chord progression
-    ChordProgression& print()
-    {
-        std::cout << "ChordProgression: (";
-        auto it = this->begin();
-        int i = 0;
-        while (it != this->end()) {
-            std::cout << it->toString();
-            if(++it != this->end()) std::cout << "|";
-        }
-        std::cout << ")";
-        if(mTonic) std::cout << "  --->  " << mTonic.toString(false) <<  " : (" << getRoman(mTonic) << ")";
-        std::cout << std::endl;
-        return *this;
-    }
+    ChordProg& print();
 
     // Get Roman Chord Symbols
-    std::string getRoman(const Note& aTonic) const
-    {
-        auto tonic = aTonic ? aTonic : mTonic ? mTonic : Note("C");
-        std::string romanChordSymbols;
-        auto it = this->begin();
-        while (it != this->end()) {
-            romanChordSymbols += it->getRoman(tonic);
-            if(++it != this->end()) romanChordSymbols += "|";
-        }
-        return romanChordSymbols;
-    }
+    std::string getRoman(const Note& aTonic) const;
 
     // Print the chord progression as Roman Chords
-    ChordProgression& printRoman(const Note& aTonic)
-    {
-        std::cout << "Roman: (" << getRoman(aTonic ? aTonic : mTonic ? mTonic : Note("C")) << ")" << std::endl;
-        return *this;
-    }
+    ChordProg& printRoman(const Note& aTonic);
 
     // Print the chord progression as Roman Chords
-    ChordProgression& printRoman()
-    {
-        return printRoman(mTonic);   
-    }
+    ChordProg& printRoman();
 
     // Set the Tonic
-    ChordProgression& setTonic(const Note& aTonic)
-    {
-        mTonic = aTonic;
-        return *this;
-    }
-    // Set the Tonic
-    ChordProgression& setTonic(const std::string& aTonic)
-    {
-        mTonic = Note(aTonic);
-        return *this;
-    }
+    ChordProg& setTonic(const Note& aTonic);
+    ChordProg& setTonic(const std::string& aTonic);
 
     // Get the Tonic
-    const Note& getTonic() const
-    {
-        return mTonic;
-    }
+    const Note& getTonic() const;
 
     // Change Tonic
-    ChordProgression& changeKey(const Note& aTonic)
-    {
-        if(!mTonic) mTonic = at(0).getRoot();
-        if(mTonic) transpose(aTonic.getPitch()-mTonic.getPitch());
-        mTonic = aTonic;
-        return *this;
-    }
-    // Change Tonic
-    ChordProgression& changeKey(const std::string& aTonic)
-    {
-        return changeKey(Note(aTonic));
-    }
+    ChordProg& changeKey(const Note& aTonic);
+    ChordProg& changeKey(const std::string& aTonic);
 
     // Get Notes used in the progression
-    Notes getNotes() const
-    {
-        Notes notes;
-        for(auto& chord : *this){
-            notes.add(chord.getNotes());
-        }
-        // Remove duplicates and octave
-        notes.removeDuplicates();
+    Notes getNotes() const;
 
-        return std::move(notes);
-    }
-
-    static std::map<std::string, ChordProgression> Map;
+    // A Map of Chord Progressions
+    static std::map<std::string, ChordProg> Map;
 
 private:
     // Function to convert a string of chord symbols to a vector of chord symbols
-    std::vector<std::string> chordStringToVector(std::string chordSymbols)
-    {
-        // Remove all spaces from the chord symbols
-        chordSymbols.erase(std::remove(chordSymbols.begin(), chordSymbols.end(), ' '), chordSymbols.end());
-
-        std::vector<std::string> chordSymbolsVector;
-        std::string chordSymbol;
-        for (int i = 0; i < chordSymbols.size(); i++) {
-            auto c = chordSymbols[i];
-            if (c == '|' || c == ','){
-                if(chordSymbol.size() > 0){
-                    chordSymbolsVector.push_back(chordSymbol);
-                    chordSymbol = "";
-                }
-            } 
-            else {
-                chordSymbol += chordSymbols[i];
-            }
-        }
-        // If a chordSymbol is still present push it to the vector
-        if(chordSymbol.size() > 0) chordSymbolsVector.push_back(chordSymbol);
-
-        // Use the vector-based set function
-        return std::move(chordSymbolsVector);
-    }
+    std::vector<std::string> chordStringToVector(std::string chordSymbols);
 
     // Tonic of the progression
     Note mTonic = Note(); // The Note Object will init in a not ok state, so it can be checked if it is set by mNote.ok() or cast to bool
-};
-
-
-// Initialize the static member variable sProgressions
-std::map<std::string, ChordProgression> ChordProgression::Map = {
-//   // Major Progressions
-    {"DooWop"         ,ChordProgression("I|vi|IV|V"                 )},
-    {"Axis"           ,ChordProgression("I|V|vi|IV"                 )},
-    {"Axis2"          ,ChordProgression("vi|IV|I|V"                 )},
-    {"M3425"          ,ChordProgression("iii|IV|ii|V"               )},
-    {"RedHot2"        ,ChordProgression("I|V|ii|IV"                 )},
-    {"RedHot3"        ,ChordProgression("IV|I|V|vi"                 )},
-    {"RedHot4"        ,ChordProgression("I|V|vi|IV"                 )},
-    {"RoyalRoad"      ,ChordProgression("I|IV|iii|vi"               )},
-    {"Japan"          ,ChordProgression("IV|V|iii|vi"               )},
-    {"Emotional"      ,ChordProgression("vi|IV|V|iii"               )},
-    {"MysteryClimb"   ,ChordProgression("IV|V|vi"                   )},
-    {"Evanescence"    ,ChordProgression("I|iii|I|iii"               )},
-    {"Christiania"    ,ChordProgression("I|iii|vi|V|IV|I|ii|V"      )},
-    {"Love"           ,ChordProgression("I|V/7|vi|iii/5|IV|I/3|ii|V")},
-    {"Canon"          ,ChordProgression("D|A|Bm|F#m|G|D|G|A7","D")},
-    {"Major 5ths"     ,ChordProgression("Am7|Dm7|G7|CM7|FM7|Bm7b5|Em7|Am", Note("C"))},
-
-
-    {"KissFromARose"     ,ChordProgression("bVI|bVII|I"                )}, // Aeolian (Major 1 Chord)
-    {"SuperMarioCadence" ,ChordProgression("I|bVI|bVII|I"              )}, // Aeolian (Major 1 Chord)
-
-    // Minor Progressions
-    {"JonnyMinor1"    ,ChordProgression("Am|Dm|B°|E"  ,Note("A"))}, // Harmonic Minor
-    {"JonnyMinor2"    ,ChordProgression("Am|F|C|G"    ,Note("A"))}, // Natural Minor
-    {"JonnyMinor3"    ,ChordProgression("Am|C|D|E"    ,Note("A"))}, 
-    {"JonnyMinor3"    ,ChordProgression("Am|Em|G|D"   ,Note("A"))}, 
-    {"Andalusian"     ,ChordProgression("i|bVII|bVI|V"          )}, // Aeolian (Major 5th Chord)
-    {"Interstellar"   ,ChordProgression("F|G|Am|G|F"  ,Note("A"))}, // by Hans Zimmer (Interstellar) - Root A, Scale Minor
-
-    // Aeolian Progressions
-    {"AeolianCascade" ,ChordProgression("i|bIII|bVII|iv"        )},
-    {"AeolianVamp"    ,ChordProgression("i|bVII|bVI|bVII"       )},
-
-    // Dorian Progressions
-    {"PlagelCascade"  ,ChordProgression("i|bIII|bVII|IV")},
-    {"DorianVamp"     ,ChordProgression("i|IV|i|IV")},
-    {"DorianVamp2"    ,ChordProgression("i|ii|i|ii")},
-    {"Dorian1374"     ,ChordProgression("i|bVII|bIII|IV")},
-    {"Time"           ,ChordProgression("Am|Em|G|D|CM7|Em|G|D", Note("A"))}, // by Hans Zimmer (Inception) - Root A, Scale Dorian
-    {"UptownFunk"     ,ChordProgression("Dm7|G7"              , Note("D"))}, // Bruno Mars: Uptown Funk (DorianVamp) - https://tabs.ultimate-guitar.com/tab/bruno-mars/uptown-funk-chords-1710737 
-
-    // Mixolydian
-    {"MixolydianVamp"     ,ChordProgression("I|bVII|IV|I"               )},
-
-    // Mixolydian b6
-    {"PrincessLeia"       ,ChordProgression("I|iv6")}, // Mixolydian b6, Harmonic Major
-
-    // Progressions Named by the Song they are taken from
-    {"Hes A Pirate A"     , ChordProgression("Dm|Bb|Am|Dm|Bb|F|C|Dm|Dm|Gm|Bb|Dm|Bb|Dm|A|A7" , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
-    {"Hes A Pirate Bridge", ChordProgression("A|Dm|C|Dm|A|Dm|Gm|A"                          , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
-    {"Hes A Pirate B"     , ChordProgression("Dm|Dm|C|Dm|Dm|Dm|C|Dm"                        , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
-    {"Hes A Pirate C"     , ChordProgression("Dm|C|F|Bb|F|Am|Dm|Dm|Dm|C|F|Bb|Gm|Bb|Am|A"    , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
-    {"Hes A Pirate Chorus", ChordProgression("Dm|Bb|F|C|Gm|Dm|A7|Dm"                        , Note("D"))}, // by Hans Zimmer (Pirates of the Caribean) - Root D-Aeolian (Major 5th Chord)
-    // https://www.youtube.com/watch?v=WbRtz5Trnbo
-    {"Ghibli Marry"       , ChordProgression("Cm|D7|Gm|Fm6/D,Bb7|EbM7|F/Eb|Dm|Gm|Em7b5|A7|Dm7|C|Bb|A|D7")}, // Joe Hisaishi - Studio Ghibli
-    {"Ghibli Spirited"    , ChordProgression("Gb|Ab|Db|Bbm", Note("Db"))}, // Joe Hisaishi - Studio Ghibli Db Major
-    {"Ghibli3"            , ChordProgression("AbM7|Eb/G",Note("C"))}, // Use C-Minor Pentatonic Scale over this 
-    {"2-5-1"              , ChordProgression("ii7|V7|I7"                 )},
-    {"AugmentedClimb"     , ChordProgression("I|I+|I6no5|I7no5|IV"       )},
-    {"LastNightOnEarth"   , ChordProgression("I|I+|I6no5|I7no5|IV|iv|I|I")},
-    {"ClapHands"          , ChordProgression("Bm|G7","B")}, // Tom Waits: ClapHands - https://tabs.ultimate-guitar.com/tab/tom-waits/clap-hands-chords-876967
-    {"LayLadyLayA1"       , ChordProgression("A|C#m|G|Bm", Note("A"))}, // Johnny Cash: Hurt - https://tabs.ultimate-guitar.com/tab/johnny-cash/hurt-chords-108013
-    {"LayLadyLayA2"       , ChordProgression("E|F#m|A|A" , Note("A"))}, // Johnny Cash: Hurt - https://tabs.ultimate-guitar.com/tab/johnny-cash/hurt-chords-108013
-    {"Creep"              , ChordProgression("I|III|IV|iv","G")}, // Radiohead: Creep - Original Key G
-    {"LayLadyLayA2"       , ChordProgression("E|F#m|A|A"                , "A")}, // Hello by Adele https://www.youtube.com/watch?v=rQXendWErCA
-    {"Hello Verse"        , ChordProgression("Fm|Ab|Eb|Db"              , "F")},
-    {"Hello PreChorus"    , ChordProgression("Fm|Eb|Cm|Db|Fm|Eb|Db|Db"  , "F")},
-    {"Hello Chorus"       , ChordProgression("Fm|Db|Ab|Eb"              , "F")},
-    {"Hello Bridge"       , ChordProgression("Fm|Db|Eb|Ab"              , "F")},
-
-
 };
 
 
@@ -1117,9 +340,9 @@ public:
     ChordSequencer() = default;
 
     // Function to set the chord progression
-    void set(const ChordProgression& aChordProgression)
+    void set(const ChordProg& aChordProg)
     {
-        chordProgression = aChordProgression;
+        chordProgression = aChordProg;
         rewind();
     }
 
@@ -1146,7 +369,7 @@ public:
     }
 
 private:
-    ChordProgression chordProgression;
+    ChordProg chordProgression;
     int index = -1;
     std::vector<int> current = {};
 };
@@ -1154,73 +377,73 @@ private:
 
 
 // ----------------------------------------------------------------------- //
-// ----------------------- ChordProgressions Class ----------------------- //
+// ----------------------- ChordProgs Class ----------------------- //
 // ----------------------------------------------------------------------- //
-class ChordProgressions {
+class ChordProgs {
 public:
     // Constructor
-    ChordProgressions()
+    ChordProgs()
     {
         // Create the chord progressions
-        // createChordProgressions();
+        // createChordProgs();
     };
 
     // Function to create the chord progressions
-    void createChordProgressions()
+    void createChordProgs()
     {
         // Sad Chord Progressions from https://www.pianote.com/blog/sad-chord-progressions/
-        chordProgressions["PopProgression"]      = ChordProgression("vi|IV|I|V");
-        chordProgressions["HarmonicMinorAxis"]   = ChordProgression("vi|IV|I|bIII");  // Check this progression - Not Harmonic minor
-        chordProgressions["Creep"]               = ChordProgression("I|III|IV|iv");
-        chordProgressions["HarmonicVamp"]        = ChordProgression("i|i|bVI|V");
-        chordProgressions["HouseOfTheRisingSun"] = ChordProgression("i|III|IV|VI");
-        chordProgressions["Harmonic Shift"]      = ChordProgression("i|iv|III|V");
-        chordProgressions["AeolianClosedLoop"]   = ChordProgression("i|bVII|iv|i");   // Added to Aeolian
-        chordProgressions["LanaProgression"]     = ChordProgression("i|III|v|VI");
-        chordProgressions["Emotional"]           = ChordProgression("vi|IV|V|iii");   // Added to Major
-        chordProgressions["MoonlightSonata"]     = ChordProgression("i|VI|ii|V");     
-        chordProgressions["Sting"]               = ChordProgression("i|VII|iv|V");
-        chordProgressions["MinorMysteryClimb"]   = ChordProgression("IV|V|vi");
+        chordProgressions["PopProgression"]      = ChordProg("vi|IV|I|V");
+        chordProgressions["HarmonicMinorAxis"]   = ChordProg("vi|IV|I|bIII");  // Check this progression - Not Harmonic minor
+        chordProgressions["Creep"]               = ChordProg("I|III|IV|iv");
+        chordProgressions["HarmonicVamp"]        = ChordProg("i|i|bVI|V");
+        chordProgressions["HouseOfTheRisingSun"] = ChordProg("i|III|IV|VI");
+        chordProgressions["Harmonic Shift"]      = ChordProg("i|iv|III|V");
+        chordProgressions["AeolianClosedLoop"]   = ChordProg("i|bVII|iv|i");   // Added to Aeolian
+        chordProgressions["LanaProgression"]     = ChordProg("i|III|v|VI");
+        chordProgressions["Emotional"]           = ChordProg("vi|IV|V|iii");   // Added to Major
+        chordProgressions["MoonlightSonata"]     = ChordProg("i|VI|ii|V");     
+        chordProgressions["Sting"]               = ChordProg("i|VII|iv|V");
+        chordProgressions["MinorMysteryClimb"]   = ChordProg("IV|V|vi");
         // The 5 Sad Piano Chord Progressions https://pianowithjonny.com/piano-lessons/5-sad-piano-chord-progressions/
-        chordProgressions["Evanescence"]         = ChordProgression("I|iii|I|iii");
-        chordProgressions["PrincessLeia"]        = ChordProgression("I|iv6");
-        chordProgressions["Sentimental"]         = ChordProgression("i|V|i|vi7b5");             // Normally arranged with decending bass line i | V/7 | i/b7 | vi7b5
-        chordProgressions["LoveProgression"]     = ChordProgression("I|V|vi|iii|IV|I|ii7|V"); // I | V/7 | vi | iii/5 | IV | I/3 | ii7 | V
+        chordProgressions["Evanescence"]         = ChordProg("I|iii|I|iii");
+        chordProgressions["PrincessLeia"]        = ChordProg("I|iv6");
+        chordProgressions["Sentimental"]         = ChordProg("i|V|i|vi7b5");             // Normally arranged with decending bass line i | V/7 | i/b7 | vi7b5
+        chordProgressions["LoveProgression"]     = ChordProg("I|V|vi|iii|IV|I|ii7|V"); // I | V/7 | vi | iii/5 | IV | I/3 | ii7 | V
         // The 12 bar blues progression
-        chordProgressions["Blues"]               = ChordProgression("I7|IV7|I7|I7|IV7|IV7|I7|I7|V7|IV7|I7|V7");
+        chordProgressions["Blues"]               = ChordProg("I7|IV7|I7|I7|IV7|IV7|I7|I7|V7|IV7|I7|V7");
         // Jazz Progressions
-        chordProgressions["RhythmChanges"]       = ChordProgression("I|vi|ii|V");
+        chordProgressions["RhythmChanges"]       = ChordProg("I|vi|ii|V");
         // Cadence
-        chordProgressions["PlagalCadence"]       = ChordProgression("IV|I");
-        chordProgressions["PerfectCadence"]      = ChordProgression("V7|I");
+        chordProgressions["PlagalCadence"]       = ChordProg("IV|I");
+        chordProgressions["PerfectCadence"]      = ChordProg("V7|I");
 
         // Tom Waits
-        chordProgressions["JockeyFullOfBourbon"]  = ChordProgression("i|V");
-        chordProgressions["Jockey"] = ChordProgression("i|iv|i|V");
+        chordProgressions["JockeyFullOfBourbon"]  = ChordProg("i|V");
+        chordProgressions["Jockey"] = ChordProg("i|iv|i|V");
         // Clap Hands
-        chordProgressions["??"] = ChordProgression("i|V|iv|V");
-        chordProgressions["ClapHands"] = ChordProgression("i|bVI7"); // 
-        chordProgressions["ChocolateJesus"] = ChordProgression("i|iv|i|V7"); // Harmonic Minor
+        chordProgressions["??"] = ChordProg("i|V|iv|V");
+        chordProgressions["ClapHands"] = ChordProg("i|bVI7"); // 
+        chordProgressions["ChocolateJesus"] = ChordProg("i|iv|i|V7"); // Harmonic Minor
 
         // Hans Zimme
-        chordProgressions["Time"] = ChordProgression("Am|Em|G|D|CM7|Em|G|D"); // Am Em G D CM7 Em G D
+        chordProgressions["Time"] = ChordProg("Am|Em|G|D|CM7|Em|G|D"); // Am Em G D CM7 Em G D
 
     }
 
     // Function to add a chord progression to the map
     void add(const std::string& name, const std::string& progression)
     {
-        chordProgressions[name] = ChordProgression(progression);
+        chordProgressions[name] = ChordProg(progression);
     }
 
     // Function to add a chord progression to the map
-    void add(const std::string& name, const ChordProgression& progression)
+    void add(const std::string& name, const ChordProg& progression)
     {
         chordProgressions[name] = progression;
     }
 
     // Overload index operator to get the chord progression
-    ChordProgression& operator[](const std::string& chordProgression)
+    ChordProg& operator[](const std::string& chordProgression)
     {
         return chordProgressions[chordProgression];
     }
@@ -1240,7 +463,7 @@ public:
     }
 
 private:
-    std::map<std::string, ChordProgression> chordProgressions; // TODO: Make this into a static private member
+    std::map<std::string, ChordProg> chordProgressions; // TODO: Make this into a static private member
 };
 
 

@@ -17,6 +17,7 @@ set(SOURCES
     src/InterfaceGPT.cpp
     src/Interval.cpp
     src/Note.cpp
+    src/Chords.cpp
 )
 
 # Add your header files here
