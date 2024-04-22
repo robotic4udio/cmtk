@@ -18,6 +18,7 @@ set(SOURCES
     src/Interval.cpp
     src/Note.cpp
     src/Chord.cpp
+    src/Scale.cpp
 )
 
 # Add your header files here
@@ -25,6 +26,7 @@ set(HEADERS
     src/Interval.h
     src/Note.h
     src/Chord.h
+    src/Scale.h
     src/InterfaceGPT.h
     libraries/SimpleJSON/json.hpp
 )

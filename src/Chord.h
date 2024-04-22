@@ -4,8 +4,14 @@
 #include "CMTK.h"
 #include "Interval.h"
 #include "Note.h"
+#include "Scale.h"
 
 namespace cmtk {
+
+// Forward declaration
+class Scale;
+
+
 // -------------------------------------------------------------------------------------------- //
 // ---------------------------------- ChordType Class ----------------------------------------- //
 // -------------------------------------------------------------------------------------------- //
@@ -277,7 +283,7 @@ public:
     ChordProg& printChords();
 
     // Print the chord progression
-    ChordProg& print();
+    ChordProg& print(bool simplify=false);
 
     // Get Roman Chord Symbols
     std::string getRoman(const Note& aTonic) const;
@@ -304,6 +310,9 @@ public:
 
     // A Map of Chord Progressions
     static std::map<std::string, ChordProg> Map;
+
+    // Get a Chord Progression from the Map
+    static ChordProg Get(const std::string& aChordProg);
 
 private:
     // Function to convert a string of chord symbols to a vector of chord symbols

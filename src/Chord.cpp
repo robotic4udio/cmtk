@@ -847,7 +847,7 @@ ChordProg& ChordProg::printChords()
 }
 
 // Print the chord progression
-ChordProg& ChordProg::print()
+ChordProg& ChordProg::print(bool simplify)
 {
     std::cout << "ChordProg: (";
     auto it = this->begin();
@@ -857,7 +857,7 @@ ChordProg& ChordProg::print()
         if(++it != this->end()) std::cout << "|";
     }
     std::cout << ")";
-    if(mTonic) std::cout << "  --->  " << mTonic.toString(false) <<  " : (" << getRoman(mTonic) << ")";
+    if(mTonic) std::cout << "  --->  " << mTonic.toString(simplify) <<  " : (" << getRoman(mTonic) << ")";
     std::cout << std::endl;
     return *this;
 }
@@ -1043,6 +1043,21 @@ std::map<std::string, ChordProg> ChordProg::Map = {
 
 };
 
+
+ChordProg ChordProg::Get(const std::string& aChordProg)
+{
+    if(aChordProg == "Christiania") return Scale::GetChordProg("C-Major-13654125"); // Christiania: I kan ikke slå os ihjel - https://www.youtube.com/watch?v=3Z8Y6ZUJ1dA
+
+    // Check if the chord progression is already in the map, if so return it
+    auto it = Map.find(aChordProg);
+    if(it != Map.end()) return it->second;
+
+    // If the chord progression is not in the map, then create it from Scale
+    ChordProg chordProg = Scale::GetChordProg(aChordProg);
+
+    
+    return Scale::GetChordProg(aChordProg);   
+}
 
 
 
