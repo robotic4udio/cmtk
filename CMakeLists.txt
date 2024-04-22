@@ -17,14 +17,14 @@ set(SOURCES
     src/InterfaceGPT.cpp
     src/Interval.cpp
     src/Note.cpp
-    src/Chords.cpp
+    src/Chord.cpp
 )
 
 # Add your header files here
 set(HEADERS
     src/Interval.h
     src/Note.h
-    src/Chords.h
+    src/Chord.h
     src/InterfaceGPT.h
     libraries/SimpleJSON/json.hpp
 )

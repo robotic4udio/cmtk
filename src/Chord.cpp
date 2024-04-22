@@ -1,4 +1,4 @@
-#include "Chords.h"
+#include "Chord.h"
 
 namespace cmtk {
 
