@@ -15,10 +15,12 @@ project(MyProject)
 set(SOURCES
     src/main.cpp
     src/InterfaceGPT.cpp
+    src/Interval.cpp
 )
 
 # Add your header files here
 set(HEADERS
+    src/Interval.h
     src/Chords.h
     src/InterfaceGPT.h
     libraries/SimpleJSON/json.hpp

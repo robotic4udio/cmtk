@@ -1,13 +1,7 @@
-#include "Chords.h"
 #include "InterfaceGPT.h"
-#include "../libraries/SimpleJSON/json.hpp"
-#include "Interval.h"
 #include "Scale.h"
-#include "Note.h"
 
-#define API_KEY "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"
 
-using json::JSON;
 using namespace cmtk;
 
 int main() {

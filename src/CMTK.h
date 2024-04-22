@@ -208,7 +208,7 @@ inline bool removeChars(std::string& s, const std::string& chars)
 }
 
 // Function to convert a roman numeral to an integer
-int romanToInt(std::string romanNumeral)
+inline int romanToInt(std::string romanNumeral)
 {
     // Convert the roman numeral to uppercase
     std::transform(romanNumeral.begin(), romanNumeral.end(), romanNumeral.begin(), ::toupper);
@@ -245,7 +245,7 @@ int romanToInt(std::string romanNumeral)
 };
 
 // Function to convert an integer to a roman numeral
-std::string intToRoman(int num, bool upperCase = true)
+inline std::string intToRoman(int num, bool upperCase = true)
 {
     // Create a map of the roman numerals
     std::map<int, std::string> romanMap;
@@ -289,7 +289,7 @@ std::string intToRoman(int num, bool upperCase = true)
 };
 
 // Function to convert a pitch expressed as a roman numeral to a semitone value
-int romanPitchToSemitone(std::string romanPitch, int root=0)
+inline int romanPitchToSemitone(std::string romanPitch, int root=0)
 {
     int semitone = root;
 
@@ -359,7 +359,7 @@ inline bool isArabicChordSymbol(std::string chordSymbol)
 }
 
 // Function to convert a pitch expressed as an arabic numeral to a semitone value
-int arabicPitchToSemitone(std::string arabicPitch, int root=0)
+inline int arabicPitchToSemitone(std::string arabicPitch, int root=0)
 {
     int semitone = root;
 
