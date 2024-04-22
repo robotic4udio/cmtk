@@ -50,19 +50,19 @@ public:
     bool isKindOfMinor() const;
 
     // Get the chord symbol
-    const std::string& getChordType();
+    std::string getChordType();
 
     // Get the intervals
     const Intervals& getIntervals() const;
 
     // ChordType to string
-    const std::string& toString() const;
+    std::string toString() const;
 
     // Stream operator
     friend std::ostream& operator<<(std::ostream& os, const ChordType& ct);
 
     // Print the chordType
-    ChordType& print();
+    ChordType print();
 
     // Size of ChordType
     size_t size() const;
@@ -138,7 +138,7 @@ public:
     Chord& setRoman(const std::string& aRomanChordSymbol);
 
     // Get Roman Chord Symbol from Chord and Tonic
-    const std::string& getRoman(const Note& aTonic) const;
+    std::string getRoman(const Note& aTonic) const;
 
     // Print the Roman Chord
     Chord& printRoman(const Note& aTonic);

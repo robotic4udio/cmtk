@@ -236,7 +236,7 @@ bool ChordType::isKindOfMinor() const
 }
 
 // Get the chord symbol
-const std::string& ChordType::getChordType()
+std::string ChordType::getChordType()
 {
     return mChordType;
 }
@@ -248,7 +248,7 @@ const Intervals& ChordType::getIntervals() const
 }
 
 // ChordType to string
-const std::string& ChordType::toString() const
+std::string ChordType::toString() const
 {
     return mChordType;
 }
@@ -261,7 +261,7 @@ std::ostream& operator<<(std::ostream& os, const ChordType& ct)
 }
 
 // Print the chordType
-ChordType& ChordType::print()
+ChordType ChordType::print()
 {
     std::cout << "ChordType: " << mChordType << " ---> (" << mIntervals << ")" << std::endl;
     return *this;
@@ -452,7 +452,7 @@ Chord& Chord::setRoman(const std::string& aRomanChordSymbol)
 }
 
 // Get Roman Chord Symbol from Chord and Tonic
-const std::string& Chord::getRoman(const Note& aTonic) const
+std::string Chord::getRoman(const Note& aTonic) const
 {
     // Get the interval from the tonic to the root note
     const auto& interval = aTonic.getIntervalTo(mRootNote);
@@ -1034,6 +1034,7 @@ std::map<std::string, ChordProg> ChordProg::Map = {
     {"LayLadyLayA1"       , ChordProg("A|C#m|G|Bm", Note("A"))}, // Johnny Cash: Hurt - https://tabs.ultimate-guitar.com/tab/johnny-cash/hurt-chords-108013
     {"LayLadyLayA2"       , ChordProg("E|F#m|A|A" , Note("A"))}, // Johnny Cash: Hurt - https://tabs.ultimate-guitar.com/tab/johnny-cash/hurt-chords-108013
     {"Creep"              , ChordProg("I|III|IV|iv","G")}, // Radiohead: Creep - Original Key G
+    {"LayLadyLayA2"       , ChordProg("E|F#m|A|A"                , "A")}, // Hello by Adele https://www.youtube.com/watch?v=rQXendWErCA
     {"Hello Verse"        , ChordProg("Fm|Ab|Eb|Db"              , "F")},
     {"Hello PreChorus"    , ChordProg("Fm|Eb|Cm|Db|Fm|Eb|Db|Db"  , "F")},
     {"Hello Chorus"       , ChordProg("Fm|Db|Ab|Eb"              , "F")},
