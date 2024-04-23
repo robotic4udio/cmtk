@@ -10,6 +10,7 @@ namespace cmtk {
 
 // Forward declaration
 class Scale;
+class ChordVoicing;
 
 
 // -------------------------------------------------------------------------------------------- //
@@ -73,17 +74,6 @@ private:
     Intervals mIntervals = Intervals({Interval(1), Interval(3), Interval(5)});
 };
 
-// -------------------------------------------------------------------------------------------- //
-// ---------------------------------- ChordVoicing Class -------------------------------------- //
-// -------------------------------------------------------------------------------------------- //
-class ChordVoicing : std::vector<int>  {
-public:
-    // For now it is just a vector of ints representing the order of degrees in the intervals
-
-
-private:
-
-};
 
 // -------------------------------------------------------------------------------------------- //
 // ---------------------------------- Chord Class --------------------------------------------- //
@@ -224,11 +214,146 @@ private:
     ChordType mChordType;  // Object representing the chord type, i.e. the basic structure of the chord
     Note mRootNote;        // The root note of the chord
     Note mBassNote;        // The bass note of the chord, this is only different from the root note if the chord is a slash chord
-    ChordVoicing mVoicing; // TODO: Make a ChordVoicing class that contains the voicing of the chord
 };
 
 
+class ChordVoicing {
+public:
+    ChordVoicing(Chord& aChord, const std::string aVoicing = ""):mChord(aChord)
+    {
+        setVoicing(aVoicing);
+    }
 
+    ChordVoicing& setVoicing(const std::string& aVoicing)
+    {
+        mVoicing = aVoicing;
+        return *this;
+    }
+
+    // Get Notes
+    Notes getNotes()
+    {
+        // If the voicing is empty, then return the chord notes
+        if(mVoicing.empty()) return mChord.getNotes();
+
+        auto intervals = mChord.getIntervals();
+        Notes notes;
+
+        auto sv = split(mVoicing, ' ');
+
+        bool addRest = false;
+        int last = -1;  
+        Note minNote(  0);
+        Note maxNote(127);
+        std::set<int> usedDegrees;
+        for(auto s : sv){
+            int transpose = 0;
+            transpose += removeCount(s, '+');
+            transpose -= removeCount(s, '-');
+
+            if(s == "*"){
+                addRest = true;
+                continue;
+            }
+            else if(s == "B"){
+                notes.push_back(mChord.getBass());
+                if(transpose) notes.back().shiftOctave(transpose);
+                continue;
+            }
+            else if(removePrefix(s,"L:"))
+            {
+                if(isNumber(s)) minNote.set(std::stoi(s));
+                else            minNote.set(s);
+            }
+            else if(removePrefix(s,"H:"))
+            {
+                if(isNumber(s)) maxNote.set(std::stoi(s));
+                else            maxNote.set(s);
+            }
+            else if(isNumber(s)){
+                int d = std::stoi(s);
+                if(intervals.containsDegree(d)){
+                    usedDegrees.insert(d);
+                    auto i = intervals.getIntervalFromDegree(d);
+                    auto n = mChord.getRoot() + i;
+                    while(n.getPitch() < last) n.shiftOctave(1);
+                    if(transpose) notes.back().shiftOctave(transpose);
+                    notes.push_back(n);
+                    last = n;
+                }
+            }
+        }
+
+        // Remove the used degrees
+        for(auto d : usedDegrees){
+            intervals.removeDegree(d);
+        }
+
+        // Add the rest of the intervals
+        if(addRest){
+            for(auto i : intervals){
+                auto n = mChord.getRoot() + i;
+                while(n.getPitch() < last) n.shiftOctave(1);
+                notes.push_back(n);
+                last = n;
+            }
+        }
+
+        // Force notes into range
+        for(auto& n : notes){
+            while(n < minNote) n.shiftOctave(1);
+            while(n > maxNote) n.shiftOctave(-1);
+        }
+
+        // Remove duplicates
+        notes.removeDuplicates().sort();
+
+        // Return the notes
+        return std::move(notes);
+    }
+
+    ChordVoicing& setChord(const Chord& aChord)
+    {
+        mChord = aChord;
+        return *this;
+    }
+
+    ChordVoicing& print(bool simplify=true)
+    {
+        std::cout << mChord.toString() << " -> Voicing(" << mVoicing << ") -> (";
+        auto notes = getNotes();
+        std::cout <<  notes.toString(false,simplify) << ")" 
+                << " -> (" << getNotes().getPitchString() << ")";
+        std::cout << std::endl;
+        return *this;
+    }
+
+
+
+private:
+    // Input
+    Chord& mChord;
+
+    // Voicing
+    std::string mVoicing;
+
+    // Remove all occurences of a character from a string and return the number of occurences
+    int removeCount(std::string& s, char c)
+    {
+        int count = 0;
+        for(int i = 0; i < s.size(); i++)
+        {
+            if(s[i] == c)
+            {
+                count++;
+                s.erase(i,1);
+                i--;
+            }
+        }
+        return count;
+    }
+
+};
 
 
 // -------------------------------------------------------------------------------------------- //

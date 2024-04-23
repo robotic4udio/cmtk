@@ -857,7 +857,7 @@ ChordProg& ChordProg::print(bool simplify)
         if(++it != this->end()) std::cout << "|";
     }
     std::cout << ")";
-    if(mTonic) std::cout << "  --->  " << mTonic.toString(simplify) <<  " : (" << getRoman(mTonic) << ")";
+    if(mTonic) std::cout << "  <==>  " << mTonic.toString(simplify) <<  " : (" << getRoman(mTonic) << ")";
     std::cout << std::endl;
     return *this;
 }

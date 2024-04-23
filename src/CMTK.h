@@ -7,6 +7,8 @@
 #include <iomanip>
 #include <map>
 #include <algorithm>
+#include <set>
+#include <cmath>
 
 namespace cmtk {
 
@@ -26,6 +28,31 @@ static constexpr const int C9 = C0+108;
 
 static constexpr const int OCTAVES_BELOW_ZERO = C0/12;
 
+// Commonly used constants
+static constexpr const float PI           = 3.1415926535897932384626433832795f;
+static constexpr const float HALF_PI      = 0.5f * PI;
+static constexpr const float TWO_PI       = 2.0f * PI;
+static constexpr const float DEG_TO_RAD   = PI/180.0f;
+static constexpr const float RAD_TO_DEG   = 180.0f/PI;
+static constexpr const float ONE_OVER_127 = 1.0f/127.0f;
+static constexpr const float ONE_OVER_128 = 1.0f/128.0f;
+static constexpr const float SQRT_2       = 1.4142135623730950488016887242097f;
+static constexpr const float HALF_SQRT_2  = 0.5f * SQRT_2;
+
+static constexpr const float MIDI_A4_FREQ                     = 440.0f; // set A4=440Hz
+static constexpr const float MIDI_A4_FREQ_RECIPROCAL          = 1.0f/MIDI_A4_FREQ;
+static constexpr const float MIDI_A4_KEY                      =  69.0f; // What MIDI Key is A4
+static constexpr const float MIDI_NOTES_PER_OCTAVE            =  12.0f; 	
+static constexpr const float MIDI_NOTES_PER_OCTAVE_RECIPROCAL =  1.0f/MIDI_NOTES_PER_OCTAVE; 	
+static const float LOG2                             = logf(2.0f);
+static const float LOG2_OVER_12                     = LOG2/12.0f;
+static const float ONE_OVER_LOG2_OVER_12            = 1.0f/LOG2_OVER_12;
+static const float LOGTEN                           = logf(10.0f);
+static const float ONE_OVER_LOGTEN                  = 1.0f/LOGTEN;
+static const float TEN_OVER_LOGTEN                  = 10.0f/LOGTEN;
+static const float LOGTEN_OVER_TEN                  = LOGTEN/10.0f;
+static const float LOGTEN_OVER_TWENTY               = LOGTEN/20.0f;
+static const float TWENTY_OVER_LOGTEN               = 20.0f/LOGTEN;
 
 // ----------------------------------------------------------------------- //
 // ----------------------------- Helper Functions ------------------------ //

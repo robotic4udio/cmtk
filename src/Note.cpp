@@ -20,10 +20,11 @@ Note::Note(int note)
 
 
 // Function to set the note from a midinote
-void Note::set(int note)
+Note& Note::set(int note)
 {
     clear();
     mNote = note;
+    return *this;
 }
 
 int Note::getPitch() const
@@ -34,6 +35,11 @@ int Note::getPitch() const
 int Note::getPitchWrap() const
 {
     return mNote%12;
+}
+
+float Note::getFreq() const 
+{
+    return 440.0 * pow(2.0, (mNote - 69) / 12.0);
 }
 
 int Note::getOctave() const
@@ -146,7 +152,7 @@ std::string Note::toString(bool includeOctave, bool simplify) const
 
 Note& Note::print(bool includeOctave, bool simplify) const
 {
-    std::cout << toString(includeOctave,simplify) << ": " << getPitch() << std::endl;
+    std::cout << toString(includeOctave,simplify) << ": " << getPitch() << " = " << getFreq() << " Hz" << std::endl;
     return *const_cast<Note*>(this);
 }
 
@@ -172,6 +178,11 @@ bool Note::operator!=(const Note& other) const
 bool Note::operator<(const Note& other) const
 {
     return mNote < other.mNote;
+}
+
+bool Note::operator>(const Note& other) const
+{
+    return mNote > other.mNote;
 }
 
 // Assignment operator
@@ -451,6 +462,15 @@ std::string Notes::getPitchString() const
     return std::move(res);
 }
 
+// Get a string with the pitch vector
+std::string Notes::getFreqString() const
+{
+    std::string res;
+    for(const auto& note : *this) res += std::to_string(note.getPitch()) + " ";
+    if(!res.empty()) res.pop_back();
+    return std::move(res);
+}
+
 // To string
 std::string Notes::toString(bool octave, bool simplify) const
 {
@@ -476,7 +496,7 @@ std::ostream& operator<<(std::ostream& os, const Notes& notes)
     return os;
     }
 
-void Notes::print(bool octave, bool simplify) const
+Notes& Notes::print(bool octave, bool simplify)
 {
     std::cout << "Notes(";
     auto it = begin();
@@ -486,16 +506,33 @@ void Notes::print(bool octave, bool simplify) const
         if(++it != end()) std::cout << " ";
     }
     std::cout << ")" << std::endl;
+    return *this;
 }
 
-void Notes::transpose(int semitones)
+Notes& Notes::printFreq()
+{
+    std::cout << "Freq(";
+    auto it = begin();
+    while(it != end())
+    {
+        std::cout << it->getFreq();
+        if(++it != end()) std::cout << " ";
+    }
+    std::cout << ")" << std::endl;
+
+    return *this;
+}
+
+Notes& Notes::transpose(int semitones)
 {
     for(auto& note : *this) note.transpose(semitones);
+    return *this;
 }
 
-void Notes::sort()
+Notes& Notes::sort()
 {
     std::sort(begin(),end());
+    return *this;
 }
 
 // Assignment operator
@@ -539,11 +576,25 @@ int Notes::semiAt(int i) const
 }
 
 // Get Vector of semitones
-std::vector<int> Notes::getMidiPitches() const
+std::vector<int> Notes::getPitch() const
 {
     std::vector<int> semis;
     for(auto& note : *this) semis.push_back(note.getPitch());
     return std::move(semis);
+}
+
+// Get Vector of frequencies
+std::vector<float> Notes::getFreq() const
+{
+    std::vector<float> freqs;
+    auto it = begin();
+    while(it != end())
+    {
+        freqs.push_back(it->getFreq());
+        it++;
+    }
+
+    return std::move(freqs);
 }
 
 // Get Vector of N

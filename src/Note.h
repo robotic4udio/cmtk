@@ -24,7 +24,7 @@ public:
     Note(int note);
 
     // Function to set the note from a midinote
-    void set(int note);
+    Note& set(int note);
 
     int getPitch() const;
 
@@ -35,6 +35,8 @@ public:
     Note& setOctave(int octave);
 
     Note& shiftOctave(int octaves);
+
+    float getFreq() const;
 
     // Function to set the note from a string
     Note& set(std::string noteSymbol);
@@ -63,6 +65,7 @@ public:
     bool operator!=(const Note& other) const;
 
     bool operator<(const Note& other) const;
+    bool operator>(const Note& other) const;
 
     // Assignment operator
     Note& operator=(const int& note);
@@ -162,17 +165,22 @@ public:
     // Get a string with the pitch vector
     std::string getPitchString() const;
 
+    // Get a string with the freq vector
+    std::string getFreqString() const;
+
     // To string
     std::string toString(bool octave=false, bool simplify=false) const;
 
     // Stream operator
     friend std::ostream& operator<<(std::ostream& os, const Notes& notes);
 
-    void print(bool octave=false, bool simplify=false) const;
+    Notes& print(bool octave=false, bool simplify=false);
 
-    void transpose(int semitones);
+    Notes& printFreq();
 
-    void sort();
+    Notes& transpose(int semitones);
+
+    Notes& sort();
 
     // Assignment operator
     Notes& operator=(const std::string& notes);
@@ -193,7 +201,10 @@ public:
     int semiAt(int i) const;
 
     // Get Vector of semitones
-    std::vector<int> getMidiPitches() const;
+    std::vector<int> getPitch() const;
+
+    // Get Vector of frequencies
+    std::vector<float> getFreq() const;
 
     // Get Vector of N
     static Notes AllKeys();
