@@ -815,19 +815,47 @@ Scale::Scale(std::string aName, Note aRootNote)
     ChordProg Scale::GetChordProg(const std::string& s, int size)
     {
         ChordProg chordProgression;
+        Scale scale;
         auto tokens = split(s, '-');
         if(tokens.size() == 3)
         {   
-            chordProgression = Scale(tokens[1],tokens[0]).getChordProg(tokens[2],size);
+            scale = Scale(tokens[1],tokens[0]);
+            chordProgression = scale.getChordProg(tokens[2],size);
+            chordProgression.setTonic(scale.getRoot());
         }
         else if(tokens.size() == 4)
         {
             size = std::stoi(tokens[3]);
-            chordProgression = Scale(tokens[1],tokens[0]).getChordProg(tokens[2],size);
+            scale = Scale(tokens[1],tokens[0]);
+            chordProgression = scale.getChordProg(tokens[2],size);
+            chordProgression.setTonic(scale.getRoot());
         }
 
         return std::move(chordProgression);
-    } 
+    }
+
+    std::pair<ChordProg, Scale> GetChordProgAndScale(const std::string& s, int size = 3)
+    {
+        ChordProg chordProgression;
+        Scale scale;
+        auto tokens = split(s, '-');
+        if(tokens.size() == 3)
+        {   
+            scale = Scale(tokens[1],tokens[0]);
+            chordProgression = scale.getChordProg(tokens[2],size);
+            chordProgression.setTonic(scale.getRoot());
+        }
+        else if(tokens.size() == 4)
+        {
+            size = std::stoi(tokens[3]);
+            scale = Scale(tokens[1],tokens[0]);
+            chordProgression = scale.getChordProg(tokens[2],size);
+            chordProgression.setTonic(scale.getRoot());
+        }
+
+        return std::make_pair(chordProgression, scale);
+    }
+
 
     // Print the chord symbols
     void Scale::printChordSymbols(int size)

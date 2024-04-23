@@ -62,7 +62,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const ChordType& ct);
 
     // Print the chordType
-    ChordType print();
+    ChordType& print();
 
     // Size of ChordType
     size_t size() const;
@@ -321,6 +321,7 @@ private:
     // Tonic of the progression
     Note mTonic = Note(); // The Note Object will init in a not ok state, so it can be checked if it is set by mNote.ok() or cast to bool
 };
+
 
 
 

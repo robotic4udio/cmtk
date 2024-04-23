@@ -90,6 +90,9 @@ public:
     // Get ChordProg from a combined string of Root, Scale and Degrees, e.g. "C-Major-145" -> ChordProg("C|F|G")
     static ChordProg GetChordProg(const std::string& s, int size = 3);
 
+    // Get ChordProg from a combined string of Root, Scale and Degrees, e.g. "C-Major-145" -> ChordProg("C|F|G")
+    static std::pair<ChordProg, Scale> GetChordProgAndScale(const std::string& s, int size = 3);
+
     // Print the chord symbols
     void printChordSymbols(int size = 3);
 

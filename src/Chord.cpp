@@ -261,7 +261,7 @@ std::ostream& operator<<(std::ostream& os, const ChordType& ct)
 }
 
 // Print the chordType
-ChordType ChordType::print()
+ChordType& ChordType::print()
 {
     std::cout << "ChordType: " << mChordType << " ---> (" << mIntervals << ")" << std::endl;
     return *this;
@@ -872,7 +872,7 @@ std::string ChordProg::getRoman(const Note& aTonic) const
         romanChordSymbols += it->getRoman(tonic);
         if(++it != this->end()) romanChordSymbols += "|";
     }
-    return romanChordSymbols;
+    return std::move(romanChordSymbols);
 }
 
 // Print the chord progression as Roman Chords

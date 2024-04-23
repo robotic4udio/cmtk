@@ -17,7 +17,7 @@ int main() {
 
   ChordProg::Get("F-Dorian-143576-4").print().printChords();
   ChordProg::Get("Christiania").print().printChords();
-  ChordProg::Get("Canon").print().printChords();
+  ChordProg::Get("LayLadyLayA1").print().printChords();
   ChordProg::Get("D-Phrygian-15634145").print().printChords();
 
   return 0;
