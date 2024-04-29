@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <set>
 #include <cmath>
+// Include the SimpleJSON library
+#include <json.hpp>
 
 namespace cmtk {
 
@@ -500,12 +502,11 @@ class CMTK
 {
 public:
 
-    
 
+bool mPreferSharp = false;
 
-    bool mPreferSharp = false;
-
-
+public:
+    json::JSON mJSON;
 };
 
 

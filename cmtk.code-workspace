@@ -80,7 +80,8 @@
 			"stack": "cpp",
 			"thread": "cpp",
 			"functional": "cpp",
-			"version": "cpp"
+			"version": "cpp",
+			"iterator": "cpp"
 		}
 	}
 }

@@ -56,6 +56,9 @@ public:
     // Get the intervals
     const Intervals& getIntervals() const;
 
+    // Get the interval at index
+    const Interval& getIntervalAt(int index) const;
+
     // ChordType to string
     std::string toString() const;
 
@@ -191,8 +194,14 @@ public:
     // Get Intervals
     const Intervals& getIntervals() const;
 
+    // Get Interval at index
+    const Interval& getIntervalAt(int index) const;
+
     // Get the Notes of the chord
     Notes getNotes() const;
+
+    // Get the Note at index
+    Note getNoteAt(int index) const;
 
     // Transpose the Chord
     Chord& transpose(int semitones);
@@ -210,6 +219,9 @@ public:
     // Size of Chord
     size_t size() const;
 
+    // Get JSON representation
+    json::JSON getJSON() const;
+
 private:
     ChordType mChordType;  // Object representing the chord type, i.e. the basic structure of the chord
     Note mRootNote;        // The root note of the chord
@@ -217,141 +229,35 @@ private:
 };
 
 
+// -------------------------------------------------------------------------------------------- //
+// ---------------------------------- ChordVoicing Class -------------------------------------- //
+// -------------------------------------------------------------------------------------------- //
 class ChordVoicing {
 public:
-    ChordVoicing(Chord& aChord, const std::string aVoicing = ""):mChord(aChord)
-    {
-        setVoicing(aVoicing);
-    }
+    // Constructor
+    ChordVoicing(Chord& aChord, const std::string aVoicing = "");
 
-    ChordVoicing& setVoicing(const std::string& aVoicing)
-    {
-        mVoicing = aVoicing;
-        return *this;
-    }
+    // Set the voicing, format: "B 1 3 5 7 9 11 13 L:C0 H:C4" - L and H are the lowest and highest note
+    ChordVoicing& setVoicing(const std::string& aVoicing);
 
     // Get Notes
-    Notes getNotes()
-    {
-        // If the voicing is empty, then return the chord notes
-        if(mVoicing.empty()) return mChord.getNotes();
+    Notes getNotes();
 
-        auto intervals = mChord.getIntervals();
-        Notes notes;
+    // Set the Chord
+    ChordVoicing& setChord(Chord& aChord);
 
-        auto sv = split(mVoicing, ' ');
-
-        bool addRest = false;
-        int last = -1;  
-        Note minNote(  0);
-        Note maxNote(127);
-        std::set<int> usedDegrees;
-        for(auto s : sv){
-            int transpose = 0;
-            transpose += removeCount(s, '+');
-            transpose -= removeCount(s, '-');
-
-            if(s == "*"){
-                addRest = true;
-                continue;
-            }
-            else if(s == "B"){
-                notes.push_back(mChord.getBass());
-                if(transpose) notes.back().shiftOctave(transpose);
-                continue;
-            }
-            else if(removePrefix(s,"L:"))
-            {
-                if(isNumber(s)) minNote.set(std::stoi(s));
-                else            minNote.set(s);
-            }
-            else if(removePrefix(s,"H:"))
-            {
-                if(isNumber(s)) maxNote.set(std::stoi(s));
-                else            maxNote.set(s);
-            }
-            else if(isNumber(s)){
-                int d = std::stoi(s);
-                if(intervals.containsDegree(d)){
-                    usedDegrees.insert(d);
-                    auto i = intervals.getIntervalFromDegree(d);
-                    auto n = mChord.getRoot() + i;
-                    while(n.getPitch() < last) n.shiftOctave(1);
-                    if(transpose) notes.back().shiftOctave(transpose);
-                    notes.push_back(n);
-                    last = n;
-                }
-            }
-        }
-
-        // Remove the used degrees
-        for(auto d : usedDegrees){
-            intervals.removeDegree(d);
-        }
-
-        // Add the rest of the intervals
-        if(addRest){
-            for(auto i : intervals){
-                auto n = mChord.getRoot() + i;
-                while(n.getPitch() < last) n.shiftOctave(1);
-                notes.push_back(n);
-                last = n;
-            }
-        }
-
-        // Force notes into range
-        for(auto& n : notes){
-            while(n < minNote) n.shiftOctave(1);
-            while(n > maxNote) n.shiftOctave(-1);
-        }
-
-        // Remove duplicates
-        notes.removeDuplicates().sort();
-
-        // Return the notes
-        return std::move(notes);
-    }
-
-    ChordVoicing& setChord(const Chord& aChord)
-    {
-        mChord = aChord;
-        return *this;
-    }
-
-    ChordVoicing& print(bool simplify=true)
-    {
-        std::cout << mChord.toString() << " -> Voicing(" << mVoicing << ") -> (";
-        auto notes = getNotes();
-        std::cout <<  notes.toString(false,simplify) << ")" 
-                << " -> (" << getNotes().getPitchString() << ")";
-        std::cout << std::endl;
-        return *this;
-    }
-
-
+    // Print the ChordVoicing
+    ChordVoicing& print(bool simplify=true);
 
 private:
-    // Input
+    // The Chord
     Chord& mChord;
 
     // Voicing
     std::string mVoicing;
 
     // Remove all occurences of a character from a string and return the number of occurences
-    int removeCount(std::string& s, char c)
-    {
-        int count = 0;
-        for(int i = 0; i < s.size(); i++)
-        {
-            if(s[i] == c)
-            {
-                count++;
-                s.erase(i,1);
-                i--;
-            }
-        }
-        return count;
-    }
+    int removeCount(std::string& s, char c);
 
 };
 
@@ -360,7 +266,7 @@ private:
 // ---------------------------------- ChordProg Class ----------------------------------------- //
 // -------------------------------------------------------------------------------------------- //
 using ChordVector = std::vector<Chord>;
-class ChordProg : public ChordVector {
+class ChordProg : public ChordVector, public CMTK {
 public:
     ChordProg() = default;
     // Constructor to create a chord progression from a vector of chords
@@ -402,6 +308,7 @@ public:
     // Function to clear the progression
     ChordProg& clear();
 
+    // Transpose the progression by n semitones
     ChordProg& transpose(int n);
 
     // Print the chord progression
@@ -433,11 +340,20 @@ public:
     // Get Notes used in the progression
     Notes getNotes() const;
 
+    // Get Chord At Index
+    Chord& chordAt(int index);
+
     // A Map of Chord Progressions
     static std::map<std::string, ChordProg> Map;
 
     // Get a Chord Progression from the Map
     static ChordProg Get(const std::string& aChordProg);
+
+    // Get the Chord Progression as a string
+    std::string toString() const;
+
+    // Get the JSON representation
+    json::JSON getJSON();
 
 private:
     // Function to convert a string of chord symbols to a vector of chord symbols

@@ -247,6 +247,12 @@ const Intervals& ChordType::getIntervals() const
     return mIntervals;
 }
 
+// Get the intervals
+const Interval& ChordType::getIntervalAt(int i) const
+{
+    return mIntervals[i];
+}
+
 // ChordType to string
 std::string ChordType::toString() const
 {
@@ -643,10 +649,22 @@ const Intervals& Chord::getIntervals() const
     return mChordType.getIntervals();
 }
 
+// Get Interval at index
+const Interval& Chord::getIntervalAt(int index) const
+{
+    return mChordType.getIntervalAt(index);
+}
+
 // Get the Notes of the chord
 Notes Chord::getNotes() const
 {
+    const auto& intervals = getIntervals();
     return mRootNote.getNoteAt(getIntervals());
+}
+
+Note Chord::getNoteAt(int index) const
+{
+    return mRootNote.getNoteAt(getIntervalAt(index));
 }
 
 // Transpose the Chord
@@ -706,6 +724,148 @@ Chord& Chord::print(bool simplify)
 size_t Chord::size() const 
 {
     return mChordType.size();
+}
+
+// Get JSON
+json::JSON Chord::getJSON() const
+{
+    json::JSON j;
+    j["Chord"] = toString();
+    return std::move(j);
+}
+
+
+
+
+
+// -------------------------------------------------------------------------------------------- //
+// ---------------------------------- ChordVoicing Class -------------------------------------- //
+// -------------------------------------------------------------------------------------------- //
+ChordVoicing::ChordVoicing(Chord& aChord, const std::string aVoicing)
+:mChord(aChord)
+{
+    setVoicing(aVoicing);
+}
+
+ChordVoicing& ChordVoicing::setVoicing(const std::string& aVoicing)
+{
+    mVoicing = aVoicing;
+    return *this;
+}
+
+// Get Notes
+Notes ChordVoicing::getNotes()
+{
+    // If the voicing is empty, then return the chord notes
+    if(mVoicing.empty()) return mChord.getNotes();
+
+    auto intervals = mChord.getIntervals();
+    Notes notes;
+
+    auto sv = split(mVoicing, ' ');
+
+    bool addRest = false;
+    int last = -1;  
+    Note minNote(  0);
+    Note maxNote(127);
+    std::set<int> usedDegrees;
+    for(auto s : sv){
+        int transpose = 0;
+        transpose += removeCount(s, '+');
+        transpose -= removeCount(s, '-');
+
+        if(s == "*"){
+            addRest = true;
+            continue;
+        }
+        else if(s == "B"){
+            notes.push_back(mChord.getBass());
+            if(transpose) notes.back().shiftOctave(transpose);
+            continue;
+        }
+        else if(removePrefix(s,"L:"))
+        {
+            if(isNumber(s)) minNote.set(std::stoi(s));
+            else            minNote.set(s);
+        }
+        else if(removePrefix(s,"H:"))
+        {
+            if(isNumber(s)) maxNote.set(std::stoi(s));
+            else            maxNote.set(s);
+        }
+        else if(isNumber(s)){
+            int d = std::stoi(s);
+            if(intervals.containsDegree(d)){
+                usedDegrees.insert(d);
+                auto i = intervals.getIntervalFromDegree(d);
+                auto n = mChord.getRoot() + i;
+                while(n.getPitch() < last) n.shiftOctave(1);
+                if(transpose) notes.back().shiftOctave(transpose);
+                notes.push_back(n);
+                last = n;
+            }
+        }
+    }
+
+    // Remove the used degrees
+    for(auto d : usedDegrees){
+        intervals.removeDegree(d);
+    }
+
+    // Add the rest of the intervals
+    if(addRest){
+        for(auto i : intervals){
+            auto n = mChord.getRoot() + i;
+            while(n.getPitch() < last) n.shiftOctave(1);
+            notes.push_back(n);
+            last = n;
+        }
+    }
+
+    // Force notes into range
+    for(auto& n : notes){
+        while(n < minNote) n.shiftOctave(1);
+        while(n > maxNote) n.shiftOctave(-1);
+    }
+
+    // Remove duplicates
+    notes.removeDuplicates().sort();
+
+    // Return the notes
+    return std::move(notes);
+}
+
+ChordVoicing& ChordVoicing::setChord(Chord& aChord)
+{
+    mChord = aChord;
+    return *this;
+}
+
+ChordVoicing& ChordVoicing::print(bool simplify)
+{
+    std::cout << mChord.toString() << " -> Voicing(" << mVoicing << ") -> (";
+    auto notes = getNotes();
+    std::cout <<  notes.toString(false,simplify) << ")" 
+            << " -> (" << getNotes().getPitchString() << ")";
+    std::cout << std::endl;
+    return *this;
+}
+
+// -----PRIVATE FUNCTIONS----- //
+// Remove all occurences of a character from a string and return the number of occurences
+int ChordVoicing::removeCount(std::string& s, char c)
+{
+    int count = 0;
+    for(int i = 0; i < s.size(); i++)
+    {
+        if(s[i] == c)
+        {
+            count++;
+            s.erase(i,1);
+            i--;
+        }
+    }
+    return count;
 }
 
 
@@ -846,6 +1006,17 @@ ChordProg& ChordProg::printChords()
     return *this;
 }
 
+std::string ChordProg::toString() const
+{
+    std::string res;
+    auto it = this->begin();
+    while (it != this->end()) {
+        res += it->toString();
+        if(++it != this->end()) res += "|";
+    }
+    return std::move(res);
+}
+
 // Print the chord progression
 ChordProg& ChordProg::print(bool simplify)
 {
@@ -934,7 +1105,14 @@ Notes ChordProg::getNotes() const
     return std::move(notes);
 }
 
-static std::map<std::string, ChordProg> Map;
+// Get the Chord at index
+Chord& ChordProg::chordAt(int index)
+{
+    return ChordVector::at(index);
+}
+
+
+// static std::map<std::string, ChordProg> Map;
 
 // ------------------------------Private Functions--------------------------------------- //
 
@@ -1053,14 +1231,31 @@ ChordProg ChordProg::Get(const std::string& aChordProg)
     if(it != Map.end()) return it->second;
 
     // If the chord progression is not in the map, then create it from Scale
-    ChordProg chordProg = Scale::GetChordProg(aChordProg);
+    ChordProg chordProg;
+    
+    // Try to get the chord progression from the Scale
+    try {
+        chordProg = Scale::GetChordProg(aChordProg);
+    } 
+    catch (const std::exception& e) {
+        // Handle the exception here
+        // You can print an error message or take appropriate action
+        // For example, you can set chordProg to a default value or throw a new exception
+        // depending on your application's requirements
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
 
     
-    return Scale::GetChordProg(aChordProg);   
+    return chordProg;   
 }
 
 
-
+// Get the JSON representation of the chord progression
+json::JSON ChordProg::getJSON()
+{
+    mJSON["ChordProg"] = toString();
+    return mJSON;
+}
 
 
 

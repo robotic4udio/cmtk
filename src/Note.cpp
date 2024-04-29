@@ -344,6 +344,14 @@ bool Note::sharp() const
     return mSharp  > 0; 
 }
 
+// Get the note as JSON
+json::JSON Note::getJSON() const
+{
+    json::JSON json;
+    json["Note"] = toString(true,false);
+    return std::move(json);
+}
+
 
 // -------------------------------------------------------------------------------------------- //
 // ---------------------------------- Notes Class --------------------------------------------- //
@@ -657,8 +665,15 @@ Notes::operator bool() const
     return ok();
 }
 
-    
-
+// Get the notes as JSON
+json::JSON Notes::getJSON() const
+{
+    json::JSON json;
+    json::JSON arr = json::Array();
+    for(auto& note : *this) arr.append(note.getJSON());
+    json["Notes"] = arr;
+    return std::move(json);
+}
 
 
 } // namespace cmtk

@@ -59,65 +59,63 @@ public:
     // Clear the note
     Note& clear();
 
-    // Equality operator
+    // Comparison operators
     bool operator==(const Note& other) const;
-
     bool operator!=(const Note& other) const;
-
     bool operator<(const Note& other) const;
     bool operator>(const Note& other) const;
 
     // Assignment operator
     Note& operator=(const int& note);
-
-    // Assignment operator
     Note& operator=(const std::string& note);
     
-    // Cast to int
+    // Cast operator
     operator int() const;
-
-    // Cast to string
     operator std::string() const;
+    operator bool() const; // Cast to bool - same as isOk()
 
     // Transpose
     Note& transpose(int n);
-
-    // Transpose Interval
     Note& transpose(const Interval& interval);
 
+    // Math operators
     Note operator+(const int& semitones) const;
-
     Note operator-(const int& semitones) const;
-
     Note operator+(const Interval& interval) const;
-
     Notes operator+(const Intervals& intervals) const;
 
-    // Increment operator
+    // Increment / Decrement operators
     Note& operator++();
-
-    // Decrement operator
     Note& operator--();
 
     // Stream operator
     friend std::ostream& operator<<(std::ostream& os, const Note& note);
 
+    // Check if note is a specific key, e.g. C or F#, octave is ignored
     bool isKey(const std::string& key) const;
 
+    // Flatten or sharpen the note
     Note& flatten();
     Note& sharpen();
 
+    // Get the notes of the major scale with this as root
     Notes getMajorNotes();
 
+    // Get a note that is a specific interval from this note
     Note getNoteAt(const Interval& interval) const;
 
-    Interval getIntervalTo(const Note& otherNote) const;
-
+    // Get a vector notes from a vector of intervals
     Notes getNoteAt(const Intervals& interval) const;
 
+    // Get the interval between this note and another note
+    Interval getIntervalTo(const Note& otherNote) const;
+
+    // Check that the note is ok
     bool isOk() const;
 
-    operator bool() const;
+    // Get the note as JSON
+    json::JSON getJSON() const;
+
 
 private:
     int mNote = -1;
@@ -227,9 +225,10 @@ public:
     // Cast to bool
     operator bool() const;
 
+    // Get the notes as JSON
+    json::JSON getJSON() const;
     
 };
-
 
 // This results in a seqentation fault if placed in the cpp file? TODO: Find out why, fix and move to cpp file...
 inline Note Note::getNoteAt(const Interval& interval) const

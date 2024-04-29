@@ -551,8 +551,8 @@ Scale::Scale(std::string aName, Note aRootNote)
         // Scale Unknown?
         if(mIntervals.empty())
         {
-            std::cerr << "Error: Unrecognized scale name, Returning Major" << std::endl;
-            setScale("Major");
+            // Throw exception for unknown scale
+            throw std::runtime_error("Scale::Scale(): Unknown scale: " + mName);
         }
 
         return *this;
@@ -778,6 +778,8 @@ Scale::Scale(std::string aName, Note aRootNote)
         {
             chordProgression.addChord(getChord(index, size));
         }
+        chordProgression.setTonic(mRootNote);
+        chordProgression.mJSON["Scale"] = getName();
 
         return std::move(chordProgression);
     }
@@ -808,54 +810,37 @@ Scale::Scale(std::string aName, Note aRootNote)
                 indexes.push_back(index);
             }
         }
-        return std::move(getChordProg(indexes,size).setTonic(mRootNote));
+        return std::move(getChordProg(indexes,size));
     }
 
     // Get ChordProg from a combined string of Root, Scale and Degrees, e.g. "C-Major-145" -> ChordProg("C|F|G")
     ChordProg Scale::GetChordProg(const std::string& s, int size)
     {
         ChordProg chordProgression;
-        Scale scale;
-        auto tokens = split(s, '-');
-        if(tokens.size() == 3)
-        {   
-            scale = Scale(tokens[1],tokens[0]);
-            chordProgression = scale.getChordProg(tokens[2],size);
-            chordProgression.setTonic(scale.getRoot());
-        }
-        else if(tokens.size() == 4)
-        {
-            size = std::stoi(tokens[3]);
-            scale = Scale(tokens[1],tokens[0]);
-            chordProgression = scale.getChordProg(tokens[2],size);
-            chordProgression.setTonic(scale.getRoot());
+        try {
+            Scale scale;
+            auto tokens = split(s, '-');
+            if(tokens.size() == 3)
+            {   
+                scale = Scale(tokens[1],tokens[0]);
+                chordProgression = scale.getChordProg(tokens[2],size);
+            }
+            else if(tokens.size() == 4)
+            {
+                size = std::stoi(tokens[3]);
+                scale = Scale(tokens[1],tokens[0]);
+                chordProgression = scale.getChordProg(tokens[2],size);
+            }
+            else {
+                throw std::runtime_error("Scale::GetChordProg(): Invalid argument: " + s);
+            }
+        } catch (const std::exception& e) {
+            // Handle the exception here
+            std::cerr << e.what() << std::endl;
         }
 
         return std::move(chordProgression);
     }
-
-    std::pair<ChordProg, Scale> GetChordProgAndScale(const std::string& s, int size = 3)
-    {
-        ChordProg chordProgression;
-        Scale scale;
-        auto tokens = split(s, '-');
-        if(tokens.size() == 3)
-        {   
-            scale = Scale(tokens[1],tokens[0]);
-            chordProgression = scale.getChordProg(tokens[2],size);
-            chordProgression.setTonic(scale.getRoot());
-        }
-        else if(tokens.size() == 4)
-        {
-            size = std::stoi(tokens[3]);
-            scale = Scale(tokens[1],tokens[0]);
-            chordProgression = scale.getChordProg(tokens[2],size);
-            chordProgression.setTonic(scale.getRoot());
-        }
-
-        return std::make_pair(chordProgression, scale);
-    }
-
 
     // Print the chord symbols
     void Scale::printChordSymbols(int size)
@@ -1280,5 +1265,19 @@ Scale::Scale(std::string aName, Note aRootNote)
     {
         mNotes = mRootNote.getNoteAt(mIntervals);
     }
+
+
+    // Get JSON representation of the scale
+    json::JSON& Scale::getJSON()
+    {
+        mJSON["Name"] = getName();
+        mJSON["Root"] = getRoot();
+        return mJSON;
+    }
+
+
+
+
+
 
 } // namespace cmtk

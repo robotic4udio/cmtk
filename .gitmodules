@@ -1,3 +1,10 @@
 [submodule "libraries/SimpleJSON"]
 	path = libraries/SimpleJSON
 	url = https://github.com/HjalteBested/SimpleJSON.git
+
+[submodule "libraries/midifile"]
+	path = libraries/midifile
+	url = https://github.com/HjalteBested/midifile.git
+[submodule "libraries/oscpkt"]
+	path = libraries/oscpkt
+	url = https://github.com/HjalteBested/oscpkt.git
