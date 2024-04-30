@@ -5,6 +5,7 @@
 [submodule "libraries/midifile"]
 	path = libraries/midifile
 	url = https://github.com/HjalteBested/midifile.git
+	
 [submodule "libraries/oscpkt"]
 	path = libraries/oscpkt
 	url = https://github.com/HjalteBested/oscpkt.git
