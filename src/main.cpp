@@ -17,7 +17,7 @@ int main() {
   //Scale::GetChordProg("C-Dorian-14141374",4).print().printChords();
   //Scale::GetChordProg("C-Doian-1425",4).print().printChords();
   //
-  Scale("F-Phrygian").getChordProg("1235",4).print().printChords();
+  Scale("F-Dorian").getChordProg("1235",4).print().printChords();
   //
 
   // Start the timer 
@@ -25,12 +25,8 @@ int main() {
 
   
 
-  auto cp = ChordProg::Get("G-Mixolydian-143576-3");
+  auto cp = ChordProg::Get("C-Hungarian Minor-136251-3");
 
-
-
-
-  std::cout << "Time taken by creation of: ";
   cp.print().printChords();
 
 

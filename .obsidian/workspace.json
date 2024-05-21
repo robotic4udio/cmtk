@@ -4,19 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "b89c136619dc2a12",
+        "id": "d9d2b46bcace6681",
         "type": "tabs",
         "children": [
           {
-            "id": "11cdd0de27598339",
+            "id": "50db42503b3e2136",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "README.md",
-                "mode": "source",
-                "source": false
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -85,7 +81,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +97,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -124,9 +118,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "README.md"
-              }
+              "state": {}
             }
           }
         ]
@@ -146,22 +138,22 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "11cdd0de27598339",
+  "active": "50db42503b3e2136",
   "lastOpenFiles": [
     "build/CMakeFiles/Progress/2",
-    "build/CMakeFiles/Progress/3",
-    "build/CMakeFiles/MyProject.dir/src/main.cpp-7b10a92e.o.tmp",
+    "build/CMakeFiles/MyProject.dir/src/main.cpp-bbe9752e.o.tmp",
     "build/CMakeFiles/Progress/1",
-    "build/CMakeFiles/Progress/count.txt",
-    "build/CMakeFiles/Progress",
-    "build/CMakeFiles/MyProject.dir/src/main.cpp-f54b478c.o.tmp",
-    "build/CMakeFiles/MyProject.dir/src/main.cpp-5cb725dc.o.tmp",
-    "build/CMakeFiles/MyProject.dir/src/main.cpp-f58ddd15.o.tmp",
-    "build/CMakeFiles/MyProject.dir/src/main.cpp-438084fc.o.tmp",
-    "build/CMakeFiles/MyProject.dir/src/main.cpp-99ed4727.o.tmp",
+    "build/CMakeFiles/Progress/13",
+    "build/CMakeFiles/Progress/12",
+    "build/CMakeFiles/Progress/11",
+    "build/CMakeFiles/Progress/10",
+    "build/CMakeFiles/Progress/9",
+    "build/CMakeFiles/Progress/8",
+    "build/CMakeFiles/Progress/7",
+    "build/CMakeFiles/Progress/6",
+    "README.md",
     "libraries/SimpleJSON/README.md",
     "libraries/SimpleJSON/API.md",
-    "README.md",
     "Welcome.md"
   ]
 }
