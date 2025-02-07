@@ -1236,6 +1236,7 @@ ChordProg ChordProg::Get(const std::string& aChordProg)
     // Try to get the chord progression from the Scale
     try {
         chordProg = Scale::GetChordProg(aChordProg);
+        return chordProg;
     } 
     catch (const std::exception& e) {
         // Handle the exception here
@@ -1245,6 +1246,17 @@ ChordProg ChordProg::Get(const std::string& aChordProg)
         std::cerr << "Error: " << e.what() << std::endl;
     }
 
+    try {
+        chordProg = ChordProg(aChordProg);
+        return chordProg;
+    }
+    catch (const std::exception& e) {
+        // Handle the exception here
+        // You can print an error message or take appropriate action
+        // For example, you can set chordProg to a default value or throw a new exception
+        // depending on your application's requirements
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
     
     return chordProg;   
 }

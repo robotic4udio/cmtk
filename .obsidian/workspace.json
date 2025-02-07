@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "d9d2b46bcace6681",
+        "id": "6dfda94f4ea9db06",
         "type": "tabs",
         "children": [
           {
-            "id": "50db42503b3e2136",
+            "id": "3c4df0054a2d0751",
             "type": "leaf",
             "state": {
               "type": "empty",
@@ -138,7 +138,7 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "50db42503b3e2136",
+  "active": "3c4df0054a2d0751",
   "lastOpenFiles": [
     "build/CMakeFiles/Progress/2",
     "build/CMakeFiles/MyProject.dir/src/main.cpp-bbe9752e.o.tmp",
