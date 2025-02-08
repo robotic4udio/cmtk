@@ -726,17 +726,6 @@ size_t Chord::size() const
     return mChordType.size();
 }
 
-// Get JSON
-json::JSON Chord::getJSON() const
-{
-    json::JSON j;
-    j["Chord"] = toString();
-    return std::move(j);
-}
-
-
-
-
 
 // -------------------------------------------------------------------------------------------- //
 // ---------------------------------- ChordVoicing Class -------------------------------------- //
@@ -1260,16 +1249,6 @@ ChordProg ChordProg::Get(const std::string& aChordProg)
     
     return chordProg;   
 }
-
-
-// Get the JSON representation of the chord progression
-json::JSON ChordProg::getJSON()
-{
-    mJSON["ChordProg"] = toString();
-    return mJSON;
-}
-
-
 
 
 

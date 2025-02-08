@@ -187,8 +187,6 @@ public:
     // Print all the diatonic scales to a given chord progression
     static void PrintDiatonicScales(const ChordProg& chordProgression, int size = 3);
 
-    // Get JSON representation of the scale
-    json::JSON& getJSON();
 private:
     // The scale name
     std::string mName;

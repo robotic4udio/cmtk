@@ -779,7 +779,6 @@ Scale::Scale(std::string aName, Note aRootNote)
             chordProgression.addChord(getChord(index, size));
         }
         chordProgression.setTonic(mRootNote);
-        chordProgression.mJSON["Scale"] = getName();
 
         return std::move(chordProgression);
     }
@@ -1265,19 +1264,6 @@ Scale::Scale(std::string aName, Note aRootNote)
     {
         mNotes = mRootNote.getNoteAt(mIntervals);
     }
-
-
-    // Get JSON representation of the scale
-    json::JSON& Scale::getJSON()
-    {
-        mJSON["Name"] = getName();
-        mJSON["Root"] = getRoot();
-        return mJSON;
-    }
-
-
-
-
 
 
 } // namespace cmtk

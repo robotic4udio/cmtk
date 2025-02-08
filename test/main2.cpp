@@ -1,6 +1,4 @@
-#include "InterfaceGPT.h"
 #include "Scale.h"
-#include "MidiFile.h"
 
 // Include the TIMER
 #include <chrono>

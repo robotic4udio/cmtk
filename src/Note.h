@@ -113,10 +113,6 @@ public:
     // Check that the note is ok
     bool isOk() const;
 
-    // Get the note as JSON
-    json::JSON getJSON() const;
-
-
 private:
     int mNote = -1;
     std::string mNoteString = "";
@@ -224,9 +220,6 @@ public:
 
     // Cast to bool
     operator bool() const;
-
-    // Get the notes as JSON
-    json::JSON getJSON() const;
     
 };
 

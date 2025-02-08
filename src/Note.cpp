@@ -68,7 +68,8 @@ Note& Note::set(std::string noteSymbol)
     std::transform(noteSymbol.begin(), noteSymbol.end(), noteSymbol.begin(), ::toupper);
 
     // Remove all spaces from the note symbol
-    noteSymbol.erase(std::remove(noteSymbol.begin(), noteSymbol.end(), ' '), noteSymbol.end());
+    noteSymbol.erase(std::remove_if(noteSymbol.begin(), noteSymbol.end(), ::isspace), noteSymbol.end());
+    
 
     // Use the note to set the note value
     if     (removePrefix(noteSymbol,"C")){ mNoteString = "C"; mNote =  0; } 
@@ -80,12 +81,15 @@ Note& Note::set(std::string noteSymbol)
     else if(removePrefix(noteSymbol,"B")){ mNoteString = "B"; mNote = 11; } 
     else return *this;
 
-    // Take care of flats and sharps
-    while(noteSymbol.front() == 'B' || noteSymbol.front() == '#'){
-        if      (noteSymbol[0] == 'B') { mNoteString += 'b'; mNote -= 1; mSharp--; }
-        else if (noteSymbol[0] == '#') { mNoteString += '#'; mNote += 1; mSharp++; }
-        noteSymbol.erase(0,1);
-    }
+    // Remove all flats and sharps
+    auto it = std::remove_if(noteSymbol.begin(), noteSymbol.end(), [this](char c){ 
+        if(c == 'B') { mNoteString += 'b'; mNote -= 1; mSharp--; return true; }
+        if(c == '#') { mNoteString += '#'; mNote += 1; mSharp++; return true; }
+        return false;
+    });
+
+    // Erase from the string
+    noteSymbol.erase(it,noteSymbol.end());
 
     // Add the octave
     mNote += noteSymbol.empty() ? C1 : C0 + std::stoi(noteSymbol) * 12;
@@ -344,13 +348,6 @@ bool Note::sharp() const
     return mSharp  > 0; 
 }
 
-// Get the note as JSON
-json::JSON Note::getJSON() const
-{
-    json::JSON json;
-    json["Note"] = toString(true,false);
-    return std::move(json);
-}
 
 
 // -------------------------------------------------------------------------------------------- //
@@ -663,16 +660,6 @@ bool Notes::ok() const
 Notes::operator bool() const
 {
     return ok();
-}
-
-// Get the notes as JSON
-json::JSON Notes::getJSON() const
-{
-    json::JSON json;
-    json::JSON arr = json::Array();
-    for(auto& note : *this) arr.append(note.getJSON());
-    json["Notes"] = arr;
-    return std::move(json);
 }
 
 

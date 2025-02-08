@@ -219,9 +219,6 @@ public:
     // Size of Chord
     size_t size() const;
 
-    // Get JSON representation
-    json::JSON getJSON() const;
-
 private:
     ChordType mChordType;  // Object representing the chord type, i.e. the basic structure of the chord
     Note mRootNote;        // The root note of the chord
@@ -351,9 +348,6 @@ public:
 
     // Get the Chord Progression as a string
     std::string toString() const;
-
-    // Get the JSON representation
-    json::JSON getJSON();
 
 private:
     // Function to convert a string of chord symbols to a vector of chord symbols
