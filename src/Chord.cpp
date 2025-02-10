@@ -252,6 +252,7 @@ const Intervals& ChordType::getIntervals() const
 // Get the intervals
 const Interval& ChordType::getIntervalAt(int i) const
 {
+    while(i < 0) i += mIntervals.size();
     return mIntervals[i];
 }
 
