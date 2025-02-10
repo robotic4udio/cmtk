@@ -158,6 +158,7 @@ public:
 
     // Get the note
     const Note& getRoot() const;
+    const Note& getRoot(int low, int high) const;
 
     // Set the BassNote
     Chord& setBass(const Note& note, bool keepOctave=false);
@@ -181,6 +182,7 @@ public:
 
     // Get the Bass note
     const Note& getBass() const;
+    const Note& getBass(int low, int high) const;
 
     // Set Octave
     Chord& setOctave(int octave, bool keepBass=false);

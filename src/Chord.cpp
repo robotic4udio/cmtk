@@ -560,6 +560,14 @@ const Note& Chord::getRoot() const
     return mRootNote;
 }
 
+const Note& Chord::getRoot(int low, int high) const
+{
+    auto root = mRootNote;
+    while(root.getPitch() < low)  root.shiftOctave( 1);
+    while(root.getPitch() > high) root.shiftOctave(-1);
+    return root;
+}
+
 // Set the BassNote
 Chord& Chord::setBass(const Note& note, bool keepOctave)
 {
@@ -614,6 +622,14 @@ Chord& Chord::forceBassInRange(int min, int max)
 const Note& Chord::getBass() const
 {
     return mBassNote;
+}
+
+const Note& Chord::getBass(int low, int high) const
+{
+    auto bass = mBassNote;
+    while(bass.getPitch() < low)  bass.shiftOctave( 1);
+    while(bass.getPitch() > high) bass.shiftOctave(-1);
+    return bass;
 }
 
 // Set Octave

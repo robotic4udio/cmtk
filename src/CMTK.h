@@ -26,6 +26,8 @@ static constexpr const int C6 = C0+72;
 static constexpr const int C7 = C0+84;
 static constexpr const int C8 = C0+96;
 static constexpr const int C9 = C0+108;
+static constexpr const int C10 = C0+120;
+
 
 static constexpr const int OCTAVES_BELOW_ZERO = C0/12;
 
