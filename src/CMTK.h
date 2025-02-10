@@ -30,7 +30,9 @@ static constexpr const int C9 = C0+108;
 static constexpr const int OCTAVES_BELOW_ZERO = C0/12;
 
 // Commonly used constants
-static constexpr const float PI           = 3.1415926535897932384626433832795f;
+#ifndef PI
+#define	PI 3.1415926535897932384626433832795f
+#endif
 static constexpr const float HALF_PI      = 0.5f * PI;
 static constexpr const float TWO_PI       = 2.0f * PI;
 static constexpr const float DEG_TO_RAD   = PI/180.0f;
