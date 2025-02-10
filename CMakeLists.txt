@@ -1,6 +1,9 @@
 # Minimum required CMake version
 cmake_minimum_required(VERSION 3.19)
 
+# Project name
+project(CMTK)
+
 # include_directories(include)
 include_directories(src)
 
@@ -35,9 +38,6 @@ add_library(cmtklib STATIC ${SOURCES} ${HEADERS})
 
 # Add include directories
 target_include_directories(cmtklib PUBLIC include)
-
-# Project name
-project(CMTK)
 
 # Add executable target
 add_executable(MyProject src/main.cpp)

@@ -1,4 +1,4 @@
-#include "Scale.h"
+#include "Chord.h"
 
 // Include the TIMER
 #include <chrono>
@@ -8,28 +8,32 @@ using namespace cmtk;
 
 int main() {
 
-  // Scale("F-Lydian").print(4);
-  //Scale::GetChordProg("F-Dorian-14141374",4).print().printChords();
-  //Scale::GetChordProg("F-Dorian-14141374",4).print().printChords();
-  //
-  //Scale::GetChordProg("C-Dorian-14141374",4).print().printChords();
-  //Scale::GetChordProg("C-Doian-1425",4).print().printChords();
-  //
-  Scale("F-Phrygian").getChordProg("1235",4).print().printChords();
-  //
 
-  // Start the timer 
+  // Create a chord
 
+  auto c = Chord("C13",-2);
+  
+  auto intervals = c.getIntervals();
+  intervals.print().printSemi();
+
+
+
+  auto n = Note(62);
+  n.print();
+
+  //chord.print();
+  auto notes = Notes(60, 63, 67, 70, 74, 77);
+  notes.print();
+  notes.getChordSymbol();
+
+  Notes n2(NoteVector{Note{"C"}, Note{"D"}, Note{"G"}, Note{"Eb4"}, Note{"A4"}});
+  n2.print();
+
+  n2.getChordSymbol();
 
   
 
-  auto cp = ChordProg::Get("G-Mixolydian-143576-3");
 
-
-
-
-  std::cout << "Time taken by creation of: ";
-  cp.print().printChords();
 
 
   return 0;

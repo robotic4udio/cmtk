@@ -42,9 +42,14 @@ float Note::getFreq() const
     return 440.0 * pow(2.0, (mNote - 69) / 12.0);
 }
 
-int Note::getOctave() const
+int Note::getOctave(int offset) const
 {
-    return (mNote - C0) / 12;
+    return (mNote + offset - C0) / 12;
+}
+
+int Note::getOctave(const Interval& interval) const
+{
+    return getOctave(interval.getSemi()); 
 }
 
 Note& Note::setOctave(int octave)
@@ -92,7 +97,7 @@ Note& Note::set(std::string noteSymbol)
     noteSymbol.erase(it,noteSymbol.end());
 
     // Add the octave
-    mNote += noteSymbol.empty() ? C1 : C0 + std::stoi(noteSymbol) * 12;
+    mNote += noteSymbol.empty() ? C3 : C0 + std::stoi(noteSymbol) * 12;
 
     return *this;
 }
@@ -151,7 +156,7 @@ std::string Note::toString(bool includeOctave, bool simplify) const
 
     if(includeOctave) res += std::to_string(octave);
 
-    return std::move(res);
+    return res;
 }
 
 Note& Note::print(bool includeOctave, bool simplify) const
@@ -661,6 +666,135 @@ Notes::operator bool() const
 {
     return ok();
 }
+
+std::string Notes::getChordSymbol(int root) const 
+{   
+    // Get the pitch vector
+    std::vector<int> pitchVec = getPitch();
+    // Get the lowest pitch
+    int lowest = *std::min_element(pitchVec.begin(), pitchVec.end());
+    // Normalize the pitch vector
+    for(auto& p : pitchVec) p -= lowest; 
+    // Wrap the pitch vector around the octave
+    for(auto& p : pitchVec) p %= 12;
+
+    // Remove duplicates
+    pitchVec.erase(std::unique(pitchVec.begin(), pitchVec.end()), pitchVec.end());
+    // Sort the pitch vector
+    std::sort(pitchVec.begin(), pitchVec.end());
+
+    // Initialize the root assuming no inversion
+	if(root < 0) root = lowest % 12;
+    int octave = lowest / 12;
+
+    // print the pitch vector
+    std::cout << "Pitch Vector: ";
+    for(auto& p : pitchVec) std::cout << p%12 << " ";
+    std::cout << std::endl;
+
+    // Chord String
+    std::string chordString = "-";
+    if(pitchVec.size() == 2)
+    {
+        if     (equals(pitchVec, {0,7})){ chordString = "5";                } // 5th Chord
+        else if(equals(pitchVec, {0,5})){ chordString = "5";     root -= 7; } // 5th Chord 1st inversion
+        else if(equals(pitchVec, {0,4})){ chordString = " no5";             } // M no5
+        else if(equals(pitchVec, {0,8})){ chordString = " no5";  root -= 4; } // M no5 1st inversion
+        else if(equals(pitchVec, {0,3})){ chordString = "m no5";            } // m no5
+        else if(equals(pitchVec, {0,9})){ chordString = "m no5"; root -= 3; } // m no5 1st inversion
+    }
+    else if(pitchVec.size() == 3)
+    {
+        // Major Triad
+            
+        if     (equals(pitchVec, {0,4,7})){ chordString = "";             } // Major
+        else if(equals(pitchVec, {0,3,8})){ chordString = "";  root -= 4; } // Major Triad 1st inversion
+        else if(equals(pitchVec, {0,5,9})){ chordString = "";  root -= 7; } // Major Triad 2nd inversion
+        
+        // Minor Triad
+        else if(equals(pitchVec, {0,3,7})){ chordString = "m";            } // Minor
+        else if(equals(pitchVec, {0,4,9})){ chordString = "m"; root -= 3; } // Minor
+        else if(equals(pitchVec, {0,5,8})){ chordString = "m"; root -= 7; } // Minor
+        
+        // Diminished Triad
+        else if(equals(pitchVec, {0,3,6})){ chordString = "dim";            } // Diminished
+        else if(equals(pitchVec, {0,3,9})){ chordString = "dim"; root -= 3; } // Diminished
+        else if(equals(pitchVec, {0,3,6})){ chordString = "dim"; root -= 6; } // Diminished
+
+        // Augmented Triad
+        else if(equals(pitchVec, {0,4,8 })){ chordString = "aug";            } // Augmented if symmetric so all inversions are the same
+
+        // Sus2
+        else if(equals(pitchVec, {0,2,7 })){ chordString = "sus2";            } // Sus2
+        // else if(equals(pitchVec, {0,5,10})){ chordString = "sus2"; root -= 2; } // Sus2 1st inversion
+        // else if(equals(pitchVec, {0,5,7 })){ chordString = "sus2"; root -= 7; } // Sus2 2nd inversion
+
+        // Sus4
+        else if(equals(pitchVec, {0,5,7 })){ chordString = "sus4";            } // Sus4
+        // else if(equals(pitchVec, {0,2,7 })){ chordString = "sus4"; root -= 5; } // Sus4 1st inversion
+        // else if(equals(pitchVec, {0,5,10})){ chordString = "sus4"; root -= 7; } // Sus4 2nd inversion
+    }
+    else if(pitchVec.size() >= 4)
+    {
+        // Dominant Chords
+        if     (equals(pitchVec, {0,2,4,5,7,9,10   })){ chordString = "13";   } // Dominant 13th
+        else if(equals(pitchVec, {0,2,4,5,7,10     })){ chordString = "11";   } // Dominant 11th
+        else if(equals(pitchVec, {0,2,4,7,10       })){ chordString = "9";    } // Dominant 9th
+        else if(equals(pitchVec, {0,4,7,10         })){ chordString = "7";    } // Dominant 7th
+
+        // Minor Chords
+        else if(equals(pitchVec, {0,3,7,10         })){ chordString = "m7";    } // Minor 7th
+        else if(equals(pitchVec, {0,2,3,7,10       })){ chordString = "m9";    } // Minor 9th
+        else if(equals(pitchVec, {0,2,3,5,7,10     })){ chordString = "m11";   } // Minor 11th
+        else if(equals(pitchVec, {0,2,3,5,7,9,10   })){ chordString = "m13";   } // Minor 13th
+
+        // Maj Chords
+        else if(equals(pitchVec, {0,4,7,11         })){ chordString = "Maj7"; } // Major 7th
+        else if(equals(pitchVec, {0,2,4,7,11       })){ chordString = "Maj9"; } // Major 9th
+        else if(equals(pitchVec, {0,2,4,5,7,11     })){ chordString = "Maj11";} // Major 11th
+        else if(equals(pitchVec, {0,2,4,5,7,9,11   })){ chordString = "Maj13";} // Major 13th
+
+        // m b5 Chords
+        else if(equals(pitchVec, {0,3,6,10         })){ chordString = "m7b5"; } // m7b5
+        else if(equals(pitchVec, {0,2,3,6,10       })){ chordString = "m9b5"; } // m9b5
+        else if(equals(pitchVec, {0,2,3,5,6,10     })){ chordString = "m11b5";} // m11b5
+        else if(equals(pitchVec, {0,2,3,5,6,9,10   })){ chordString = "m13b5";} // m13b5
+
+        // 
+        else if(equals(pitchVec, {0,3,6,9          })){ chordString = "dim7"; } // Diminished 7th
+        else if(equals(pitchVec, {0,4,8,10         })){ chordString = "aug7"; } // Augmented 7th
+        else if(equals(pitchVec, {0,4,7,11         })){ chordString = "Maj7"; } // Major 7th
+        else if(equals(pitchVec, {0,3,7,11         })){ chordString = "mMaj7";} // Minor Major 7th
+
+        // Major Add Chords 
+        else if(cmtk::remove(pitchVec, {0,4,7})){ 
+            chordString = "";
+            // Add the remaining intervals
+            for(auto& p : pitchVec) chordString += " add" + Interval::NewFromSemi(p).toString();
+        } 
+        // Minor add Chords
+        else if(cmtk::remove(pitchVec, {0,3,7})){ 
+            chordString = "m";
+            // Add the remaining intervals
+            for(auto& p : pitchVec) chordString += " add" + Interval::NewFromSemi(p).toString();
+        }
+    }
+
+    // Make sure the root is positive
+    while(root < 0) root += 12;
+    
+    // Get the root note name
+    chordString.insert(0, KeyNameAt(root));
+
+    // Print the chordString
+    std::cout << chordString << std::endl;
+
+
+    return chordString;
+
+}
+
+
 
 
 } // namespace cmtk

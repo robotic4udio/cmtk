@@ -19,8 +19,8 @@ class ChordVoicing;
 class ChordType : public CMTK {
 public:
     // Constructor
-    ChordType() = default;
-    ChordType(const std::string& chordSymbol);
+    ChordType() {};
+    ChordType(std::string chordSymbol);
 
     // Enum class to represent the quality of the chord
     enum class Quality {
@@ -73,7 +73,7 @@ public:
 
 
 private:
-    std::string mChordType = "";
+    std::string mChordType = "M";
     Intervals mIntervals = Intervals({Interval(1), Interval(3), Interval(5)});
 };
 
@@ -99,6 +99,9 @@ public:
 
     // Constructor from a combined chord symbol
     Chord(const std::string& chordSymbol);
+
+    // Constructor from a combined chord symbol and octave
+    Chord(const std::string& chordSymbol, int octave);
 
     // Set the chord from a Note and a ChordType
     Chord& setChord(const Note& aRootNote, const ChordType& chordType, const Note& aBassNote);

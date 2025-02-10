@@ -1,11 +1,13 @@
 #include "Chord.h"
 
+// #define CMTK_DEBUG
+
 namespace cmtk {
 
 // -------------------------------------------------------------------------------------------- //
 // ---------------------------------- ChordType Class ----------------------------------------- //
 // -------------------------------------------------------------------------------------------- //
-ChordType::ChordType(const std::string& chordSymbol)
+ChordType::ChordType( std::string chordSymbol)
 {
     set(chordSymbol);
 }
@@ -148,7 +150,7 @@ ChordType& ChordType::set(const std::string& aChordType){
 
     // Sort the chordIntervals
     mIntervals.sort();
-
+    
     // Print warning if there are still characters left
     if(chordType.size() > 0){
         std::cerr << "ChordType::setChord(): Warning: Error parsing chord symbol: " << aChordType << " - Remaining: " << chordType << std::endl;
@@ -317,6 +319,13 @@ Chord::Chord(const std::string& note, const std::string& chordType, const std::s
 Chord::Chord(const std::string& chordSymbol)
 {
     setChord(chordSymbol);
+}
+
+// Constructor from a combined chord symbol and octave
+Chord::Chord(const std::string& chordSymbol, int octave)
+{
+    setChord(chordSymbol);
+    setOctave(octave);
 }
 
 // Set the chord from a Note and a ChordType

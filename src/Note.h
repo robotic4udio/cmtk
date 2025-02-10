@@ -30,7 +30,8 @@ public:
 
     int getPitchWrap() const;
 
-    int getOctave() const;
+    int getOctave(int offset = 0) const;
+    int getOctave(const Interval& interval) const;
 
     Note& setOctave(int octave);
 
@@ -128,7 +129,7 @@ private:
 // ---------------------------------- Notes Class --------------------------------------------- //
 // -------------------------------------------------------------------------------------------- //
 using NoteVector = std::vector<Note>;
-class Notes : public NoteVector
+class Notes : public NoteVector, public CMTK
 {
 public:
     Notes() = default;
@@ -139,6 +140,13 @@ public:
     Notes(const std::vector<int>& notes);
     Notes(const std::vector<std::string>& notes);
     Notes(const Intervals& intervals, const Note& root = C1);
+
+    // template constuctor with a list of integers note values
+    template <typename... Args>
+    Notes(Args... args)
+    {
+        (push_back(args), ...);
+    }
 
     // Set Notes
     void set(const NoteVector& notes);
@@ -220,24 +228,29 @@ public:
 
     // Cast to bool
     operator bool() const;
+
+    // getChordSymbol
+    std::string getChordSymbol(int root = -1) const;
+
     
 };
 
 // This results in a seqentation fault if placed in the cpp file? TODO: Find out why, fix and move to cpp file...
 inline Note Note::getNoteAt(const Interval& interval) const
 {
-    auto octave = getOctave();
+    // Get the key of the current note
     const auto& key = toString(false,true);
+    // Get the degree of the interval
     auto deg = interval.getDegree();
-    if(deg > 7){
-        octave++;
-        deg -= 7;
-    }
-
+    // Get
+    while(deg > 7) deg -= 7;
+    
+    // Get the note from the MajorNoteMap
     const auto s = MajorNoteMapAt(key, deg-1);
 
+    // Make a note from the string
     Note note(s);
-    note.setOctave(octave);
+    // Set the interval of the note correctly
     auto q = interval.getQuality();
     while(q > 0)
     {
@@ -249,8 +262,11 @@ inline Note Note::getNoteAt(const Interval& interval) const
         note.flatten();
         q++;
     }
+    
+    // Set the octave of the note based on the current note octave offset by the interval
+    note.setOctave(getOctave(interval));
 
-    return std::move(note);
+    return note;
 }
 
 
