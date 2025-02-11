@@ -353,8 +353,11 @@ Chord& Chord::setChord(const std::string& aRootNote, const std::string& aChordTy
     return setChord(rootNote,chordType,bassNote);
 }
 
-Chord& Chord::setChord(const std::string& chordSymbol)
+Chord& Chord::setChord(std::string chordSymbol)
 {
+    // Remove all spaces from the chord symbol
+    chordSymbol.erase(std::remove_if(chordSymbol.begin(), chordSymbol.end(), ::isspace), chordSymbol.end());
+
     // Find the first non note character
     auto pos = chordSymbol.find_first_not_of("ABCDEFGb#");
     auto slashPos = chordSymbol.find_first_of('/');
@@ -560,7 +563,7 @@ const Note& Chord::getRoot() const
     return mRootNote;
 }
 
-const Note& Chord::getRoot(int low, int high) const
+Note Chord::getRoot(int low, int high) const
 {
     auto root = mRootNote;
     while(root.getPitch() < low)  root.shiftOctave( 1);
@@ -624,7 +627,7 @@ const Note& Chord::getBass() const
     return mBassNote;
 }
 
-const Note& Chord::getBass(int low, int high) const
+Note Chord::getBass(int low, int high) const
 {
     auto bass = mBassNote;
     while(bass.getPitch() < low)  bass.shiftOctave( 1);
@@ -692,7 +695,20 @@ Notes Chord::getNotes() const
 
 Note Chord::getNoteAt(int index) const
 {
-    return mRootNote.getNoteAt(getIntervalAt(index));
+    auto n = size();
+    auto octaveshift = 0;
+    while(index < 0){
+        index += n;
+        octaveshift--;
+    }
+    while(index >= n){
+        index -= n;
+        octaveshift++;
+    }
+    auto note = mRootNote.getNoteAt(getIntervalAt(index));
+    note.shiftOctave(octaveshift);
+
+    return note;
 }
 
 // Transpose the Chord

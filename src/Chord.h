@@ -113,7 +113,7 @@ public:
     Chord& setChord(const std::string& aRootNote, const std::string& aChordType, const std::string& aBassNote = "");
 
     // Set the Chord from a combined chord symbol, e.g. "Cm7/E"
-    Chord& setChord(const std::string& chordSymbol);
+    Chord& setChord(std::string chordSymbol);
 
     // Create a new Chord from a Roman Chord String and a Tonic
     static Chord NewRoman(const std::string& chordSymbol, const Note& aTonic);
@@ -158,7 +158,7 @@ public:
 
     // Get the note
     const Note& getRoot() const;
-    const Note& getRoot(int low, int high) const;
+    Note getRoot(int low, int high) const;
 
     // Set the BassNote
     Chord& setBass(const Note& note, bool keepOctave=false);
@@ -182,7 +182,7 @@ public:
 
     // Get the Bass note
     const Note& getBass() const;
-    const Note& getBass(int low, int high) const;
+    Note getBass(int low, int high) const;
 
     // Set Octave
     Chord& setOctave(int octave, bool keepBass=false);
