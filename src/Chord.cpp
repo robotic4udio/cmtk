@@ -678,6 +678,8 @@ const Intervals& Chord::getIntervals() const
 // Get Interval at index
 const Interval& Chord::getIntervalAt(int index) const
 {
+    while(index < 0)                  index += mChordType.size();
+    while(index >= mChordType.size()) index -= mChordType.size();
     return mChordType.getIntervalAt(index);
 }
 
