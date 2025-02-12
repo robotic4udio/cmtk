@@ -71,6 +71,9 @@ public:
     // Size of ChordType
     size_t size() const;
 
+    // Inversion
+    int inversion = 0;
+
 
 private:
     std::string mChordType = "M";
@@ -171,6 +174,10 @@ public:
 
     // Set Bass from Interval with respect to the root note
     Chord& setBass(const Interval& interval, bool keepOctave=false);
+
+    // Get a random note from the chord
+    Note getRandNote();
+    Note getRandNote(int low, int high);
 
     // Set Bass from Root
     Chord& rootBass();

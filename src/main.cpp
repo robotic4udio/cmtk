@@ -32,10 +32,9 @@ int main() {
   // Dark Synthwave
   Scale("F-Minor").getChordProg("1425",4).print().printChords();
 
-  // Start the timer 
-  auto cp = ChordProg::Get("i|iv|iv|V").setTonic("F");
-  cp.print().printChords();
-
+ 
+  auto c = Chord("C13");
+  c.print();
 
   return 0;
 

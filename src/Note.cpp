@@ -478,7 +478,7 @@ std::string Notes::getFreqString() const
     std::string res;
     for(const auto& note : *this) res += std::to_string(note.getPitch()) + " ";
     if(!res.empty()) res.pop_back();
-    return std::move(res);
+    return res;
 }
 
 // To string
@@ -491,7 +491,7 @@ std::string Notes::toString(bool octave, bool simplify) const
         res += it->toString(octave,simplify);
         if(++it != end()) res += " ";
     }
-    return std::move(res);
+    return res;
 }
 
 // Stream operator
@@ -590,7 +590,7 @@ std::vector<int> Notes::getPitch() const
 {
     std::vector<int> semis;
     for(auto& note : *this) semis.push_back(note.getPitch());
-    return std::move(semis);
+    return semis;
 }
 
 // Get Vector of frequencies
@@ -604,7 +604,7 @@ std::vector<float> Notes::getFreq() const
         it++;
     }
 
-    return std::move(freqs);
+    return freqs;
 }
 
 // Get Vector of N
@@ -612,7 +612,7 @@ Notes Notes::AllKeys()
 {
     Notes notes;
     for(auto& s : KeyNames) notes.push_back(Note(s));
-    return std::move(notes);
+    return notes;
 }
 
 // Contains a specific note
@@ -685,7 +685,6 @@ std::string Notes::getChordSymbol(int root) const
 
     // Initialize the root assuming no inversion
 	if(root < 0) root = lowest % 12;
-    int octave = lowest / 12;
 
     // print the pitch vector
     std::cout << "Pitch Vector: ";

@@ -17,6 +17,11 @@ ChordType& ChordType::set(const std::string& aChordType){
     auto chordType = aChordType;
     mChordType = chordType;
 
+    // Remove all spaces from the chord symbol
+    chordType.erase(std::remove_if(chordType.begin(), chordType.end(), ::isspace), chordType.end());
+
+
+
     // Initialize the quality of the chord
     Quality quality = Quality::NA;
 
@@ -131,13 +136,18 @@ ChordType& ChordType::set(const std::string& aChordType){
         if(removePrefix(chordType, "#13"   )){ mIntervals.setQuality(13,  1, true); found = true; }
 
         // Add notes if required
-        if(removePrefix(chordType, "add2"  )){ mIntervals.add(Interval( 2));        found = true; }
-        if(removePrefix(chordType, "add4"  )){ mIntervals.add(Interval( 4));        found = true; }
-        if(removePrefix(chordType, "add6"  )){ mIntervals.add(Interval( 6));        found = true; }
-        if(removePrefix(chordType, "add9"  )){ mIntervals.add(Interval( 9));        found = true; }
-        if(removePrefix(chordType, "add11" )){ mIntervals.add(Interval(11));        found = true; }
-        if(removePrefix(chordType, "add13" )){ mIntervals.add(Interval(13));        found = true; }
+        if(removePrefix(chordType, "add"  )){ 
+            int quality = 0;
+            if     (removePrefix(chordType, "#"  )){ quality =  1; }
+            else if(removePrefix(chordType, "b"  )){ quality = -1; }
 
+            if(removePrefix(chordType, "2"  )){ mIntervals.add(Interval( 2, quality)); found = true; }
+            if(removePrefix(chordType, "4"  )){ mIntervals.add(Interval( 4, quality)); found = true; }
+            if(removePrefix(chordType, "6"  )){ mIntervals.add(Interval( 6, quality)); found = true; }
+            if(removePrefix(chordType, "9"  )){ mIntervals.add(Interval( 9, quality)); found = true; }
+            if(removePrefix(chordType, "11" )){ mIntervals.add(Interval(11, quality)); found = true; }
+            if(removePrefix(chordType, "13" )){ mIntervals.add(Interval(13, quality)); found = true; }
+        }
         // Remove notes if required
         if(removePrefix(chordType, "no1"   )){ mIntervals.removeDegree( 1);         found = true; }
         if(removePrefix(chordType, "no3"   )){ mIntervals.removeDegree( 3);         found = true; }
@@ -149,7 +159,22 @@ ChordType& ChordType::set(const std::string& aChordType){
     }
 
     // Sort the chordIntervals
+    mIntervals.removeDuplicates();
     mIntervals.sort();
+
+    // Get the inversion from the chors. The inversion is noted by a :1, :2, :3, etc.
+    if(removePrefix(chordType, ":")){
+        try {
+            inversion = std::stoi(chordType);
+            // Remove the digits from the start of the chordType
+            chordType.erase(chordType.begin(), std::find_if(chordType.begin(), chordType.end(), [](char c) { return !std::isdigit(c); }));
+
+            std::cout << "Inversion: " << inversion << std::endl;
+        } 
+        catch (std::invalid_argument& e) {
+            std::cerr << "ChordType::setChord(): Error parsing inversion: " << aChordType << std::endl;
+        }
+    }
     
     // Print warning if there are still characters left
     if(chordType.size() > 0){
@@ -356,7 +381,7 @@ Chord& Chord::setChord(const std::string& aRootNote, const std::string& aChordTy
 Chord& Chord::setChord(std::string chordSymbol)
 {
     // Remove all spaces from the chord symbol
-    chordSymbol.erase(std::remove_if(chordSymbol.begin(), chordSymbol.end(), ::isspace), chordSymbol.end());
+    // chordSymbol.erase(std::remove_if(chordSymbol.begin(), chordSymbol.end(), ::isspace), chordSymbol.end());
 
     // Find the first non note character
     auto pos = chordSymbol.find_first_not_of("ABCDEFGb#");
@@ -367,6 +392,7 @@ Chord& Chord::setChord(std::string chordSymbol)
     std::string chordString = pos == chordSymbol.npos ? "" : chordSymbol.substr(pos,slashPos-pos);
     std::string slashString = slashPos == chordSymbol.npos ? "" : chordSymbol.substr(slashPos+1);
 
+    #define CMTK_DEBUG
     #ifdef CMTK_DEBUG
     // Print Debug Info
     std::cout << "NoteString: " << noteString 
@@ -635,6 +661,27 @@ Note Chord::getBass(int low, int high) const
     return bass;
 }
 
+// Get a random note from the chord
+Note Chord::getRandNote()
+{
+    return getNoteAt(rand() % size());
+}
+
+Note Chord::getRandNote(int low, int high)
+{
+    auto note = getRandNote();
+    auto pitch = note.getPitch();
+    auto octaves_below = (pitch - low) / 12;
+    auto octaves_above = (high - pitch) / 12;
+    auto octave_range = octaves_below + octaves_above;
+
+    if(octave_range == 0) return note;
+    return note.shiftOctave(rand() % (octave_range+1) - octaves_below);
+
+}
+
+
+
 // Set Octave
 Chord& Chord::setOctave(int octave, bool keepBass)
 {   
@@ -797,7 +844,7 @@ Notes ChordVoicing::getNotes()
 
     auto sv = split(mVoicing, ' ');
 
-    bool addRest = false;
+    bool addRest = false; 
     int last = -1;  
     Note minNote(  0);
     Note maxNote(127);
