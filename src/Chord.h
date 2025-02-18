@@ -74,6 +74,11 @@ public:
     // Inversion
     int inversion = 0;
 
+    // Comparison operator
+    bool operator==(const ChordType& other) const {
+        return mChordType == other.mChordType;
+    }
+
 
 private:
     std::string mChordType = "M";
@@ -230,6 +235,13 @@ public:
 
     // Size of Chord
     size_t size() const;
+
+
+    // Comparison operator
+    bool operator==(const Chord& other) const {
+        return mRootNote == other.mRootNote && mChordType == other.mChordType && mBassNote == other.mBassNote;
+    }
+
 
 private:
     ChordType mChordType;  // Object representing the chord type, i.e. the basic structure of the chord
